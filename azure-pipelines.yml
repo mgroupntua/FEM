@@ -1,0 +1,105 @@
+# .NET Desktop
+# Build and run tests for .NET Desktop or Windows classic desktop solutions.
+# Add steps that publish symbols, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/apps/windows/dot-net
+
+trigger:
+- develop
+
+pool:
+  vmImage: 'VS2017-Win2016'
+
+variables:
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+  Version: '1.0.$(Build.BuildId)'
+  Major: '1'
+  Minor: '0'
+  Patch: '$(Build.BuildId)'
+  testProject: 'tests/MGroup.FEM.Tests'
+
+steps:
+- task: DotNetCoreCLI@2
+  name: dotnetRestore
+  displayName: "Restore nugets"
+  inputs:
+    command: 'restore'
+    verbosityRestore: 'Normal'
+    feedRestore: 'MSolve-Nugets'
+
+
+- task: SonarCloudPrepare@1
+  displayName: "Prepares SonarCloud analysis"
+  inputs:
+    SonarCloud: 'SonarCloud'
+    organization: 'mgroupntua'
+    scannerMode: 'MSBuild'
+    projectKey: 'MSolve.FEM'
+    extraProperties: 'sonar.cs.opencover.reportsPaths=$(Build.SourcesDirectory)/coverage/coverage.opencover.xml'
+
+
+- task: DotNetCoreCLI@2
+  name: dotnetBuild
+  displayName: "Build projects"
+  inputs:
+    command: 'build'
+    arguments: '-p:Version=$(Major).$(Minor).$(Build.BuildId)'
+    verbosityPack: 'Minimal'
+    configuration: '$(buildConfiguration)'
+
+- script: |
+    dotnet test --logger trx --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=$(Build.SourcesDirectory)/coverage/ $(testProject)
+  displayName: 'Runs tests'
+
+
+- task: SonarCloudAnalyze@1
+  displayName: "Performs SonarCloud Analysis"
+
+- task: SonarCloudPublish@1
+  displayName: 'Publish Quality Gate Results'
+  inputs:
+    pollingTimeoutSec: '300'
+
+- task: PublishTestResults@2
+  inputs:
+    testRunner: VSTest
+    testResultsFiles: '**/*.trx'
+
+- task: PublishCodeCoverageResults@1
+  inputs:
+    summaryFileLocation: $(Build.SourcesDirectory)/coverage/Cobertura/Cobertura.xml
+    reportDirectory: $(Build.SourcesDirectory)/coverage/Cobertura
+    codecoverageTool: cobertura
+
+- task: DotNetCoreCLI@2
+  name: dotnetPack
+  displayName: "Packages new nugets"
+  inputs:
+    command: 'pack'
+    versioningScheme: 'byEnvVar'
+    versionEnvVar: 'Version'
+    verbosityPack: 'Minimal'
+
+- task: PublishBuildArtifacts@1
+  name: publishToFeed
+  displayName: "Publishes to pipeline artifacts"
+  inputs:
+    ArtifactName: 'drop'
+
+- task: DotNetCoreCLI@2
+  name: dotnetPushNuget
+  displayName: "Push nugets to feed"
+  inputs:
+    command: 'push'
+    packagesToPush: '$(build.artifactStagingDirectory)/*.nupkg'
+    verbosityPack: 'Minimal'
+    feedPublish: 'MSolve-Nugets'
+
+- task: DotNetCoreCLI@2
+  enabled: false
+  name: dotnetPushSymbol
+  displayName: "Publishes symbol nugets"
+  inputs:
+    command: 'push'
+    searchPatternPush: '$(Build.ArtifactStagingDirectory)/*.snupkg'
+    feedPublish: 'MSolve-Nugets'
