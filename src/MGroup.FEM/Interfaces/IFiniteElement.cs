@@ -5,9 +5,9 @@ using MGroup.MSolve.Discretization.Interfaces;
 
 namespace MGroup.FEM.Interfaces
 {
-    public interface IFiniteElement : IElementType
-    {
-        int ID { get; }
-        ElementDimensions ElementDimensions { get; }
-    }
+	public interface IFiniteElement : IElementType
+	{
+		int ID { get; }
+		ElementDimensions ElementDimensions { get; }
+	}
 }

@@ -7,12 +7,12 @@ using MGroup.MSolve.Geometry.Coordinates;
 
 namespace MGroup.FEM.Interpolation
 {
-    /// <summary>
-    /// Isoparamteric interpolation of a wedge finite element with 15 nodes. Quadratic shape functions.
-    /// Implements singleton pattern.
-    /// Authors: Dimitris Tsapetis
-    /// </summary>
-    public class InterpolationWedge15 : IsoparametricInterpolation3DBase
+	/// <summary>
+	/// Isoparamteric interpolation of a wedge finite element with 15 nodes. Quadratic shape functions.
+	/// Implements singleton pattern.
+	/// Authors: Dimitris Tsapetis
+	/// </summary>
+	public class InterpolationWedge15 : IsoparametricInterpolation3DBase
 	{
 		private static readonly InterpolationWedge15 uniqueInstance = new InterpolationWedge15();
 
@@ -51,22 +51,22 @@ namespace MGroup.FEM.Interpolation
 		/// </summary>
 		public static InterpolationWedge15 UniqueInstance => uniqueInstance;
 
-        /// <summary>
-        /// See <see cref="IIsoparametricInterpolation2D.CheckElementNodes(IReadOnlyList{Node})"/>
-        /// </summary>
-        public override void CheckElementNodes(IReadOnlyList<Node> nodes)
-        {
-            if (nodes.Count != 15) throw new ArgumentException(
-                $"A Wedge15 finite element has 15 nodes, but {nodes.Count} nodes were provided.");
-            // TODO: Also check the order of the nodes too and perhaps even the shape
-        }
+		/// <summary>
+		/// See <see cref="IIsoparametricInterpolation2D.CheckElementNodes(IReadOnlyList{Node})"/>
+		/// </summary>
+		public override void CheckElementNodes(IReadOnlyList<Node> nodes)
+		{
+			if (nodes.Count != 15) throw new ArgumentException(
+				$"A Wedge15 finite element has 15 nodes, but {nodes.Count} nodes were provided.");
+			// TODO: Also check the order of the nodes too and perhaps even the shape
+		}
 
-        /// <summary>
-        /// The reverse mapping for this interpolation, namely from global cartesian coordinates to natural (element local) coordinate system.
-        /// </summary>
-        /// <param name="node">The nodes of the finite element in the global cartesian coordinate system.</param>
-        /// <returns></returns>
-        public override IInverseInterpolation3D CreateInverseMappingFor(IReadOnlyList<Node> node) =>
+		/// <summary>
+		/// The reverse mapping for this interpolation, namely from global cartesian coordinates to natural (element local) coordinate system.
+		/// </summary>
+		/// <param name="node">The nodes of the finite element in the global cartesian coordinate system.</param>
+		/// <returns></returns>
+		public override IInverseInterpolation3D CreateInverseMappingFor(IReadOnlyList<Node> node) =>
 			throw new NotImplementedException("Iterative procedure needed");
 
 		// Evaluated according to https://www.code-aster.org/V2/doc/v11/en/man_r/r3/r3.01.01.pdf

@@ -7,12 +7,12 @@ using MGroup.MSolve.Geometry.Coordinates;
 
 namespace MGroup.FEM.Interpolation
 {
-    /// <summary>
-    /// Isoparametric interpolation of a hexahedral finite element with 27 nodes. Quadratic shape functions.
-    /// Implements singleton pattern.
-    /// Authors: Dimitris Tsapetis
-    /// </summary>
-    public class InterpolationHexa27 : IsoparametricInterpolation3DBase
+	/// <summary>
+	/// Isoparametric interpolation of a hexahedral finite element with 27 nodes. Quadratic shape functions.
+	/// Implements singleton pattern.
+	/// Authors: Dimitris Tsapetis
+	/// </summary>
+	public class InterpolationHexa27 : IsoparametricInterpolation3DBase
 	{
 		private static readonly InterpolationHexa27 uniqueInstance = new InterpolationHexa27();
 
@@ -67,23 +67,23 @@ namespace MGroup.FEM.Interpolation
 		/// </summary>
 		public static InterpolationHexa27 UniqueInstance => uniqueInstance;
 
-        /// <summary>
-        /// See <see cref="IIsoparametricInterpolation2D.CheckElementNodes(IReadOnlyList{Node})"/>
-        /// </summary>
-        public override void CheckElementNodes(IReadOnlyList<Node> nodes)
-        {
-            if (nodes.Count != 27) throw new ArgumentException(
-                $"A Hexa27 finite element has 27 nodes, but {nodes.Count} nodes were provided.");
-            // TODO: Also check the order of the nodes too and perhaps even the shape
-        }
+		/// <summary>
+		/// See <see cref="IIsoparametricInterpolation2D.CheckElementNodes(IReadOnlyList{Node})"/>
+		/// </summary>
+		public override void CheckElementNodes(IReadOnlyList<Node> nodes)
+		{
+			if (nodes.Count != 27) throw new ArgumentException(
+				$"A Hexa27 finite element has 27 nodes, but {nodes.Count} nodes were provided.");
+			// TODO: Also check the order of the nodes too and perhaps even the shape
+		}
 
-        /// <summary>
-        /// The inverse mapping of this interpolation, namely from global cartesian to natural (element local) coordinate system.
-        /// </summary>
-        /// <param name="node">The nodes of the finite element in the global cartesian coordinate system.</param>
-        /// <returns></returns>
-        public override IInverseInterpolation3D CreateInverseMappingFor(IReadOnlyList<Node> node)
-            => throw new NotImplementedException("Iterative procedure needed");
+		/// <summary>
+		/// The inverse mapping of this interpolation, namely from global cartesian to natural (element local) coordinate system.
+		/// </summary>
+		/// <param name="node">The nodes of the finite element in the global cartesian coordinate system.</param>
+		/// <returns></returns>
+		public override IInverseInterpolation3D CreateInverseMappingFor(IReadOnlyList<Node> node)
+			=> throw new NotImplementedException("Iterative procedure needed");
 
 		/// <summary>
 		/// Evaluates Hexa27 shape functions according to <see cref="https://www.code-aster.org/V2/doc/v13/en/man_r/r3/r3.01.01.pdf">this</see>

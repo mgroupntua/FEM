@@ -8,42 +8,42 @@ using MGroup.MSolve.Discretization.Interfaces;
 //      2) The order of the nodes should be defined by what is now called ElementType
 namespace MGroup.FEM.Entities
 {
-    public enum AbsorptionType
-    {
-        Unknown = 0,
-        Compressional = 1,
-        Shear = 2
-    }
-
-    public class Element: IElement
+	public enum AbsorptionType
 	{
-        private readonly Dictionary<int, Node> nodesDictionary = new Dictionary<int, Node>();
-        private readonly Dictionary<IDofType, AbsorptionType> absorptions = new Dictionary<IDofType, AbsorptionType>();
-        private readonly IList<Node> embeddedNodes = new List<Node>();
+		Unknown = 0,
+		Compressional = 1,
+		Shear = 2
+	}
 
-        public Dictionary<int, Node> NodesDictionary => nodesDictionary;
+	public class Element : IElement
+	{
+		private readonly Dictionary<int, Node> nodesDictionary = new Dictionary<int, Node>();
+		private readonly Dictionary<IDofType, AbsorptionType> absorptions = new Dictionary<IDofType, AbsorptionType>();
+		private readonly IList<Node> embeddedNodes = new List<Node>();
 
-        public Dictionary<IDofType, AbsorptionType> Absorptions => absorptions;
+		public Dictionary<int, Node> NodesDictionary => nodesDictionary;
 
-        IReadOnlyList<INode> IElement.Nodes => nodesDictionary.Values.ToList<INode>();
-        public IList<Node> Nodes => nodesDictionary.Values.ToList();
+		public Dictionary<IDofType, AbsorptionType> Absorptions => absorptions;
+
+		IReadOnlyList<INode> IElement.Nodes => nodesDictionary.Values.ToList<INode>();
+		public IList<Node> Nodes => nodesDictionary.Values.ToList();
 
 
-        public IList<Node> EmbeddedNodes => embeddedNodes;
+		public IList<Node> EmbeddedNodes => embeddedNodes;
 
-        public int ID { get; set; }
+		public int ID { get; set; }
 
 		IElementType IElement.ElementType => ElementType;
-        public IFiniteElement ElementType { get; set; }
+		public IFiniteElement ElementType { get; set; }
 
-        ISubdomain IElement.Subdomain => this.Subdomain;
-        public Subdomain Subdomain { get; set; }
+		ISubdomain IElement.Subdomain => this.Subdomain;
+		public Subdomain Subdomain { get; set; }
 
-        public void AddNode(Node node) => nodesDictionary.Add(node.ID, node);
+		public void AddNode(Node node) => nodesDictionary.Add(node.ID, node);
 
-        public void AddNodes(IList<Node> nodes)
-        {
-            foreach (Node node in nodes) AddNode(node);
-        }
-    }
+		public void AddNodes(IList<Node> nodes)
+		{
+			foreach (Node node in nodes) AddNode(node);
+		}
+	}
 }

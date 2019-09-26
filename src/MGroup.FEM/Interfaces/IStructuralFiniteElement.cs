@@ -1,6 +1,6 @@
 ﻿namespace MGroup.FEM.Interfaces
 {
-    public interface IStructuralFiniteElement : IFiniteElement
-    {
-    }
+	public interface IStructuralFiniteElement : IFiniteElement
+	{
+	}
 }

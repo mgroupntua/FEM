@@ -6,10 +6,10 @@ using Xunit;
 
 namespace MGroup.FEM.Tests.Interpolation
 {
-    /// <summary>
-    /// Unit testing implementations of <see cref="IIsoparametricInterpolation3D_OLD"/>
-    /// </summary>
-    public class IsoparametricInterpolation3D
+	/// <summary>
+	/// Unit testing implementations of <see cref="IIsoparametricInterpolation3D_OLD"/>
+	/// </summary>
+	public class IsoparametricInterpolation3D
 	{
 		private const int numRandomPoints = 10;
 		private delegate NaturalPoint[] GenerateRandomPoints();
@@ -54,10 +54,10 @@ namespace MGroup.FEM.Tests.Interpolation
 			NaturalPoint[] points = pointGenerators[interpolation]();
 			for (int p = 0; p < points.Length; p++)
 			{
-                double[] shapeFunctions = interpolation.EvaluateFunctionsAt(points[p]);
+				double[] shapeFunctions = interpolation.EvaluateFunctionsAt(points[p]);
 				double sum = 0.0;
 				for (int f = 0; f < interpolation.NumFunctions; f++) sum += shapeFunctions[f];
-				Assert.True(Utilities.AreValuesEqual(1.0,sum,tolerance));
+				Assert.True(Utilities.AreValuesEqual(1.0, sum, tolerance));
 			}
 		}
 
@@ -68,11 +68,11 @@ namespace MGroup.FEM.Tests.Interpolation
 			double tolerance = 1e-10;
 			for (int n = 0; n < interpolation.NodalNaturalCoordinates.Count; n++)
 			{
-                double[] shapeFunctions = interpolation.EvaluateFunctionsAt(interpolation.NodalNaturalCoordinates[n]);
+				double[] shapeFunctions = interpolation.EvaluateFunctionsAt(interpolation.NodalNaturalCoordinates[n]);
 				for (int f = 0; f < interpolation.NumFunctions; f++)
 				{
-					if (f==n) Assert.True(Utilities.AreValuesEqual(1.0,shapeFunctions[f], tolerance));
-					else Assert.True(Utilities.AreValuesEqual(0.0,shapeFunctions[f],tolerance));
+					if (f == n) Assert.True(Utilities.AreValuesEqual(1.0, shapeFunctions[f], tolerance));
+					else Assert.True(Utilities.AreValuesEqual(0.0, shapeFunctions[f], tolerance));
 				}
 			}
 		}
@@ -84,14 +84,14 @@ namespace MGroup.FEM.Tests.Interpolation
 		/// <returns></returns>
 		private static NaturalPoint[] GenerateRandomPointsInTetrahedron()
 		{
-			var rand= new Random();
-			var randomPoints= new NaturalPoint[numRandomPoints];
+			var rand = new Random();
+			var randomPoints = new NaturalPoint[numRandomPoints];
 			for (int i = 0; i < numRandomPoints; i++)
 			{
 				double xi = rand.NextDouble();
 				double eta = rand.NextDouble() * xi;
 				double zeta = rand.NextDouble() * eta;
-				randomPoints[i]= new NaturalPoint(xi,eta,zeta);
+				randomPoints[i] = new NaturalPoint(xi, eta, zeta);
 			}
 
 			return randomPoints;
@@ -107,9 +107,9 @@ namespace MGroup.FEM.Tests.Interpolation
 			var randomPoints = new NaturalPoint[numRandomPoints];
 			for (int i = 0; i < numRandomPoints; i++)
 			{
-				double xi= -1 + rand.NextDouble() * 2.0;
+				double xi = -1 + rand.NextDouble() * 2.0;
 				double eta = rand.NextDouble();
-				double zeta = rand.NextDouble()*eta;
+				double zeta = rand.NextDouble() * eta;
 				randomPoints[i] = new NaturalPoint(xi, eta, zeta);
 			}
 
@@ -123,7 +123,7 @@ namespace MGroup.FEM.Tests.Interpolation
 		private static NaturalPoint[] GenerateRandomPointsInCube()
 		{
 			var rand = new Random();
-			var randomPoints= new NaturalPoint[numRandomPoints];
+			var randomPoints = new NaturalPoint[numRandomPoints];
 			for (int i = 0; i < numRandomPoints; i++)
 			{
 				double xi = -1 + rand.NextDouble() * 2.0;
@@ -142,11 +142,11 @@ namespace MGroup.FEM.Tests.Interpolation
 		private static NaturalPoint[] GenerateRandomPointsInPyramid()
 		{
 			var rand = new Random();
-			var randomPoints= new NaturalPoint[numRandomPoints];
+			var randomPoints = new NaturalPoint[numRandomPoints];
 			for (int i = 0; i < numRandomPoints; i++)
 			{
 				double zeta = rand.NextDouble();
-				double xi = (-1 + rand.NextDouble() * 2.0)*(1-zeta);
+				double xi = (-1 + rand.NextDouble() * 2.0) * (1 - zeta);
 				double eta = (-1 + rand.NextDouble() * 2.0) * xi;
 				randomPoints[i] = new NaturalPoint(xi, eta, zeta);
 			}

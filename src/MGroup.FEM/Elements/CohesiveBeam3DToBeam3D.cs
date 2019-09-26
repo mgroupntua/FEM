@@ -66,9 +66,9 @@
 //        {
 //            //IReadOnlyList<Matrix2D> shapeFunctionDerivatives = interpolation.EvaluateNaturalGradientsAtGaussPoints(QuadratureForStiffness);
 //            double[,] shapeFunctionDerivatives = interpolation.EvaluateGradientsAt();
-            
+
 //            IReadOnlyList<Vector> N1 = interpolation.EvaluateFunctionsAtGaussPoints(QuadratureForStiffness);
-            
+
 //            IReadOnlyList<Matrix2D> N3 = interpolation.EvaluateN3ShapeFunctionsReorganized(QuadratureForStiffness); //Shape functions matrix [N_beam]
 
 //            double[,] u_prok = new double[3, 2];

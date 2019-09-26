@@ -12,12 +12,12 @@ namespace MGroup.FEM.Interpolation.Inverse
 	/// https://link.springer.com/article/10.1007/BF00350284
 	/// Authors: Dimitris Tsapetis
 	/// </summary>
-	public class InverseInterpolationHexa8:IInverseInterpolation3D
-    {
-	    public InverseInterpolationHexa8(IReadOnlyList<Node> nodes)
-	    {
-		    
-	    }
+	public class InverseInterpolationHexa8 : IInverseInterpolation3D
+	{
+		public InverseInterpolationHexa8(IReadOnlyList<Node> nodes)
+		{
+
+		}
 
 		public NaturalPoint TransformPointCartesianToNatural(CartesianPoint point)
 		{

@@ -8,24 +8,24 @@ using MGroup.MSolve.Discretization.Loads;
 
 namespace MGroup.FEM.Entities
 {
-    /// <summary>
-    /// You should use <see cref="Load"/> instead.
-    /// </summary>
-    public class SteadyNodalLoad: ITimeDependentNodalLoad
-    {
-        private readonly double constantloadAmount;
+	/// <summary>
+	/// You should use <see cref="Load"/> instead.
+	/// </summary>
+	public class SteadyNodalLoad : ITimeDependentNodalLoad
+	{
+		private readonly double constantloadAmount;
 
-        public SteadyNodalLoad(double constantloadAmount)
-        {
-            this.constantloadAmount = constantloadAmount;
-        }
+		public SteadyNodalLoad(double constantloadAmount)
+		{
+			this.constantloadAmount = constantloadAmount;
+		}
 
-        public INode Node { get; set; }
-        public IDofType DOF { get; set; }
+		public INode Node { get; set; }
+		public IDofType DOF { get; set; }
 
-        public double GetLoadAmount(int timeStep)
-        {
-            return constantloadAmount;
-        }
-    }
+		public double GetLoadAmount(int timeStep)
+		{
+			return constantloadAmount;
+		}
+	}
 }

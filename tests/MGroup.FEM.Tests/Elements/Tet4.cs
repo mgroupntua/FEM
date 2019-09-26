@@ -8,11 +8,11 @@ using Xunit;
 
 namespace MGroup.FEM.Tests.Elements
 {
-    /// <summary>
-    /// Tests 4-noded tetrahedral instances of <see cref="Tet4"/> against the notes of the
-    /// University of Colorado at Boulder FEM course.
-    /// </summary>
-    public class Tet4
+	/// <summary>
+	/// Tests 4-noded tetrahedral instances of <see cref="Tet4"/> against the notes of the
+	/// University of Colorado at Boulder FEM course.
+	/// </summary>
+	public class Tet4
 	{
 		private static readonly ElasticMaterial3D Material0 = new ElasticMaterial3D()
 		{
@@ -20,7 +20,7 @@ namespace MGroup.FEM.Tests.Elements
 			PoissonRatio = 1.0 / 3.0
 		};
 
-		private static readonly DynamicMaterial DynamicMaterial0 = new DynamicMaterial(1,0,0);
+		private static readonly DynamicMaterial DynamicMaterial0 = new DynamicMaterial(1, 0, 0);
 
 		private static readonly IReadOnlyList<Node> NodeSet0 = new Node[]
 		{
