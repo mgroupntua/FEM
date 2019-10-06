@@ -24,12 +24,15 @@ var quad4 = factory.CreateElement(CellType.Quad4, nodeSet);
 For the stiffness integration of the Tri3 element an one-point integration is sufficient.
 
 **GaussPoints for stiffness:**
+
 | X   | Y   | Z | W   |
 |-----|-----|---|-----|
 | 1/3 | 1/3 | 0 | 0.5 | 
+
 For the mass integration of the Tri3 element an three-point integration is needed.
 
 **GaussPoints for mass:**
+
 | X                | Y                | Z | W                      |
 |------------------|------------------|---|------------------------|
 | 0.66666666666667 | 0.16666666666667 | 0 | 0.5 * 0.33333333333333 |   
@@ -38,12 +41,13 @@ For the mass integration of the Tri3 element an three-point integration is neede
 
 #### Tri6
 <p align="center">
-  <img src="../docs/Images/Tri6.png" width="400"/>
+  <img src="../docs/Images/tri6.png" width="400"/>
 </p>
 
 **GaussPoints for stiffness:**
 
 For the stiffness integration of the Tri3 element an three-point integration is needed.
+
 | X                | Y                | Z | W                      |
 |------------------|------------------|---|------------------------|
 | 0.66666666666667 | 0.16666666666667 | 0 | 0.5 * 0.33333333333333 |   
@@ -65,7 +69,7 @@ For the mass integration of the Tri3 element an three-point integration is neede
 
 #### Quad4
 <p align="center">
-  <img src="../docs/Images/Quad4.png" width="400"/>
+  <img src="../docs/Images/quad4.png" width="400"/>
 </p>
 In case of quadrilateral elements the same Gauss points are used for both stiffness and mass.
 
@@ -80,7 +84,7 @@ In case of quadrilateral elements the same Gauss points are used for both stiffn
 
 #### Quad8
 <p align="center">
-  <img src="../docs/Images/Quad8.png" width="400"/>
+  <img src="../docs/Images/quad8.png" width="400"/>
 </p>
 
 **GaussPoints for stiffness and mass:**
