@@ -1,5 +1,5 @@
 ### About
-This library is featuring linear algebra solvers for the solution of spatially and temporally discretized mechanics problems. In its core, it serves as a binding between the [LinearAlgebra](https://github.com/mgroupntua/linearalgebra) and the [MSolve.Core](https://github.com/mgroupntua/MSolve.Core) repos.
+This library is featuring the spatial discretization method of Finite Elements. In its core, it serves as an implementation of the Discretization project of the [MSolve.Core](https://github.com/mgroupntua/MSolve.Core) repo.
 
 ### Documentation
 - [Programming manual](programming.md)
