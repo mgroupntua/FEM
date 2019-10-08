@@ -1,8 +1,8 @@
-title: MSolve.Solvers
+title: MSolve.FEM
 email: info@mgroup.ntua.gr
 description: > # this means to ignore newlines until "baseurl:"
- Linear algebra solvers for the solution of spatially and temporally discretized computational mechanics problems.
-baseurl: "/MSolve.Solvers" # the subpath of your site, e.g. /blog
+ Finite element analysis library for computational mechanics applications
+baseurl: "/MSolve.FEM" # the subpath of your site, e.g. /blog
 
 url: "" # the base hostname & protocol for your site
 
