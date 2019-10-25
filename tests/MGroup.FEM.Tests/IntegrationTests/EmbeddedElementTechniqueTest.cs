@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using MGroup.Analyzers;
 using MGroup.Analyzers.NonLinear;
@@ -11,7 +11,7 @@ using MGroup.MSolve.Discretization;
 using MGroup.MSolve.Discretization.FreedomDegrees;
 using MGroup.MSolve.Discretization.Integration.Quadratures;
 using MGroup.MSolve.Discretization.Loads;
-using MGroup.MSolve.Logging;
+using MGroup.Analyzers.Logging;
 using MGroup.Problems;
 using MGroup.Solvers.Direct;
 using Xunit;

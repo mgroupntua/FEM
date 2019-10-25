@@ -1,4 +1,4 @@
-﻿using MGroup.Analyzers;
+using MGroup.Analyzers;
 using MGroup.FEM.Elements;
 using MGroup.FEM.Entities;
 using MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient;
@@ -8,7 +8,7 @@ using MGroup.MSolve.Discretization;
 using MGroup.MSolve.Discretization.FreedomDegrees;
 using MGroup.MSolve.Discretization.Loads;
 using MGroup.MSolve.Discretization.Mesh;
-using MGroup.MSolve.Logging;
+using MGroup.Analyzers.Logging;
 using MGroup.Problems;
 using MGroup.Solvers.Iterative;
 using Xunit;

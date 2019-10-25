@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using MGroup.Analyzers;
 using MGroup.FEM.Elements;
 using MGroup.FEM.Entities;
@@ -7,7 +7,7 @@ using MGroup.MSolve.Discretization;
 using MGroup.MSolve.Discretization.FreedomDegrees;
 using MGroup.MSolve.Discretization.Loads;
 using MGroup.Problems;
-using MGroup.Solvers;
+using MGroup.MSolve.Solvers;
 using MGroup.Solvers.Direct;
 using Xunit;
 
