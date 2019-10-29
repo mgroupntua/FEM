@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using MGroup.FEM.Elements.SupportiveClasses;
 using MGroup.FEM.Entities;
 using MGroup.LinearAlgebra.Matrices;
-using MGroup.Materials.Interfaces;
+using MGroup.MSolve.Constitutive;
 using MGroup.MSolve.Geometry;
 
 namespace MGroup.FEM.Elements

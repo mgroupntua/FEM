@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using MGroup.FEM.Entities;
 using MGroup.FEM.Interpolation;
 using MGroup.FEM.Interpolation.GaussPointExtrapolation;
-using MGroup.Materials;
+using MGroup.MSolve.Constitutive;
 using MGroup.MSolve.Discretization.Integration.Quadratures;
 using MGroup.MSolve.Discretization.Mesh;
 
@@ -27,8 +27,8 @@ namespace MGroup.FEM.Elements
 		private static readonly IReadOnlyDictionary<CellType, IQuadrature2D> integrationsForMass;
 		private static readonly IReadOnlyDictionary<CellType, IIsoparametricInterpolation2D> interpolations;
 
-		private readonly ElasticMaterial2D commonMaterial;
-		private readonly DynamicMaterial commonDynamicProperties;
+		private readonly IContinuumMaterial2D commonMaterial;
+		private readonly IDynamicMaterial commonDynamicProperties;
 		private readonly double commonThickness;
 
 		static ContinuumElement2DFactory()
@@ -80,8 +80,8 @@ namespace MGroup.FEM.Elements
 			ContinuumElement2DFactory.extrapolations = extrapolations;
 		}
 
-		public ContinuumElement2DFactory(double commonThickness, ElasticMaterial2D commonMaterial,
-			DynamicMaterial commonDynamicProperties)
+		public ContinuumElement2DFactory(double commonThickness, IContinuumMaterial2D commonMaterial,
+			IDynamicMaterial commonDynamicProperties)
 		{
 			this.commonThickness = commonThickness;
 			this.commonMaterial = commonMaterial;
@@ -94,16 +94,16 @@ namespace MGroup.FEM.Elements
 		}
 
 		public ContinuumElement2D CreateElement(CellType cellType, IReadOnlyList<Node> nodes, double thickness,
-			ElasticMaterial2D material, DynamicMaterial dynamicProperties)
+			IContinuumMaterial2D material, IDynamicMaterial dynamicProperties)
 		{
 			int numGPs = integrationsForStiffness[cellType].IntegrationPoints.Count;
-			var materialsAtGaussPoints = new ElasticMaterial2D[numGPs];
-			for (int gp = 0; gp < numGPs; ++gp) materialsAtGaussPoints[gp] = material.Clone();
+			var materialsAtGaussPoints = new IContinuumMaterial2D[numGPs];
+			for (int gp = 0; gp < numGPs; ++gp) materialsAtGaussPoints[gp] = (IContinuumMaterial2D)material.Clone();
 			return CreateElement(cellType, nodes, thickness, materialsAtGaussPoints, dynamicProperties);
 		}
 
 		public ContinuumElement2D CreateElement(CellType cellType, IReadOnlyList<Node> nodes, double thickness,
-			IReadOnlyList<ElasticMaterial2D> materialsAtGaussPoints, DynamicMaterial dynamicProperties)
+			IReadOnlyList<IContinuumMaterial2D> materialsAtGaussPoints, IDynamicMaterial dynamicProperties)
 		{
 			//TODO: check if nodes - interpolation and Gauss points - materials match
 #if DEBUG

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using MGroup.FEM.Elements.SupportiveClasses;
@@ -6,7 +6,7 @@ using MGroup.FEM.Embedding;
 using MGroup.FEM.Entities;
 using MGroup.FEM.Interfaces;
 using MGroup.LinearAlgebra.Matrices;
-using MGroup.Materials;
+using MGroup.MSolve.Constitutive;
 using MGroup.MSolve.Discretization;
 using MGroup.MSolve.Discretization.FreedomDegrees;
 using MGroup.MSolve.Discretization.Interfaces;
@@ -26,20 +26,20 @@ namespace MGroup.FEM.Elements
 		protected readonly static IDofType[][] dofTypes = new IDofType[][] { nodalDOFTypes, nodalDOFTypes,
 			nodalDOFTypes,nodalDOFTypes};
 
-		protected readonly ElasticMaterial2D[] materialsAtGaussPoints;
+		protected readonly IContinuumMaterial2D[] materialsAtGaussPoints;
 
 		protected IElementDofEnumerator dofEnumerator = new GenericDofEnumerator();
 
 		protected Quad4() { }
 
-		public Quad4(ElasticMaterial2D material)
+		public Quad4(IContinuumMaterial2D material)
 		{
-			materialsAtGaussPoints = new ElasticMaterial2D[iInt2];
+			materialsAtGaussPoints = new IContinuumMaterial2D[iInt2];
 			for (int i = 0; i < iInt2; i++)
-				materialsAtGaussPoints[i] = (ElasticMaterial2D)material.Clone();
+				materialsAtGaussPoints[i] = (IContinuumMaterial2D)material.Clone();
 		}
 
-		public Quad4(ElasticMaterial2D material, IElementDofEnumerator dofEnumerator)
+		public Quad4(IContinuumMaterial2D material, IElementDofEnumerator dofEnumerator)
 			: this(material)
 		{
 			this.dofEnumerator = dofEnumerator;

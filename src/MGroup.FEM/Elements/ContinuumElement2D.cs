@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using MGroup.FEM.Entities;
 using MGroup.FEM.Interfaces;
@@ -6,7 +6,7 @@ using MGroup.FEM.Interpolation;
 using MGroup.FEM.Interpolation.GaussPointExtrapolation;
 using MGroup.FEM.Interpolation.Jacobians;
 using MGroup.LinearAlgebra.Matrices;
-using MGroup.Materials;
+using MGroup.MSolve.Constitutive;
 using MGroup.MSolve.Discretization;
 using MGroup.MSolve.Discretization.FreedomDegrees;
 using MGroup.MSolve.Discretization.Integration.Quadratures;
@@ -37,13 +37,13 @@ namespace MGroup.FEM.Elements
 	{
 		private readonly static IDofType[] nodalDOFTypes = new IDofType[] { StructuralDof.TranslationX, StructuralDof.TranslationY };
 		private readonly IDofType[][] dofTypes; //TODO: this should not be stored for each element. Instead store it once for each Quad4, Tri3, etc. Otherwise create it on the fly.
-		private DynamicMaterial dynamicProperties;
-		private readonly IReadOnlyList<ElasticMaterial2D> materialsAtGaussPoints;
+		private IDynamicMaterial dynamicProperties;
+		private readonly IReadOnlyList<IContinuumMaterial2D> materialsAtGaussPoints;
 
 		public ContinuumElement2D(double thickness, IReadOnlyList<Node> nodes, IIsoparametricInterpolation2D interpolation,
 			IQuadrature2D quadratureForStiffness, IQuadrature2D quadratureForConsistentMass,
 			IGaussPointExtrapolation2D gaussPointExtrapolation,
-			IReadOnlyList<ElasticMaterial2D> materialsAtGaussPoints, DynamicMaterial dynamicProperties)
+			IReadOnlyList<IContinuumMaterial2D> materialsAtGaussPoints, IDynamicMaterial dynamicProperties)
 		{
 			this.dynamicProperties = dynamicProperties;
 			this.materialsAtGaussPoints = materialsAtGaussPoints;
@@ -75,7 +75,7 @@ namespace MGroup.FEM.Elements
 		{
 			get
 			{
-				foreach (ElasticMaterial2D material in materialsAtGaussPoints)
+				foreach (var material in materialsAtGaussPoints)
 					if (material.Modified) return true;
 				return false;
 			}
@@ -222,12 +222,12 @@ namespace MGroup.FEM.Elements
 
 		public void ClearMaterialState()
 		{
-			foreach (ElasticMaterial2D m in materialsAtGaussPoints) m.ClearState();
+			foreach (var m in materialsAtGaussPoints) m.ClearState();
 		}
 
 		public void ClearMaterialStresses()
 		{
-			foreach (ElasticMaterial2D m in materialsAtGaussPoints) m.ClearStresses();
+			foreach (var m in materialsAtGaussPoints) m.ClearStresses();
 		}
 
 		public IMatrix DampingMatrix(IElement element)
@@ -289,12 +289,12 @@ namespace MGroup.FEM.Elements
 
 		public void ResetMaterialModified()
 		{
-			foreach (ElasticMaterial2D material in materialsAtGaussPoints) material.ResetModified();
+			foreach (var material in materialsAtGaussPoints) material.ResetModified();
 		}
 
 		public void SaveMaterialState()
 		{
-			foreach (ElasticMaterial2D m in materialsAtGaussPoints) m.SaveState();
+			foreach (var m in materialsAtGaussPoints) m.SaveState();
 		}
 
 		public IMatrix StiffnessMatrix(IElement element) => DofEnumerator.GetTransformedMatrix(BuildStiffnessMatrix());

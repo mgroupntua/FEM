@@ -1,4 +1,4 @@
-﻿using MGroup.Materials.Interfaces;
+using MGroup.MSolve.Constitutive;
 
 namespace MGroup.FEM.Interfaces
 {

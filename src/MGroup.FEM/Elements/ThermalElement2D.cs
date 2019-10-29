@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using MGroup.FEM.Embedding;
 using MGroup.FEM.Entities;
@@ -8,7 +8,7 @@ using MGroup.FEM.Interpolation.GaussPointExtrapolation;
 using MGroup.FEM.Interpolation.Inverse;
 using MGroup.FEM.Interpolation.Jacobians;
 using MGroup.LinearAlgebra.Matrices;
-using MGroup.Materials;
+using MGroup.MSolve.Constitutive;
 using MGroup.MSolve.Discretization;
 using MGroup.MSolve.Discretization.FreedomDegrees;
 using MGroup.MSolve.Discretization.Integration.Quadratures;
@@ -23,14 +23,14 @@ namespace MGroup.FEM.Elements
 	public class ThermalElement2D : IFiniteElement, IEmbeddedHostElement, ICell<Node>
 	{
 		private readonly IDofType[][] dofTypes; //TODO: this should not be stored for each element. Instead store it once for each Quad4, Tri3, etc. Otherwise create it on the fly.
-		private readonly ThermalMaterial material;
+		private readonly IThermalMaterial material;
 		//private readonly Dictionary<GaussPoint, ThermalMaterial> materialsAtGaussPoints;
 
 
 		public ThermalElement2D(double thickness, IReadOnlyList<Node> nodes, IIsoparametricInterpolation2D interpolation,
 			IQuadrature2D quadratureForStiffness, IQuadrature2D quadratureForConsistentMass,
 			IGaussPointExtrapolation2D gaussPointExtrapolation,
-			ThermalMaterial material)
+			IThermalMaterial material)
 		{
 			this.material = material;
 			this.GaussPointExtrapolation = gaussPointExtrapolation;

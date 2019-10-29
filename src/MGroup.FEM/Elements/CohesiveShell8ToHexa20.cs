@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using MGroup.FEM.Elements.SupportiveClasses;
 using MGroup.FEM.Embedding;
@@ -6,7 +6,7 @@ using MGroup.FEM.Entities;
 using MGroup.FEM.Interfaces;
 using MGroup.FEM.Interpolation;
 using MGroup.LinearAlgebra.Matrices;
-using MGroup.Materials.Interfaces;
+using MGroup.MSolve.Constitutive;
 using MGroup.MSolve.Discretization;
 using MGroup.MSolve.Discretization.FreedomDegrees;
 using MGroup.MSolve.Discretization.Integration.Quadratures;

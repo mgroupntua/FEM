@@ -6,14 +6,15 @@
     <Product>MSolve</Product>
     <Description>A series of classes for spatially discretizing computational mechanics problems using the finite element method</Description>
     <PackageProjectUrl>http://mgroup.ntua.gr</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/mgroupntua/MSolve.FEM</RepositoryUrl>
+    <RepositoryUrl>https://github.com/mgroupntua/FEM</RepositoryUrl>
+    <PackageIconUrl>https://github.com/mgroupntua/FEM/raw/develop/MGroupFEM.png</PackageIconUrl>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MGroup.LinearAlgebra" Version="1.0.251" />
-    <PackageReference Include="MGroup.Materials" Version="1.0.298" />
-    <PackageReference Include="MGroup.MSolve.Discretization" Version="1.0.294" />
-    <PackageReference Include="MGroup.MSolve.Geometry" Version="1.0.294" />
+    <PackageReference Include="MGroup.LinearAlgebra" Version="1.0.310" />
+    <PackageReference Include="MGroup.MSolve.Constitutive" Version="1.0.322" />
+    <PackageReference Include="MGroup.MSolve.Discretization" Version="1.0.322" />
+    <PackageReference Include="MGroup.MSolve.Geometry" Version="1.0.322" />
   </ItemGroup>
 
 </Project>

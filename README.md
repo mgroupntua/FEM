@@ -1,6 +1,6 @@
 ![alt text](http://mgroup.ntua.gr/wp-content/uploads/2018/05/MGroup52.png "MGroup")
 
-# MSolve.FEM
+# FEM
 MSolve library that support the spatial discretization method of Finite Elements.
 
 ## Features
@@ -66,7 +66,7 @@ You can choose either to clone the solution or downloads it as a zip file.
 
  ![alt text](https://github.com/mgroupntua/MSolve.Edu/blob/master/Images/5.png "5")
 
-6. Click clone and Visual Studio will automatically download and import **MSolve.IGA**
+6. Click clone and Visual Studio will automatically download and import **MGroup.FEM**
 
 
 ### Download as ZIP
@@ -74,7 +74,7 @@ You can choose either to clone the solution or downloads it as a zip file.
 
 ![alt text](https://github.com/mgroupntua/MSolve.Edu/blob/master/Images/CloneOrDownload.png "1")
 
-2. Click **Download ZIP** option. **MSolve.IGA** will be downloaded as a ZIP file.
+2. Click **Download ZIP** option. **MGroup.FEM** will be downloaded as a ZIP file.
 
 3. Extract the ZIP file to the folder of choice.
 

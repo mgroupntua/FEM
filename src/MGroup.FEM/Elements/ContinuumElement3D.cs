@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using MGroup.FEM.Entities;
 using MGroup.FEM.Interfaces;
@@ -6,7 +6,7 @@ using MGroup.FEM.Interpolation;
 using MGroup.FEM.Interpolation.GaussPointExtrapolation;
 using MGroup.FEM.Interpolation.Jacobians;
 using MGroup.LinearAlgebra.Matrices;
-using MGroup.Materials;
+using MGroup.MSolve.Constitutive;
 using MGroup.MSolve.Discretization;
 using MGroup.MSolve.Discretization.FreedomDegrees;
 using MGroup.MSolve.Discretization.Integration.Quadratures;
@@ -30,13 +30,13 @@ namespace MGroup.FEM.Elements
 		};
 
 		private readonly IDofType[][] dofTypes;
-		private DynamicMaterial dynamicProperties;
-		private readonly IReadOnlyList<ElasticMaterial3D> materialsAtGaussPoints;
+		private IDynamicMaterial dynamicProperties;
+		private readonly IReadOnlyList<IContinuumMaterial3D> materialsAtGaussPoints;
 
 		public ContinuumElement3D(IReadOnlyList<Node> nodes, IIsoparametricInterpolation3D interpolation,
 			IQuadrature3D quadratureForStiffness, IQuadrature3D quadratureForMass,
 			IGaussPointExtrapolation3D gaussPointExtrapolation,
-			IReadOnlyList<ElasticMaterial3D> materialsAtGaussPoints, DynamicMaterial dynamicProperties)
+			IReadOnlyList<IContinuumMaterial3D> materialsAtGaussPoints, IDynamicMaterial dynamicProperties)
 		{
 			this.dynamicProperties = dynamicProperties;
 			this.materialsAtGaussPoints = materialsAtGaussPoints;
@@ -71,7 +71,7 @@ namespace MGroup.FEM.Elements
 		{
 			get
 			{
-				foreach (ElasticMaterial3D material in materialsAtGaussPoints)
+				foreach (IContinuumMaterial3D material in materialsAtGaussPoints)
 				{
 					if (material.Modified) return true;
 				}

@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using MGroup.FEM.Entities;
 using MGroup.FEM.Interpolation;
 using MGroup.FEM.Interpolation.GaussPointExtrapolation;
-using MGroup.Materials;
+using MGroup.MSolve.Constitutive;
 using MGroup.MSolve.Discretization.Integration.Quadratures;
 using MGroup.MSolve.Discretization.Mesh;
 
@@ -15,7 +15,7 @@ namespace MGroup.FEM.Elements
 		private static readonly IReadOnlyDictionary<CellType, IQuadrature2D> integrationsForMass;
 		private static readonly IReadOnlyDictionary<CellType, IIsoparametricInterpolation2D> interpolations;
 
-		private readonly ThermalMaterial commonMaterial;
+		private readonly IThermalMaterial commonMaterial;
 		private readonly double commonThickness;
 
 		static ThermalElement2DFactory()
@@ -67,7 +67,7 @@ namespace MGroup.FEM.Elements
 			ThermalElement2DFactory.extrapolations = extrapolations;
 		}
 
-		public ThermalElement2DFactory(double commonThickness, ThermalMaterial commonMaterial)
+		public ThermalElement2DFactory(double commonThickness, IThermalMaterial commonMaterial)
 		{
 			this.commonThickness = commonThickness;
 			this.commonMaterial = commonMaterial;

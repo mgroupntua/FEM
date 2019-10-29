@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using MGroup.FEM.Embedding;
 using MGroup.FEM.Entities;
 using MGroup.FEM.Interfaces;
 using MGroup.LinearAlgebra.Matrices;
-using MGroup.Materials;
+using MGroup.MSolve.Constitutive;
 using MGroup.MSolve.Discretization;
 using MGroup.MSolve.Discretization.FreedomDegrees;
 using MGroup.MSolve.Discretization.Interfaces;
@@ -26,9 +26,9 @@ namespace MGroup.FEM.Elements
 		private static readonly IDofType[][] dofTypes = {
 			new IDofType[] { ThermalDof.Temperature }, new IDofType[] { ThermalDof.Temperature } };
 
-		private readonly ThermalMaterial material;
+		private readonly IThermalMaterial material;
 
-		public ThermalRod(IReadOnlyList<Node> nodes, double crossSectionArea, ThermalMaterial material)
+		public ThermalRod(IReadOnlyList<Node> nodes, double crossSectionArea, IThermalMaterial material)
 		{
 			Debug.Assert(nodes.Count == 2, "Thermal rod element must have exactly 2 nodes.");
 			this.material = material;

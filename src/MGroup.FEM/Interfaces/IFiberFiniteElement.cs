@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using MGroup.Materials.Interfaces;
+using System.Collections.Generic;
+using MGroup.MSolve.Constitutive;
 
 namespace MGroup.FEM.Interfaces
 {

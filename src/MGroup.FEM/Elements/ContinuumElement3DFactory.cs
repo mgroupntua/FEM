@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using MGroup.FEM.Entities;
 using MGroup.FEM.Interpolation;
 using MGroup.FEM.Interpolation.GaussPointExtrapolation;
-using MGroup.Materials;
+using MGroup.MSolve.Constitutive;
 using MGroup.MSolve.Discretization.Integration.Quadratures;
 using MGroup.MSolve.Discretization.Mesh;
 
@@ -21,8 +21,8 @@ namespace MGroup.FEM.Elements
 		private static readonly IReadOnlyDictionary<CellType, IQuadrature3D> integrationsForMass;
 		private static readonly IReadOnlyDictionary<CellType, IIsoparametricInterpolation3D> interpolations;
 
-		private readonly ElasticMaterial3D commonMaterial;
-		private readonly DynamicMaterial commonDynamicProperties;
+		private readonly IContinuumMaterial3D commonMaterial;
+		private readonly IDynamicMaterial commonDynamicProperties;
 
 		static ContinuumElement3DFactory()
 		{
@@ -113,7 +113,7 @@ namespace MGroup.FEM.Elements
 			ContinuumElement3DFactory.extrapolations = extrapolations;
 		}
 
-		public ContinuumElement3DFactory(ElasticMaterial3D commonMaterial, DynamicMaterial commonDynamicProperties)
+		public ContinuumElement3DFactory(IContinuumMaterial3D commonMaterial, IDynamicMaterial commonDynamicProperties)
 		{
 			this.commonDynamicProperties = commonDynamicProperties;
 			this.commonMaterial = commonMaterial;
@@ -125,16 +125,16 @@ namespace MGroup.FEM.Elements
 		}
 
 		public ContinuumElement3D CreateElement(CellType cellType, IReadOnlyList<Node> nodes,
-			ElasticMaterial3D commonMaterial, DynamicMaterial commonDynamicProperties)
+			IContinuumMaterial3D commonMaterial, IDynamicMaterial commonDynamicProperties)
 		{
 			int numGPs = integrationsForStiffness[cellType].IntegrationPoints.Count;
-			var materialsAtGaussPoints = new ElasticMaterial3D[numGPs];
-			for (int gp = 0; gp < numGPs; ++gp) materialsAtGaussPoints[gp] = commonMaterial.Clone();
+			var materialsAtGaussPoints = new IContinuumMaterial3D[numGPs];
+			for (int gp = 0; gp < numGPs; ++gp) materialsAtGaussPoints[gp] = (IContinuumMaterial3D)commonMaterial.Clone();
 			return CreateElement(cellType, nodes, materialsAtGaussPoints, commonDynamicProperties);
 		}
 
 		public ContinuumElement3D CreateElement(CellType cellType, IReadOnlyList<Node> nodes,
-			IReadOnlyList<ElasticMaterial3D> materialsAtGaussPoints, DynamicMaterial commonDynamicProperties)
+			IReadOnlyList<IContinuumMaterial3D> materialsAtGaussPoints, IDynamicMaterial commonDynamicProperties)
 		{
 			//TODO: check if nodes - interpolation and Gauss points - materials match
 #if DEBUG

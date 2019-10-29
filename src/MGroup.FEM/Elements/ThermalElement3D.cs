@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using MGroup.FEM.Entities;
 using MGroup.FEM.Interfaces;
@@ -6,7 +6,7 @@ using MGroup.FEM.Interpolation;
 using MGroup.FEM.Interpolation.GaussPointExtrapolation;
 using MGroup.FEM.Interpolation.Jacobians;
 using MGroup.LinearAlgebra.Matrices;
-using MGroup.Materials;
+using MGroup.MSolve.Constitutive;
 using MGroup.MSolve.Discretization;
 using MGroup.MSolve.Discretization.FreedomDegrees;
 using MGroup.MSolve.Discretization.Integration.Quadratures;
@@ -20,11 +20,11 @@ namespace MGroup.FEM.Elements
 	{
 		private readonly static IDofType[] nodalDOFTypes = new IDofType[] { ThermalDof.Temperature };
 		private readonly IDofType[][] dofTypes; //TODO: this should not be stored for each element. Instead store it once for each Quad4, Tri3, etc. Otherwise create it on the fly.
-		private readonly ThermalMaterial material;
+		private readonly IThermalMaterial material;
 
 		public ThermalElement3D(IReadOnlyList<Node> nodes, IIsoparametricInterpolation3D interpolation,
 		IQuadrature3D quadratureForStiffness, IQuadrature3D quadratureForMass,
-		IGaussPointExtrapolation3D gaussPointExtrapolation, ThermalMaterial material)
+		IGaussPointExtrapolation3D gaussPointExtrapolation, IThermalMaterial material)
 		{
 			this.material = material;
 			this.GaussPointExtrapolation = gaussPointExtrapolation;
