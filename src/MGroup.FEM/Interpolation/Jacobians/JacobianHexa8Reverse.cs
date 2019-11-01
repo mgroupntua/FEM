@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using MGroup.LinearAlgebra.Matrices;
-using MGroup.MSolve.Discretization.Interfaces;
+using MGroup.MSolve.Discretization;
 
 //J_0inv_hexa and detJ_0 can only be calculated during initialization (at the first configuration) and then cached
 namespace MGroup.FEM.Interpolation.Jacobians

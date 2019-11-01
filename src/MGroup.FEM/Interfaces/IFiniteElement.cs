@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using MGroup.FEM.Entities;
-using MGroup.MSolve.Discretization.Interfaces;
+using MGroup.MSolve.Discretization;
 
 namespace MGroup.FEM.Interfaces
 {

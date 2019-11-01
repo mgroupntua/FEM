@@ -1,6 +1,5 @@
-﻿using System;
-using MGroup.MSolve.Discretization.FreedomDegrees;
-using MGroup.MSolve.FEM.Interfaces;
+using System;
+using MGroup.MSolve.Discretization;
 
 namespace MGroup.FEM.Entities
 {

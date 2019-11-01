@@ -1,13 +1,11 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using MGroup.FEM.Interfaces;
 using MGroup.LinearAlgebra.Vectors;
 using MGroup.MSolve.Discretization;
 using MGroup.MSolve.Discretization.Commons;
-using MGroup.MSolve.Discretization.FreedomDegrees;
-using MGroup.MSolve.Discretization.Interfaces;
+using MGroup.MSolve.Discretization.DofOrdering;
 using MGroup.MSolve.Discretization.Loads;
-using MGroup.MSolve.FEM.Interfaces;
 
 //TODO: find what is going on with the dynamic loads and refactor them. That 564000000 in AssignMassAccelerationHistoryLoads()
 //      cannot be correct.

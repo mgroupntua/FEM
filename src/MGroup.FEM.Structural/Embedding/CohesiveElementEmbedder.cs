@@ -4,21 +4,29 @@ using MGroup.FEM.Embedding;
 using MGroup.FEM.Entities;
 using MGroup.FEM.Interfaces;
 using MGroup.LinearAlgebra.Matrices;
+using MGroup.LinearAlgebra.Matrices.Builders;
 using MGroup.MSolve.Discretization;
+using MGroup.MSolve.Discretization.Commons;
 
-namespace MGroup.FEM.Embedding
+//TODO: All these casting should be avoided by injecting the correct type in the constructor.
+namespace MGroup.FEM.Structural.Embedding
 {
-	public class ElementEmbedder : IElementDofEnumerator
+	/// <summary>
+	/// Appropriate superelement dofenumerator for problems with embedding of <see cref="Elements.CohesiveShell8ToHexa20"/> elements.
+	/// update of the original <see cref="ElementEmbedder"/> class Authors: Gerasimos Sotiropoulos     
+	/// </summary>
+	public class CohesiveElementEmbedder : IElementDofEnumerator
 	{
 		private readonly Model model;
-		private readonly Element embeddedElement;
+		private readonly IElement embeddedElement;
 		private readonly IEmbeddedDOFInHostTransformationVector transformation;
 		private readonly Dictionary<SuperElementDof, int> superElementMap = new Dictionary<SuperElementDof, int>();
-		private readonly Dictionary<EmbeddedNode, Dictionary<IDofType, int>> dofToHostMapping = new Dictionary<EmbeddedNode, Dictionary<IDofType, int>>();
-		private Matrix transformationMatrix;
-		//private bool isElementEmbedded = false;
+		private readonly Dictionary<EmbeddedNode, Dictionary<IDofType, int>> dofToHostMapping
+			= new Dictionary<EmbeddedNode, Dictionary<IDofType, int>>();
+		private CscMatrix transformationMatrix;
 
-		public ElementEmbedder(Model model, Element embeddedElement, IEmbeddedDOFInHostTransformationVector transformation)
+		public CohesiveElementEmbedder(Model model, Element embeddedElement,
+			IEmbeddedDOFInHostTransformationVector transformation)
 		{
 			this.model = model;
 			this.embeddedElement = embeddedElement;
@@ -28,12 +36,12 @@ namespace MGroup.FEM.Embedding
 
 		private void InitializeMappings()
 		{
-			var e = (IEmbeddedElement)(embeddedElement.ElementType);
+			var e = (IEmbeddedElement)embeddedElement.ElementType;
 			superElementMap.Clear();
 			int index = 0;
 			foreach (var embeddedNode in e.EmbeddedNodes)
 			{
-				int nodeOrderInEmbeddedElement = embeddedElement.Nodes.IndexOf(embeddedNode.Node);
+				int nodeOrderInEmbeddedElement = embeddedElement.Nodes.FindFirstIndex(embeddedNode.Node);
 				var currentEmbeddedNodeDOFs = embeddedElement.ElementType.DofEnumerator.GetDofTypesForMatrixAssembly(embeddedElement)[nodeOrderInEmbeddedElement];
 				//var currentNodeDOFs = currentEmbeddedNodeDOFs.Intersect(embeddedNode.DependentDOFs);
 				var independentEmbeddedDOFs = currentEmbeddedNodeDOFs.Except(embeddedNode.DependentDOFs);
@@ -71,7 +79,7 @@ namespace MGroup.FEM.Embedding
 
 			foreach (var node in embeddedElement.Nodes.Except(e.EmbeddedNodes.Select(x => x.Node)))
 			{
-				int nodeOrderInEmbeddedElement = embeddedElement.Nodes.IndexOf(node);
+				int nodeOrderInEmbeddedElement = embeddedElement.Nodes.FindFirstIndex(node);
 				var currentNodeDOFs = embeddedElement.ElementType.DofEnumerator.GetDofTypesForMatrixAssembly(embeddedElement)[nodeOrderInEmbeddedElement];
 				foreach (var dof in currentNodeDOFs)
 				{
@@ -91,13 +99,14 @@ namespace MGroup.FEM.Embedding
 			int row = 0;
 			int col = 0;
 			int totalRows = embeddedElement.ElementType.DofEnumerator.GetDofTypesForMatrixAssembly(embeddedElement).SelectMany(x => x).Count();
-			var matrix = new double[totalRows, superElementMap.Count];
+			//var matrix = new double[totalRows, superElementMap.Count];
+			var transformationMatrixOriginal = DokColMajor.CreateEmpty(totalRows, superElementMap.Count);
 
 			foreach (var embeddedNode in e.EmbeddedNodes)
 			{
 				var localTransformationMatrix = transformation.GetTransformationVector(embeddedNode);
 				var localHostDOFs = transformation.GetDOFTypesOfHost(embeddedNode);
-				int nodeOrderInEmbeddedElement = embeddedElement.Nodes.IndexOf(embeddedNode.Node);
+				int nodeOrderInEmbeddedElement = embeddedElement.Nodes.FindFirstIndex(embeddedNode.Node);
 				var embeddedNodeDOFQuantity = embeddedElement.ElementType.DofEnumerator.GetDofTypesForMatrixAssembly(embeddedElement)[nodeOrderInEmbeddedElement].Count;
 				int dependentDOFs = transformation.GetDependentDOFTypes.Count;
 
@@ -109,7 +118,7 @@ namespace MGroup.FEM.Embedding
 						for (int k = 0; k < localHostDOFs[j].Count; k++)
 						{
 							var superelement = new SuperElementDof() { DOF = localHostDOFs[j][k], Element = embeddedNode.EmbeddedInElement, EmbeddedNode = embeddedNode.Node, HostNode = embeddedNode.EmbeddedInElement.Nodes[j] };
-							matrix[row + i, superElementMap[superelement]] = localTransformationMatrix[i][col];
+							transformationMatrixOriginal[40 + row + i, superElementMap[superelement]] = localTransformationMatrix[i][col];
 							col++;
 						}
 					}
@@ -120,19 +129,19 @@ namespace MGroup.FEM.Embedding
 				for (int j = 0; j < independentEmbeddedDOFs.Length; j++)
 				{
 					var superelement = new SuperElementDof() { DOF = independentEmbeddedDOFs[j], Element = null, HostNode = null, EmbeddedNode = embeddedNode.Node };
-					matrix[row, superElementMap[superelement]] = 1;
+					transformationMatrixOriginal[40 + row, superElementMap[superelement]] = 1;
 					row++;
 				}
 			}
 
 			foreach (var node in embeddedElement.Nodes.Except(e.EmbeddedNodes.Select(x => x.Node)))
 			{
-				int nodeOrderInEmbeddedElement = embeddedElement.Nodes.IndexOf(node);
+				int nodeOrderInEmbeddedElement = embeddedElement.Nodes.FindFirstIndex(node);
 				var currentNodeDOFs = embeddedElement.ElementType.DofEnumerator.GetDofTypesForMatrixAssembly(embeddedElement)[nodeOrderInEmbeddedElement];
 				for (int j = 0; j < currentNodeDOFs.Count; j++)
 				{
 					var superelement = new SuperElementDof() { DOF = currentNodeDOFs[j], Element = null, HostNode = null, EmbeddedNode = node };
-					matrix[row, superElementMap[superelement]] = 1;
+					transformationMatrixOriginal[row - 24, superElementMap[superelement]] = 1;
 					row++;
 				}
 			}
@@ -146,7 +155,8 @@ namespace MGroup.FEM.Embedding
 			//    sw.WriteLine(line);
 			//}
 			//sw.Close();
-			transformationMatrix = Matrix.CreateFromArray(matrix);
+			//transformationMatrixOriginal = new Matrix2D(matrix);
+			transformationMatrix = transformationMatrixOriginal.BuildCscMatrix(true); ;
 		}
 
 		private void Initialize()
@@ -158,6 +168,16 @@ namespace MGroup.FEM.Embedding
 			InitializeMappings();
 			CalculateTransformationMatrix();
 		}
+
+		//public IMatrix2D<double> GetTransformedMatrix(IMatrix2D<double> matrix)
+		//{
+		//    var e = embeddedElement.ElementType as IEmbeddedElement;
+		//    //if (e == null || !isElementEmbedded) return matrix;
+		//    if (e == null) return matrix;
+		//    if (e.EmbeddedNodes.Count == 0) return matrix;
+
+		//    return transformationMatrix.Transpose() * ((SymmetricMatrix2D<double>)matrix).ToMatrix2D() * transformationMatrix;
+		//}
 
 		public IMatrix GetTransformedMatrix(IMatrix matrix)
 		{
@@ -176,10 +196,10 @@ namespace MGroup.FEM.Embedding
 			if (e == null) return vector;
 			if (e.EmbeddedNodes.Count == 0) return vector;
 
-			return transformationMatrix.Multiply(vector, false);
+			return transformationMatrix.Multiply(vector);
 		}
 
-		public double[] GetTransformedForcesVector(double[] vector) //compa prosthiki msolve
+		public double[] GetTransformedForcesVector(double[] vector)
 		{
 			var e = embeddedElement.ElementType as IEmbeddedElement;
 			//if (e == null || !isElementEmbedded) return matrix;
@@ -188,7 +208,6 @@ namespace MGroup.FEM.Embedding
 
 			return transformationMatrix.Multiply(vector, true);
 		}
-
 
 		public IReadOnlyList<IReadOnlyList<IDofType>> GetDofTypesForMatrixAssembly(IElement element)
 		{

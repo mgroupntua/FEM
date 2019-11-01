@@ -1,9 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using MGroup.MSolve.Discretization.FreedomDegrees;
-using MGroup.MSolve.FEM.Interfaces;
+using MGroup.MSolve.Discretization;
 
 namespace MGroup.FEM.Entities
 {
@@ -38,11 +37,11 @@ namespace MGroup.FEM.Entities
 	public class EmptyMassAccelerationHistoryLoad : MassAccelerationHistoryLoad
 	{
 		public EmptyMassAccelerationHistoryLoad() : base() { }
-		public override IDofType DOF
-		{
-			get { return StructuralDof.TranslationX; }
-			set { }
-		}
+		//public override IDofType DOF
+		//{
+		//	get { return StructuralDof.TranslationX; }
+		//	set { }
+		//}
 
 		public override double this[int currentTimeStep] { get { return 0.0; } }
 	}

@@ -1,7 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using MGroup.MSolve.Discretization;
-using MGroup.MSolve.Discretization.Interfaces;
 using MGroup.MSolve.Geometry.Coordinates;
 
 //TODO: Elements and Subdomains should not be stored inside the node by default. E.g. for elements there should be 

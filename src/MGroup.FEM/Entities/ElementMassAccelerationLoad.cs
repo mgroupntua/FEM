@@ -1,4 +1,4 @@
-﻿using MGroup.MSolve.Discretization.FreedomDegrees;
+using MGroup.MSolve.Discretization;
 
 namespace MGroup.FEM.Entities
 {

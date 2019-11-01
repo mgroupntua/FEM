@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using MGroup.FEM.Embedding;
-using MGroup.MSolve.Discretization.FreedomDegrees;
+using MGroup.MSolve.Discretization;
 
 namespace MGroup.FEM.Interfaces
 {

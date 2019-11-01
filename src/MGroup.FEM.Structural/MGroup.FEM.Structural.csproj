@@ -1,20 +1,25 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Authors>George Stavroulakis, Dimitris Tsapetis</Authors>
+    <Authors>George Stavroulakis, Serafeim Bakalakos, Dimitris Tsapetis, Gerasimos Sotiropoulos, George Soimoiris</Authors>
     <Product>MSolve</Product>
-    <Description>A series of generic classes and interfaces for spatially discretizing computational mechanics problems using the finite element method</Description>
+    <Description>A series of classes of structural mechanics finite elements for the solution of problems adhering to Constitutive.Structural laws</Description>
     <PackageProjectUrl>http://mgroup.ntua.gr</PackageProjectUrl>
     <RepositoryUrl>https://github.com/mgroupntua/FEM</RepositoryUrl>
-    <PackageIconUrl>https://github.com/mgroupntua/FEM/raw/develop/MGroupFEM.png</PackageIconUrl>
+    <PackageIconUrl>https://github.com/mgroupntua/FEM/raw/develop/MGroupFEMStructural.png</PackageIconUrl>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MGroup.Constitutive.Structural" Version="1.0.347" />
     <PackageReference Include="MGroup.LinearAlgebra" Version="1.0.310" />
     <PackageReference Include="MGroup.MSolve.Constitutive" Version="1.0.343" />
     <PackageReference Include="MGroup.MSolve.Discretization" Version="1.0.343" />
     <PackageReference Include="MGroup.MSolve.Geometry" Version="1.0.343" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MGroup.FEM\MGroup.FEM.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using MGroup.LinearAlgebra.Matrices;
+using MGroup.MSolve.Discretization;
 using MGroup.MSolve.Discretization.Integration.Quadratures;
-using MGroup.MSolve.Discretization.Interfaces;
 
 //J_0a and ll1 can only be calculated during initialization (at the first configuration) and then cached
 namespace MGroup.FEM.Interpolation.Jacobians

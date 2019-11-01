@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using MGroup.LinearAlgebra.Vectors;
+using MGroup.MSolve.Discretization;
 using MGroup.MSolve.Discretization.Commons;
-using MGroup.MSolve.Discretization.FreedomDegrees;
-using MGroup.MSolve.Discretization.Interfaces;
+using MGroup.MSolve.Discretization.DofOrdering;
 
 //TODO: remove code that calculates rhs vector components (nodal loads, constraints, etc). It should be moved to dedicated 
 //      classes like EquivalentLoadAssembler, so that it can be reused between subdomains of different projects (FEM, IGA, XFEM).
