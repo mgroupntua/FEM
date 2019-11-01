@@ -28,14 +28,14 @@ steps:
     feedRestore: 'MSolve-Nugets'
 
 
-- task: SonarCloudPrepare@1
-  displayName: "Prepares SonarCloud analysis"
-  inputs:
-    SonarCloud: 'SonarCloud'
-    organization: 'mgroupntua'
-    scannerMode: 'MSBuild'
-    projectKey: 'MSolve.FEM'
-    extraProperties: 'sonar.cs.opencover.reportsPaths=$(Build.SourcesDirectory)/coverage/coverage.opencover.xml'
+# - task: SonarCloudPrepare@1
+#   displayName: "Prepares SonarCloud analysis"
+#   inputs:
+#     SonarCloud: 'SonarCloud'
+#     organization: 'mgroupntua'
+#     scannerMode: 'MSBuild'
+#     projectKey: 'MSolve.FEM'
+#     extraProperties: 'sonar.cs.opencover.reportsPaths=$(Build.SourcesDirectory)/coverage/coverage.opencover.xml'
 
 
 - task: DotNetCoreCLI@2
@@ -47,29 +47,34 @@ steps:
     verbosityPack: 'Minimal'
     configuration: '$(buildConfiguration)'
 
-- script: |
-    dotnet test --logger trx --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=$(Build.SourcesDirectory)/coverage/ $(testProject)
-  displayName: 'Runs tests'
-
-
-- task: SonarCloudAnalyze@1
-  displayName: "Performs SonarCloud Analysis"
-
-- task: SonarCloudPublish@1
-  displayName: 'Publish Quality Gate Results'
+- task: DotNetCoreCLI@2
+  displayName: Runs Tests (develop)
+  condition: eq(variables['Build.SourceBranch'], 'refs/heads/develop')
   inputs:
-    pollingTimeoutSec: '300'
+    command: 'test'
+    projects: '**/*[Tt]ests/*.csproj'
+    arguments: '--configuration $(BuildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
+    publishTestResults: true
 
-- task: PublishTestResults@2
-  inputs:
-    testRunner: VSTest
-    testResultsFiles: '**/*.trx'
 
-- task: PublishCodeCoverageResults@1
-  inputs:
-    summaryFileLocation: $(Build.SourcesDirectory)/coverage/Cobertura/Cobertura.xml
-    reportDirectory: $(Build.SourcesDirectory)/coverage/Cobertura
-    codecoverageTool: cobertura
+# - task: SonarCloudAnalyze@1
+#   displayName: "Performs SonarCloud Analysis"
+
+# - task: SonarCloudPublish@1
+#   displayName: 'Publish Quality Gate Results'
+#   inputs:
+#     pollingTimeoutSec: '300'
+
+# - task: PublishTestResults@2
+#   inputs:
+#     testRunner: VSTest
+#     testResultsFiles: '**/*.trx'
+
+# - task: PublishCodeCoverageResults@1
+#   inputs:
+#     summaryFileLocation: $(Build.SourcesDirectory)/coverage/Cobertura/Cobertura.xml
+#     reportDirectory: $(Build.SourcesDirectory)/coverage/Cobertura
+#     codecoverageTool: cobertura
 
 - task: DotNetCoreCLI@2
   name: dotnetPack
