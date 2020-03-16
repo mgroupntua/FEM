@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
@@ -7,14 +7,26 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="IntegrationTests\EmbeddingNLRVE.cs" />
+    <Compile Remove="IntegrationTests\Shell8NonLinearPlate.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="coverlet.msbuild" Version="2.6.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="MGroup.Constitutive.Structural" Version="1.0.347" />
+    <PackageReference Include="MGroup.Constitutive.Thermal" Version="1.0.347" />
+    <PackageReference Include="MGroup.MSolve.Solution" Version="1.0.343" />
+    <PackageReference Include="MGroup.NumericalAnalyzers" Version="1.0.345" />
+    <PackageReference Include="MGroup.Solvers" Version="1.0.344" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
     <PackageReference Include="Moq" Version="4.13.0" />
     <PackageReference Include="OpenCover" Version="4.7.922" />
     <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="MGroup.MSolve.Constitutive" Version="1.0.343" />
+    <PackageReference Include="MGroup.MSolve.Discretization" Version="1.0.343" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -22,6 +34,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\MGroup.FEM.Structural\MGroup.FEM.Structural.csproj" />
+    <ProjectReference Include="..\..\src\MGroup.FEM.Thermal\MGroup.FEM.Thermal.csproj" />
     <ProjectReference Include="..\..\src\MGroup.FEM\MGroup.FEM.csproj" />
   </ItemGroup>
 
