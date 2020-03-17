@@ -9,6 +9,7 @@ using Xunit;
 namespace MGroup.FEM.Tests.IntegrationTests
 {
 	using Constitutive.Structural;
+	using Constitutive.Structural.ShellElements;
 	using MSolve.Solution;
 	using NumericalAnalyzers;
 	using NumericalAnalyzers.Logging;
@@ -112,7 +113,7 @@ namespace MGroup.FEM.Tests.IntegrationTests
 		private static void ShellPlateBuilder(Model model, double load_value)
 		{
 			// Origin: branch master idio onoma ParadeigmataElegxwnBuilder2.ShellPlateBuilder(Model model, double load_value)
-			var material1 = new ShellIContinuumMaterial3D()
+			var material1 = new ShellElasticMaterial3D()
 			{
 				YoungModulus = 135300,
 				PoissonRatio = 0.3,
