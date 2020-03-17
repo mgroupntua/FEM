@@ -6,6 +6,11 @@
 trigger:
 - develop
 
+pr:
+  branches:
+    include:
+    - develop
+
 pool:
   vmImage: 'VS2017-Win2016'
 
