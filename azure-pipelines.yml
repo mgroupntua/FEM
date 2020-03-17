@@ -84,6 +84,7 @@ steps:
 - task: DotNetCoreCLI@2
   name: dotnetPack
   displayName: "Packages new nugets"
+  condition: ne(variables['Build.Reason'], 'PullRequest')
   inputs:
     command: 'pack'
     versioningScheme: 'byEnvVar'
@@ -92,6 +93,7 @@ steps:
 
 - task: PublishBuildArtifacts@1
   name: publishToFeed
+  condition: ne(variables['Build.Reason'], 'PullRequest')
   displayName: "Publishes to pipeline artifacts"
   inputs:
     ArtifactName: 'drop'
@@ -99,6 +101,7 @@ steps:
 - task: DotNetCoreCLI@2
   name: dotnetPushNuget
   displayName: "Push nugets to feed"
+  condition: ne(variables['Build.Reason'], 'PullRequest')
   inputs:
     command: 'push'
     packagesToPush: '$(build.artifactStagingDirectory)/*.nupkg'
@@ -108,6 +111,7 @@ steps:
 - task: DotNetCoreCLI@2
   enabled: false
   name: dotnetPushSymbol
+  condition: ne(variables['Build.Reason'], 'PullRequest')
   displayName: "Publishes symbol nugets"
   inputs:
     command: 'push'
