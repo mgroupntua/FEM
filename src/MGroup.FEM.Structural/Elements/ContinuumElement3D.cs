@@ -13,6 +13,8 @@ using MGroup.MSolve.Discretization.Integration.Quadratures;
 using MGroup.MSolve.Discretization.Loads;
 using MGroup.MSolve.Discretization.Mesh;
 using MGroup.MSolve.Geometry.Coordinates;
+using MGroup.LinearAlgebra.Matrices;
+using MGroup.LinearAlgebra.Vectors;
 
 namespace MGroup.FEM.Structural.Elements
 {
@@ -170,7 +172,23 @@ namespace MGroup.FEM.Structural.Elements
 
 		public double[] CalculateForces(IElement element, double[] localTotalDisplacements, double[] localDisplacements)
 		{
-			throw new NotImplementedException();
+			int numberOfDofs = 3 * Nodes.Count;
+			var Forces = Vector.CreateZero(numberOfDofs);
+			IReadOnlyList<Matrix> shapeGradientsNatural =
+				Interpolation.EvaluateNaturalGradientsAtGaussPoints(QuadratureForStiffness);
+			for (int gp = 0; gp < QuadratureForStiffness.IntegrationPoints.Count; ++gp)
+			{
+				Vector Stresses = Vector.CreateFromArray(materialsAtGaussPoints[gp].Stresses);
+				var jacobian = new IsoparametricJacobian3D(Nodes, shapeGradientsNatural[gp]);
+				Matrix shapeGradientsCartesian =
+					jacobian.TransformNaturalDerivativesToCartesian(shapeGradientsNatural[gp]);
+				Matrix deformation = BuildDeformationMatrix(shapeGradientsCartesian);
+				Vector gpForces = deformation.Transpose() * (Stresses);
+				double dA = jacobian.DirectDeterminant * QuadratureForStiffness.IntegrationPoints[gp].Weight;
+				gpForces.ScaleIntoThis(dA);
+				Forces.AddIntoThis(gpForces);
+			}
+			return Forces.CopyToArray();
 		}
 
 		public double[] CalculateForcesForLogging(IElement element, double[] localDisplacements)
@@ -181,7 +199,23 @@ namespace MGroup.FEM.Structural.Elements
 		public Tuple<double[], double[]> CalculateStresses(IElement element, double[] localDisplacements,
 			double[] localdDisplacements)
 		{
-			throw new NotImplementedException();
+			int numberOfDofs = 3 * Nodes.Count;
+			var Forces = Vector.CreateZero(numberOfDofs);
+			IReadOnlyList<Matrix> shapeGradientsNatural =
+				Interpolation.EvaluateNaturalGradientsAtGaussPoints(QuadratureForStiffness);
+
+			double[] strains = new double[6];
+			for (int gp = 0; gp < QuadratureForStiffness.IntegrationPoints.Count; ++gp)
+			{
+				strains = new double[6];
+				var jacobian = new IsoparametricJacobian3D(Nodes, shapeGradientsNatural[gp]);
+				Matrix shapeGradientsCartesian =
+					jacobian.TransformNaturalDerivativesToCartesian(shapeGradientsNatural[gp]);
+				Matrix deformation = BuildDeformationMatrix(shapeGradientsCartesian);
+				strains = deformation.Multiply(localDisplacements);
+				materialsAtGaussPoints[gp].UpdateMaterial(strains);
+			}
+			return new Tuple<double[], double[]>(strains, materialsAtGaussPoints[materialsAtGaussPoints.Count - 1].Stresses);
 		}
 
 		public double CalculateVolume()
