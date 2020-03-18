@@ -12,6 +12,7 @@ namespace MGroup.FEM.Tests.IntegrationTests
 {
 	using Constitutive.Structural;
 	using Constitutive.Structural.ContinuumElements;
+	using Constitutive.Structural.ShellElements;
 	using MSolve.Constitutive;
 	using MSolve.Solution;
 	using NumericalAnalyzers;
@@ -835,7 +836,7 @@ namespace MGroup.FEM.Tests.IntegrationTests
 			//    YoungModulus = E_shell,
 			//    PoissonRatio = ni_shell,
 			//};
-			var material2 = new ShellIContinuumMaterial3D()
+			var material2 = new ShellElasticMaterial3D()
 			{
 				YoungModulus = E_shell,
 				PoissonRatio = ni_shell,
