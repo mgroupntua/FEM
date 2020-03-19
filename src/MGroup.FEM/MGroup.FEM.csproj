@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -11,10 +11,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MGroup.LinearAlgebra" Version="1.0.310" />
-    <PackageReference Include="MGroup.MSolve.Constitutive" Version="1.0.343" />
-    <PackageReference Include="MGroup.MSolve.Discretization" Version="1.0.343" />
-    <PackageReference Include="MGroup.MSolve.Geometry" Version="1.0.343" />
+    <PackageReference Include="MGroup.LinearAlgebra" Version="0.1.0-unstable.21" />
+    <PackageReference Include="MGroup.MSolve.Constitutive" Version="0.1.0-unstable.37" />
+    <PackageReference Include="MGroup.MSolve.Discretization" Version="0.1.0-unstable.37" />
+    <PackageReference Include="MGroup.MSolve.Geometry" Version="0.1.0-unstable.37" />
   </ItemGroup>
 
 </Project>

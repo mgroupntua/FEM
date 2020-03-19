@@ -11,11 +11,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MGroup.Constitutive.Structural" Version="1.0.347" />
-    <PackageReference Include="MGroup.LinearAlgebra" Version="1.0.310" />
-    <PackageReference Include="MGroup.MSolve.Constitutive" Version="1.0.343" />
-    <PackageReference Include="MGroup.MSolve.Discretization" Version="1.0.343" />
-    <PackageReference Include="MGroup.MSolve.Geometry" Version="1.0.343" />
+    <PackageReference Include="MGroup.Constitutive.Structural" Version="0.1.0-unstable.31" />
+    <PackageReference Include="MGroup.LinearAlgebra" Version="0.1.0-unstable.21" />
+    <PackageReference Include="MGroup.MSolve.Constitutive" Version="0.1.0-unstable.37" />
+    <PackageReference Include="MGroup.MSolve.Discretization" Version="0.1.0-unstable.37" />
+    <PackageReference Include="MGroup.MSolve.Geometry" Version="0.1.0-unstable.37" />
   </ItemGroup>
 
   <ItemGroup>
