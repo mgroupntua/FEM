@@ -1,0 +1,25 @@
+To run an Abaqus job from the myJob.inp file on Windows:
+
+0) Make sure Abaqus is added to PATH:
+	- Find the path where Abaqus is installed and the Commands subfolder.
+		- For me it is C:\Program Files\SIMULIA\Abaqus\Commands
+	- Open Control Panel\System and Security\System
+	- Open Advanced System Settings
+	- In the new window System Properties, open the Advanced tab and then Environmental Variables
+	- In the new window Environmental Variables, from the list User variables for <username>, select Path and then press Edit
+	- Depending on your Windows OS:
+		- (Win10 and I think 8, 8.1) In the new window Edit environmental variable, press new and type or paste your Abaqus path. 
+		- (Older Windows versions) Add your Abaqus path to the end of the PATH string. Separate it from the previous one using the character ;
+		
+1) Copy myJob.inp to a folder on your machine. 
+	- DO NOT mess with the version of myJob.inp in the VisualStudio project's folders.
+	- If you do mess with it by mistake, DO NOT commit the changes for God's sake.
+	
+2) Open command prompt in that folder:
+	- In windows explorer, click on the folders path and select it all, if it isn't already.
+	- Type: cmd
+	- Alternatively, you could open the command prompt anywhere and change the directory, you masochist.
+	
+3) Run the job by entering: abaqus job=myJob
+	- The .inp extension is not needed
+	- If you rerun the job, make sure to enter: y , when prompted to overwrite the files. 

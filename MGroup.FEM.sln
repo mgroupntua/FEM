@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGroup.FEM.Thermal", "src\M
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGroup.FEM.PorousMedia", "src\MGroup.FEM.PorousMedia\MGroup.FEM.PorousMedia.csproj", "{37714488-F640-4529-B888-D7A4ACA3431E}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGroup.FEM.Tests", "tests\MGroup.FEM.Tests\MGroup.FEM.Tests.csproj", "{AF94B94E-657E-471D-9782-25AE3FDA8C3A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,10 @@ Global
 		{37714488-F640-4529-B888-D7A4ACA3431E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{37714488-F640-4529-B888-D7A4ACA3431E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{37714488-F640-4529-B888-D7A4ACA3431E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF94B94E-657E-471D-9782-25AE3FDA8C3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF94B94E-657E-471D-9782-25AE3FDA8C3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF94B94E-657E-471D-9782-25AE3FDA8C3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF94B94E-657E-471D-9782-25AE3FDA8C3A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -46,6 +52,7 @@ Global
 		{C6FAC11F-40ED-4CEB-A0EB-877703DA10AE} = {B0C87C19-1B55-4255-ADC8-97FC240EB363}
 		{2042A3FE-94F9-4FD8-8AA6-558F15FA37E1} = {B0C87C19-1B55-4255-ADC8-97FC240EB363}
 		{37714488-F640-4529-B888-D7A4ACA3431E} = {B0C87C19-1B55-4255-ADC8-97FC240EB363}
+		{AF94B94E-657E-471D-9782-25AE3FDA8C3A} = {F7BB06C4-D249-41C7-832F-6E03F526800D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D4E306A5-E12C-49DD-92A6-1D6687B9C4B9}
