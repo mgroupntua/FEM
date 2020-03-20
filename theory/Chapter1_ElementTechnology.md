@@ -18,7 +18,7 @@ var quad4 = factory.CreateElement(CellType.Quad4, nodeSet);
 
 #### Tri3
 <p align="center">
-  <img src="../docs/Images/Tri3.png" width="400"/>
+  <img src="../Images/Tri3.png" width="400"/>
 </p>
 
 For the stiffness integration of the Tri3 element an one-point integration is sufficient.
