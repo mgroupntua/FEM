@@ -41,7 +41,7 @@ For the mass integration of the Tri3 element an three-point integration is neede
 
 #### Tri6
 <p align="center">
-  <img src="../docs/Images/tri6.png" width="400"/>
+  <img src="../Images/tri6.png" width="400"/>
 </p>
 
 **GaussPoints for stiffness:**
@@ -69,7 +69,7 @@ For the mass integration of the Tri3 element an three-point integration is neede
 
 #### Quad4
 <p align="center">
-  <img src="../docs/Images/quad4.png" width="400"/>
+  <img src="../Images/quad4.png" width="400"/>
 </p>
 In case of quadrilateral elements the same Gauss points are used for both stiffness and mass.
 
@@ -84,7 +84,7 @@ In case of quadrilateral elements the same Gauss points are used for both stiffn
 
 #### Quad8
 <p align="center">
-  <img src="../docs/Images/quad8.png" width="400"/>
+  <img src="../Images/quad8.png" width="400"/>
 </p>
 
 **GaussPoints for stiffness and mass:**
@@ -104,7 +104,7 @@ In case of quadrilateral elements the same Gauss points are used for both stiffn
 
 #### Quad9
 <p align="center">
-  <img src="../docs/Images/Quad9.png" width="400"/>
+  <img src="../Images/Quad9.png" width="400"/>
 </p>
 
 **GaussPoints for stiffness and mass:**
@@ -131,62 +131,62 @@ var tet4 = factory.CreateElement(CellType.Tet4, NodeSet0);
 
 #### Tet4
 <p align="center">
-  <img src="../docs/Images/Tet4.png" height="400"/>
+  <img src="../Images/Tet4.png" height="400"/>
 </p>
 
 #### Tet10
 <p align="center">
-  <img src="../docs/Images/Tet10.png" height="400"/>
+  <img src="../Images/Tet10.png" height="400"/>
 </p>
 
 
 #### Hexa8
 <p align="center">
-  <img src="../docs/Images/Hexa8.png" width="400"/>
+  <img src="../Images/Hexa8.png" width="400"/>
 </p>
 
 #### Hexa20
 <p align="center">
-  <img src="../docs/Images/Hexa20.png" height="400"/>
+  <img src="../Images/Hexa20.png" height="400"/>
 </p>
 
 #### Hexa27
 <p align="center">
-  <img src="../docs/Images/Hexa27.png" height="400"/>
+  <img src="../Images/Hexa27.png" height="400"/>
 </p>
 
 #### Wedge6
 <p align="center">
-  <img src="../docs/Images/Wedge6.png" height="400"/>
+  <img src="../Images/Wedge6.png" height="400"/>
 </p>
 
 #### Wedge15
 <p align="center">
-  <img src="../docs/Images/Wedge15.png" height="400"/>
+  <img src="../Images/Wedge15.png" height="400"/>
 </p>
 
 
 #### Wedge18
 <p align="center">
-  <img src="../docs/Images/Wedge18.png" height="400"/>
+  <img src="../Images/Wedge18.png" height="400"/>
 </p>
 
 
 #### Pyra5
 <p align="center">
-  <img src="../docs/Images/Pyra5.png" width="400"/>
+  <img src="../Images/Pyra5.png" width="400"/>
 </p>
 
 
 #### Pyra13
 <p align="center">
-  <img src="../docs/Images/Pyra13.png" width="400"/>
+  <img src="../Images/Pyra13.png" width="400"/>
 </p>
 
 
 #### Pyra14
 <p align="center">
-  <img src="../docs/Images/Pyra13.png" width="400"/>
+  <img src="../Images/Pyra14.png" width="400"/>
 </p>
 
 
