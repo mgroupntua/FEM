@@ -1,4 +1,7 @@
 using System.Collections.Generic;
+using ISAAR.MSolve.FEM.Elements;
+using ISAAR.MSolve.FEM.Interpolation;
+using MGroup.Constitutive.Structural;
 using MGroup.FEM.Entities;
 using MGroup.FEM.Interpolation;
 using MGroup.FEM.Interpolation.GaussPointExtrapolation;
@@ -50,6 +53,12 @@ namespace MGroup.FEM.Structural.Elements
 			integrationsForStiffness.Add(CellType.Hexa8, GaussLegendre3D.GetQuadratureWithOrder(2, 2, 2));
 			integrationsForMass.Add(CellType.Hexa8, GaussLegendre3D.GetQuadratureWithOrder(2, 2, 2));
 			extrapolations.Add(CellType.Hexa8, ExtrapolationGaussLegendre2x2x2.UniqueInstance);
+
+			// Hexa8inv
+			interpolations.Add(CellType.Hexa8inv, InterpolationHexa8Reversed.UniqueInstance);
+			integrationsForStiffness.Add(CellType.Hexa8inv, GaussLegendre3D.GetQuadratureWithOrder(2, 2, 2));
+			integrationsForMass.Add(CellType.Hexa8inv, GaussLegendre3D.GetQuadratureWithOrder(2, 2, 2));
+			extrapolations.Add(CellType.Hexa8inv, ExtrapolationGaussLegendre2x2x2.UniqueInstance);
 
 			// Hexa20
 			// TODO: extrapolations for Hexa20
@@ -131,6 +140,12 @@ namespace MGroup.FEM.Structural.Elements
 			var materialsAtGaussPoints = new IContinuumMaterial3D[numGPs];
 			for (int gp = 0; gp < numGPs; ++gp) materialsAtGaussPoints[gp] = (IContinuumMaterial3D)commonMaterial.Clone();
 			return CreateElement(cellType, nodes, materialsAtGaussPoints, commonDynamicProperties);
+		}
+
+		public ContinummElement3DNonLinear CreateNonLinearElement(CellType cellType, IReadOnlyList<Node> nodes,
+			IContinuumMaterial3D commonMaterial, DynamicMaterial commonDynamicProperties)
+		{
+			return new ContinummElement3DNonLinear(nodes, commonMaterial, integrationsForStiffness[cellType], interpolations[cellType]);
 		}
 
 		public ContinuumElement3D CreateElement(CellType cellType, IReadOnlyList<Node> nodes,
