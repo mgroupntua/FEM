@@ -10,6 +10,8 @@ namespace MGroup.FEM.Tests.IntegrationTests
 {
 	using Constitutive.Structural;
 	using Constitutive.Structural.ContinuumElements;
+	using MGroup.FEM.Structural.Elements.supportiveClasses;
+	using MGroup.MSolve.Discretization.Mesh;
 	using MSolve.Constitutive;
 	using MSolve.Solution;
 	using NumericalAnalyzers;
@@ -169,13 +171,23 @@ namespace MGroup.FEM.Tests.IntegrationTests
 
 			// orismos elements 
 			Element e1;
+			DynamicMaterial DynamicMaterial = new DynamicMaterial(1, 0, 0);
+			var factory = new ContinuumElement3DFactory(material1, DynamicMaterial);
+			
 			int subdomainID = Hexa8NonLinearCantilever.subdomainID;
 			for (int nElement = 0; nElement < elementData.GetLength(0); nElement++)
 			{
+				List<Node> nodeSet = new List<Node>(8);
+				for (int j = 0; j < 8; j++)
+				{
+					int nodeID = elementData[nElement, j+1];
+					nodeSet.Add((Node)model.NodesDictionary[nodeID]);
+				}
 				e1 = new Element()
 				{
 					ID = nElement + 1,
-					ElementType = new Hexa8NonLinear(material1, GaussLegendre3D.GetQuadratureWithOrder(3, 3, 3)) // dixws to e. exoume sfalma enw sto beambuilding oxi//edw kaleitai me ena orisma to Hexa8                    
+					ElementType  = factory.CreateNonLinearElement(CellType.Hexa8, nodeSet, material1, DynamicMaterial)
+					//nnew Hexa8NonLinear(material1, GaussLegendre3D.GetQuadratureWithOrder(3, 3, 3)) // dixws to e. exoume sfalma enw sto beambuilding oxi//edw kaleitai me ena orisma to Hexa8                    
 				};
 				for (int j = 0; j < 8; j++)
 				{

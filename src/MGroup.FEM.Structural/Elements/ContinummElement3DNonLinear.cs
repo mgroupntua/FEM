@@ -835,7 +835,7 @@ namespace ISAAR.MSolve.FEM.Elements
         public EmbeddedNode BuildHostElementEmbeddedNode(Element element, Node node,
             IEmbeddedDOFInHostTransformationVector transformationVector)
         {
-            if (!(Interpolation.CellType == CellType.Hexa8inv))
+            if (!(Interpolation.CellType == CellType.Hexa8))
             {
                 throw new NotImplementedException();
             }
@@ -851,7 +851,7 @@ namespace ISAAR.MSolve.FEM.Elements
 
         private double[] GetNaturalCoordinates(IElement element, Node node)
         {
-            if (!(Interpolation.CellType == CellType.Hexa8inv))
+            if (!(Interpolation.CellType == CellType.Hexa8))
             {
                 throw new NotImplementedException();
             }

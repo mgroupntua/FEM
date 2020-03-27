@@ -13,6 +13,10 @@ namespace MGroup.FEM.Tests.IntegrationTests
 	using Constitutive.Structural;
 	using Constitutive.Structural.ContinuumElements;
 	using Constitutive.Structural.ShellElements;
+	using ISAAR.MSolve.FEM.Elements;
+	using ISAAR.MSolve.FEM.Interpolation;
+	using MGroup.FEM.Structural.Elements.supportiveClasses;
+	using MGroup.MSolve.Discretization.Mesh;
 	using MSolve.Constitutive;
 	using MSolve.Solution;
 	using NumericalAnalyzers;
@@ -37,7 +41,7 @@ namespace MGroup.FEM.Tests.IntegrationTests
 		private static bool AreDisplacementsSame(IReadOnlyList<Dictionary<int, double>> expectedDisplacements,
 			TotalDisplacementsPerIterationLog computedDisplacements)
 		{
-			var comparer = new ValueComparer(1E-10); // for node major dof order and skyline solver
+			var comparer = new ValueComparer(1E-9); // for node major dof order and skyline solver
 													 //var comparer = new ValueComparer(1E-1); // for other solvers. It may require adjusting after visual inspection
 			for (int iter = 0; iter < expectedDisplacements.Count; ++iter)
 			{
@@ -440,6 +444,9 @@ namespace MGroup.FEM.Tests.IntegrationTests
 			int ElementID;
 			int[] globalNodeIDforlocalNode_i = new int[8];
 
+			DynamicMaterial DynamicMaterial = new DynamicMaterial(1, 0, 0);
+			var factory = new ContinuumElement3DFactory(material1, DynamicMaterial);
+
 			for (int h1 = 0; h1 < hexa1; h1++)
 			{
 				for (int h2 = 0; h2 < hexa2; h2++)
@@ -456,11 +463,20 @@ namespace MGroup.FEM.Tests.IntegrationTests
 						globalNodeIDforlocalNode_i[6] = renumbering.GetNewNodeNumbering(Topol_rve(h1 + 1, h2 + 1, h3 + 1, hexa1, hexa2, hexa3, kuvos, endiam_plaka, katw_plaka));
 						globalNodeIDforlocalNode_i[7] = renumbering.GetNewNodeNumbering(Topol_rve(h1 + 1 + 1, h2 + 1, h3 + 1, hexa1, hexa2, hexa3, kuvos, endiam_plaka, katw_plaka));
 
+						List<Node> nodeSet = new List<Node>(8);
+						for (int j = 0; j < 8; j++)
+						{
+							int nodeID1 = globalNodeIDforlocalNode_i[ j ];
+							nodeSet.Add((Node)model.NodesDictionary[nodeID1]);
+						}
+
 						e1 = new Element()
 						{
 							ID = ElementID,
-							ElementType = new Hexa8NonLinear(material1, GaussLegendre3D.GetQuadratureWithOrder(3, 3, 3)) // dixws to e. exoume sfalma enw sto beambuilding oxi//edw kaleitai me ena orisma to Hexa8
-						};
+							ElementType //= factory.CreateNonLinearElement(CellType.Hexa8, nodeSet, material1, DynamicMaterial)
+							//=new Hexa8NonLinear(material1, GaussLegendre3D.GetQuadratureWithOrder(3, 3, 3)) // dixws to e. exoume sfalma enw sto beambuilding oxi//edw kaleitai me ena orisma to Hexa8
+							= new ContinummElement3DNonLinear(nodeSet, material1, GaussLegendre3D.GetQuadratureWithOrder(3,3,3), InterpolationHexa8Reversed.UniqueInstance)
+					};
 
 						for (int j = 0; j < 8; j++)
 						{

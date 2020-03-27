@@ -5,6 +5,7 @@ using MGroup.Constitutive.Structural;
 using MGroup.FEM.Entities;
 using MGroup.FEM.Interpolation;
 using MGroup.FEM.Interpolation.GaussPointExtrapolation;
+using MGroup.FEM.Structural.Elements.supportiveClasses;
 using MGroup.MSolve.Constitutive;
 using MGroup.MSolve.Discretization.Integration.Quadratures;
 using MGroup.MSolve.Discretization.Mesh;
@@ -48,18 +49,17 @@ namespace MGroup.FEM.Structural.Elements
 			integrationsForMass.Add(CellType.Tet10, TetrahedronQuadrature.Order5Points15);
 			extrapolations.Add(CellType.Tet10, null);
 
-			// Hexa8
-			interpolations.Add(CellType.Hexa8, InterpolationHexa8.UniqueInstance);
-			integrationsForStiffness.Add(CellType.Hexa8, GaussLegendre3D.GetQuadratureWithOrder(2, 2, 2));
-			integrationsForMass.Add(CellType.Hexa8, GaussLegendre3D.GetQuadratureWithOrder(2, 2, 2));
-			extrapolations.Add(CellType.Hexa8, ExtrapolationGaussLegendre2x2x2.UniqueInstance);
+			//// Hexa8
+			//interpolations.Add(CellType.Hexa8, InterpolationHexa8.UniqueInstance);
+			//integrationsForStiffness.Add(CellType.Hexa8, GaussLegendre3D.GetQuadratureWithOrder(2, 2, 2));
+			//integrationsForMass.Add(CellType.Hexa8, GaussLegendre3D.GetQuadratureWithOrder(2, 2, 2));
+			//extrapolations.Add(CellType.Hexa8, ExtrapolationGaussLegendre2x2x2.UniqueInstance);
 
 			// Hexa8inv
-			interpolations.Add(CellType.Hexa8inv, InterpolationHexa8Reversed.UniqueInstance);
-			integrationsForStiffness.Add(CellType.Hexa8inv, GaussLegendre3D.GetQuadratureWithOrder(2, 2, 2));
-			integrationsForMass.Add(CellType.Hexa8inv, GaussLegendre3D.GetQuadratureWithOrder(2, 2, 2));
-			extrapolations.Add(CellType.Hexa8inv, ExtrapolationGaussLegendre2x2x2.UniqueInstance);
-
+			interpolations.Add(CellType.Hexa8  , InterpolationHexa8Reversed.UniqueInstance);
+			integrationsForStiffness.Add(CellType.Hexa8, GaussLegendre3D.GetQuadratureWithOrder(2, 2, 2));
+			integrationsForMass.Add(CellType.Hexa8, GaussLegendre3D.GetQuadratureWithOrder(2, 2, 2));
+			extrapolations.Add(CellType.Hexa8,ExtrapolationGaussLegendre2x2x2.UniqueInstance);
 			// Hexa20
 			// TODO: extrapolations for Hexa20
 			interpolations.Add(CellType.Hexa20, InterpolationHexa20.UniqueInstance);
@@ -133,7 +133,7 @@ namespace MGroup.FEM.Structural.Elements
 			return CreateElement(cellType, nodes, commonMaterial, commonDynamicProperties);
 		}
 
-		public ContinuumElement3D CreateElement(CellType cellType, IReadOnlyList<Node> nodes,
+		private ContinuumElement3D CreateElement(CellType cellType, IReadOnlyList<Node> nodes,
 			IContinuumMaterial3D commonMaterial, IDynamicMaterial commonDynamicProperties)
 		{
 			int numGPs = integrationsForStiffness[cellType].IntegrationPoints.Count;
@@ -148,7 +148,7 @@ namespace MGroup.FEM.Structural.Elements
 			return new ContinummElement3DNonLinear(nodes, commonMaterial, integrationsForStiffness[cellType], interpolations[cellType]);
 		}
 
-		public ContinuumElement3D CreateElement(CellType cellType, IReadOnlyList<Node> nodes,
+		private ContinuumElement3D CreateElement(CellType cellType, IReadOnlyList<Node> nodes,
 			IReadOnlyList<IContinuumMaterial3D> materialsAtGaussPoints, IDynamicMaterial commonDynamicProperties)
 		{
 			//TODO: check if nodes - interpolation and Gauss points - materials match

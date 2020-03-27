@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using ISAAR.MSolve.Logging;
 using MGroup.Constitutive.Structural;
 using MGroup.Constitutive.Structural.ContinuumElements;
 using MGroup.FEM.Entities;
@@ -177,11 +178,11 @@ namespace ISAAR.MSolve.FEM.Tests.Elements
                 List<Node> nodeSet = new List<Node>(8);
                 for (int j = 0; j < 8; j++)
                 {
-                    int ren1 = ContinuumHexa8NodesNumbering[j ];
-                    int nodeID = elementData[nElement, ren1];
+                    int nodeID = elementData[nElement, j+1];
                     nodeSet.Add((Node)model.NodesDictionary[nodeID]);
                 }
 
+				
                 var factory = new ContinuumElement3DFactory(material1, DynamicMaterial);
 
                 //e1 = factory.CreateElement(CellType3D.Hexa8, nodeSet); 
@@ -192,8 +193,8 @@ namespace ISAAR.MSolve.FEM.Tests.Elements
                 };
                 for (int j = 0; j < 8; j++)
                 {
-                    int ren1 = ContinuumHexa8NodesNumbering[j];
-                    int nodeID = elementData[nElement, ren1];
+                    
+                    int nodeID = elementData[nElement, j+1];
                     e1.NodesDictionary.Add(nodeID, model.NodesDictionary[nodeID]);
                 }
                 model.ElementsDictionary.Add(e1.ID, e1);

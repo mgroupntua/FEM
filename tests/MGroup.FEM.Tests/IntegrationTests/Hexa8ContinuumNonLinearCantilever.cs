@@ -5,6 +5,7 @@ using MGroup.Constitutive.Structural;
 using MGroup.Constitutive.Structural.ContinuumElements;
 using MGroup.FEM.Entities;
 using MGroup.FEM.Structural.Elements;
+using MGroup.FEM.Structural.Elements.supportiveClasses;
 using MGroup.MSolve.Discretization;
 using MGroup.MSolve.Discretization.Commons;
 using MGroup.MSolve.Discretization.Integration.Quadratures;
@@ -170,7 +171,7 @@ namespace ISAAR.MSolve.Tests.FEM
 
             // orismos elements 
             Element e1;
-            int subdomainID = Hexa8ContinuumNonLinearCantilever.subdomainID;
+			int subdomainID = Hexa8ContinuumNonLinearCantilever.subdomainID;
             for (int nElement = 0; nElement < elementData.GetLength(0); nElement++)
             {
                 DynamicMaterial DynamicMaterial = new DynamicMaterial(1, 0, 0);
@@ -184,14 +185,17 @@ namespace ISAAR.MSolve.Tests.FEM
 
                 var factory = new ContinuumElement3DFactory(material1, DynamicMaterial);
 
-                e1 = new Element()
-                {
-                    ID = nElement + 1,
-                    ElementType = new ContinummElement3DNonLinear(nodeSet, material1, GaussLegendre3D.GetQuadratureWithOrder(3, 3, 3), InterpolationHexa8Reversed.UniqueInstance)// dixws to e. exoume sfalma enw sto beambuilding oxi//edw kaleitai me ena orisma to Hexa8                    
-                };
+				e1 = new Element()
+				{
+					ID = nElement + 1,
+					ElementType //factory.CreateNonLinearElement(CellType.Hexa8, nodeSet, material1, DynamicMaterial)
+					//new ContinummElement3DNonLinear(nodeSet, material1, GaussLegendre3D.GetQuadratureWithOrder(3, 3, 3), InterpolationHexa8Reversed.UniqueInstance)// dixws to e. exoume sfalma enw sto beambuilding oxi//edw kaleitai me ena orisma to Hexa8                    
+					= new ContinummElement3DNonLinear(nodeSet, material1, GaussLegendre3D.GetQuadratureWithOrder(3, 3, 3), InterpolationHexa8Reversed.UniqueInstance),
+
+				};
                 for (int j = 0; j < 8; j++)
                 {
-                    e1.NodesDictionary.Add(elementData[nElement, j + 1], model.NodesDictionary[elementData[nElement, j + 1]]);
+					e1.NodesDictionary.Add(elementData[nElement, j+1], model.NodesDictionary[elementData[nElement, j+1]]);
                 }
                 model.ElementsDictionary.Add(e1.ID, e1);
                 model.SubdomainsDictionary[subdomainID].Elements.Add( e1);

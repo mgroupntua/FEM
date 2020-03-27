@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using ISAAR.MSolve.FEM.Interpolation;
 using MGroup.FEM.Entities;
 using MGroup.FEM.Interpolation;
 using MGroup.FEM.Interpolation.GaussPointExtrapolation;
@@ -38,8 +39,14 @@ namespace MGroup.FEM.Thermal.Elements
 			integrationsForMass.Add(CellType.Tet10, TetrahedronQuadrature.Order5Points15);
 			extrapolations.Add(CellType.Tet10, null);
 
+			////Hexa8
+			//interpolations.Add(CellType.Hexa8, InterpolationHexa8.UniqueInstance);
+			//integrationsForStiffness.Add(CellType.Hexa8, GaussLegendre3D.GetQuadratureWithOrder(2, 2, 2));
+			//integrationsForMass.Add(CellType.Hexa8, GaussLegendre3D.GetQuadratureWithOrder(2, 2, 2));
+			//extrapolations.Add(CellType.Hexa8, ExtrapolationGaussLegendre2x2x2.UniqueInstance);
+
 			// Hexa8
-			interpolations.Add(CellType.Hexa8, InterpolationHexa8.UniqueInstance);
+			interpolations.Add(CellType.Hexa8, InterpolationHexa8Reversed.UniqueInstance);
 			integrationsForStiffness.Add(CellType.Hexa8, GaussLegendre3D.GetQuadratureWithOrder(2, 2, 2));
 			integrationsForMass.Add(CellType.Hexa8, GaussLegendre3D.GetQuadratureWithOrder(2, 2, 2));
 			extrapolations.Add(CellType.Hexa8, ExtrapolationGaussLegendre2x2x2.UniqueInstance);

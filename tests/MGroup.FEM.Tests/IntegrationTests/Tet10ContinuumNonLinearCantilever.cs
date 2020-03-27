@@ -4,6 +4,7 @@ using MGroup.Constitutive.Structural;
 using MGroup.Constitutive.Structural.ContinuumElements;
 using MGroup.FEM.Entities;
 using MGroup.FEM.Structural.Elements;
+using MGroup.FEM.Structural.Elements.supportiveClasses;
 using MGroup.MSolve.Discretization;
 using MGroup.MSolve.Discretization.Commons;
 using MGroup.MSolve.Discretization.Integration.Quadratures;
@@ -233,7 +234,7 @@ namespace ISAAR.MSolve.Tests.FEM
                 {-0.1250000000000000,0.0000000000000000,0.5000000000000000},
                 {0.0000000000000000,0.0000000000000000,0.7500000000000000},};
 
-            int[] take_msolve_nodes_from_adina_tade_nodes = new int[] { 2, 1, 3, 0, 5, 7, 8, 6, 9, 4 };
+            //int[] take_msolve_nodes_from_adina_tade_nodes = new int[] { 2, 1, 3, 0, 5, 7, 8, 6, 9, 4 };
 
             int[,] elementData = new int[,] {{33,2,1,88,35,13,34,90,89,97},
                 {33,3,2,88,36,14,35,91,90,97},
@@ -294,33 +295,34 @@ namespace ISAAR.MSolve.Tests.FEM
 
             // orismos elements 
             Element e1;
+			var adinaOrder = new AdinaElementLocalNodeOrdering();
             int subdomainID = Tet10ContinuumNonLinearCantilever.subdomainID;
             for (int nElement = 0; nElement < elementData.GetLength(0); nElement++)
             {
                 DynamicMaterial DynamicMaterial = new DynamicMaterial(1, 0, 0);
                 //Dictionary<int,Node3D >
-                List<Node> nodeSet = new List<Node>(8);
+                List<Node> nodeSet = new List<Node>(10);
                 for (int j = 0; j < 10; j++)
                 {
-                    int msolveNode = take_msolve_nodes_from_adina_tade_nodes[j];
-                    int nodeID = elementData[nElement, msolveNode];
+                    int nodeID = elementData[nElement, j];
                     nodeSet.Add((Node)model.NodesDictionary[nodeID]);
                 }
 
                 var factory = new ContinuumElement3DFactory(material1, DynamicMaterial);
 
-                e1 = new Element()
-                {
-                    ID = nElement + 1,
-                    //ElementType = new Hexa8NonLinear_v2(nodeSet, material1, GaussLegendre3D.GetQuadratureWithOrder(3, 3, 3), InterpolationHexa8Reverse_v2.UniqueInstance)// dixws to e. exoume sfalma enw sto beambuilding oxi//edw kaleitai me ena orisma to Hexa8                    
-                    ElementType= factory.CreateNonLinearElement(CellType.Tet10,nodeSet,material1,DynamicMaterial)
+				var nodeSet1 = adinaOrder.ReorderNodes(nodeSet, CellType.Tet10);
+				e1 = new Element()
+				{
+					ID = nElement + 1,
+					ElementType= factory.CreateNonLinearElement(CellType.Tet10,nodeSet1,material1,DynamicMaterial)
                 };
-                for (int j = 0; j < 10; j++)
-                {
-                    int msolveNode = take_msolve_nodes_from_adina_tade_nodes[j];
 
-                    e1.NodesDictionary.Add(elementData[nElement, msolveNode], model.NodesDictionary[elementData[nElement, msolveNode]]);
+				for (int j = 0; j < 10; j++)
+                {
+					int LocalNode = adinaOrder.GetNodeForLocalMsolveNode(j, CellType.Tet10);
+                   e1.NodesDictionary.Add(elementData[nElement, LocalNode], model.NodesDictionary[elementData[nElement, LocalNode]]);
                 }
+
                 model.ElementsDictionary.Add(e1.ID, e1);
                 model.SubdomainsDictionary[subdomainID].Elements.Add( e1);
             }

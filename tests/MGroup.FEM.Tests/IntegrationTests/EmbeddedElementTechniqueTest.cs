@@ -11,6 +11,11 @@ namespace MGroup.FEM.Tests.IntegrationTests
 {
 	using Constitutive.Structural;
 	using Constitutive.Structural.ContinuumElements;
+	using ISAAR.MSolve.FEM.Elements;
+	using ISAAR.MSolve.FEM.Interpolation;
+	using MGroup.FEM.Interpolation;
+	using MGroup.FEM.Structural.Elements.supportiveClasses;
+	using MGroup.MSolve.Discretization.Mesh;
 	using MSolve.Constitutive;
 	using NumericalAnalyzers;
 	using NumericalAnalyzers.Logging;
@@ -96,11 +101,21 @@ namespace MGroup.FEM.Tests.IntegrationTests
 					PoissonRatio = 0.3779,
 				};
 
+				DynamicMaterial DynamicMaterial = new DynamicMaterial(1, 0, 0);
+				var factory = new ContinuumElement3DFactory(solidMaterial, DynamicMaterial);
 				// Hexa8NL element definition
+				List<Node> nodeSet = new List<Node>(8);
+				for (int j = 1; j <  9; j++)
+				{
+					
+					nodeSet.Add((Node)model.NodesDictionary[j]);
+				}
 				var hexa8NLelement = new Element()
 				{
 					ID = 1,
-					ElementType = new Hexa8NonLinear(solidMaterial, GaussLegendre3D.GetQuadratureWithOrder(3, 3, 3))
+					ElementType// factory.CreateNonLinearElement(CellType.Hexa8, nodeSet, solidMaterial, DynamicMaterial)
+					// new Hexa8NonLinear(solidMaterial, GaussLegendre3D.GetQuadratureWithOrder(3, 3, 3))
+					= new ContinummElement3DNonLinear(nodeSet, solidMaterial, GaussLegendre3D.GetQuadratureWithOrder(3, 3, 3), InterpolationHexa8Reversed.UniqueInstance)
 				};
 
 				// Add nodes to the created element

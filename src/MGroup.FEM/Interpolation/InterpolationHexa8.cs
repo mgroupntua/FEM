@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using MGroup.FEM.Entities;
 using MGroup.FEM.Interpolation.Inverse;
 using MGroup.LinearAlgebra.Matrices;
+using MGroup.MSolve.Discretization.Mesh;
 using MGroup.MSolve.Geometry.Coordinates;
 
 namespace MGroup.FEM.Interpolation
@@ -14,6 +15,8 @@ namespace MGroup.FEM.Interpolation
 	/// </summary>
 	public class InterpolationHexa8 : IsoparametricInterpolation3DBase
 	{
+		public override CellType CellType { get; } = CellType.Hexa8;
+
 		private const double oneOverEight = 0.125;
 
 		private static readonly InterpolationHexa8 uniqueInstance = new InterpolationHexa8();

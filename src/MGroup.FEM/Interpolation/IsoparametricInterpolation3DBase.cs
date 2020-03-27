@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using MGroup.FEM.Entities;
 using MGroup.FEM.Interpolation.Inverse;
 using MGroup.FEM.Interpolation.Jacobians;
@@ -29,7 +29,7 @@ namespace MGroup.FEM.Interpolation
 		/// <summary>
 		/// See <see cref="IIsoparametricInterpolation3D.CellType"/>.
 		/// </summary>
-		public CellType CellType { get; }
+		public virtual CellType CellType { get; }
 
 		/// <summary>
 		/// See <see cref="IIsoparametricInterpolation3D.NumFunctions"/>.

@@ -2,6 +2,7 @@ using MGroup.FEM.Entities;
 using MGroup.FEM.Interpolation;
 using MGroup.FEM.Interpolation.Inverse;
 using MGroup.LinearAlgebra.Matrices;
+using MGroup.MSolve.Discretization.Mesh;
 using MGroup.MSolve.Geometry.Coordinates;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,9 @@ namespace ISAAR.MSolve.FEM.Interpolation
 {
     public class InterpolationHexa8Reversed: IsoparametricInterpolation3DBase
     {
-        private static readonly InterpolationHexa8Reversed uniqueInstance = new InterpolationHexa8Reversed();
+		public override CellType CellType { get; } = CellType.Hexa8;
+
+		private static readonly InterpolationHexa8Reversed uniqueInstance = new InterpolationHexa8Reversed();
 
         private InterpolationHexa8Reversed() : base( 8)
         {
