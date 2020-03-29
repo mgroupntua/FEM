@@ -10,6 +10,8 @@ namespace MGroup.FEM.Tests.IntegrationTests
 {
 	using Constitutive.Structural;
 	using Constitutive.Structural.ContinuumElements;
+	using ISAAR.MSolve.FEM.Elements;
+	using ISAAR.MSolve.FEM.Interpolation;
 	using MGroup.FEM.Structural.Elements.supportiveClasses;
 	using MGroup.MSolve.Discretization.Mesh;
 	using MSolve.Constitutive;
@@ -186,8 +188,9 @@ namespace MGroup.FEM.Tests.IntegrationTests
 				e1 = new Element()
 				{
 					ID = nElement + 1,
-					ElementType  = factory.CreateNonLinearElement(CellType.Hexa8, nodeSet, material1, DynamicMaterial)
-					//nnew Hexa8NonLinear(material1, GaussLegendre3D.GetQuadratureWithOrder(3, 3, 3)) // dixws to e. exoume sfalma enw sto beambuilding oxi//edw kaleitai me ena orisma to Hexa8                    
+					ElementType  //= factory.CreateNonLinearElement(CellType.Hexa8, nodeSet, material1, DynamicMaterial)
+								 //nnew Hexa8NonLinear(material1, GaussLegendre3D.GetQuadratureWithOrder(3, 3, 3)) // dixws to e. exoume sfalma enw sto beambuilding oxi//edw kaleitai me ena orisma to Hexa8                    
+					= new ContinummElement3DNonLinear(nodeSet, material1, GaussLegendre3D.GetQuadratureWithOrder(3, 3, 3), InterpolationHexa8.UniqueInstance),
 				};
 				for (int j = 0; j < 8; j++)
 				{

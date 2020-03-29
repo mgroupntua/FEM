@@ -34,6 +34,9 @@ namespace MGroup.FEM.Structural.Elements
 		private IDynamicMaterial dynamicProperties;
 		private readonly IReadOnlyList<IContinuumMaterial3D> materialsAtGaussPoints;
 
+		private double[][] GLvec;
+		private double[][] GLvec_last_converged;
+
 		public ContinuumElement3D(IReadOnlyList<Node> nodes, IIsoparametricInterpolation3D interpolation,
 			IQuadrature3D quadratureForStiffness, IQuadrature3D quadratureForMass,
 			IGaussPointExtrapolation3D gaussPointExtrapolation,
@@ -54,6 +57,14 @@ namespace MGroup.FEM.Structural.Elements
 				{
 					StructuralDof.TranslationX, StructuralDof.TranslationY, StructuralDof.TranslationZ
 				};
+			}
+
+			GLvec = new double[materialsAtGaussPoints.Count][];
+			GLvec_last_converged = new double[materialsAtGaussPoints.Count][];
+			for (int gpoint = 0; gpoint < materialsAtGaussPoints.Count; gpoint++)
+			{
+				GLvec[gpoint] = new double[6];
+				GLvec_last_converged[gpoint] = new double[6];
 			}
 		}
 
@@ -204,18 +215,43 @@ namespace MGroup.FEM.Structural.Elements
 			IReadOnlyList<Matrix> shapeGradientsNatural =
 				Interpolation.EvaluateNaturalGradientsAtGaussPoints(QuadratureForStiffness);
 
-			double[] strains = new double[6];
-			for (int gp = 0; gp < QuadratureForStiffness.IntegrationPoints.Count; ++gp)
+			//double[] strains = new double[6];
+			//for (int gp = 0; gp < QuadratureForStiffness.IntegrationPoints.Count; ++gp)
+			//{
+			//	strains = new double[6];
+			//	var jacobian = new IsoparametricJacobian3D(Nodes, shapeGradientsNatural[gp]);
+			//	Matrix shapeGradientsCartesian =
+			//		jacobian.TransformNaturalDerivativesToCartesian(shapeGradientsNatural[gp]);
+			//	Matrix deformation = BuildDeformationMatrix(shapeGradientsCartesian);
+			//	strains = deformation.Multiply(localDisplacements);
+			//	materialsAtGaussPoints[gp].UpdateMaterial(strains);
+			//}
+
+			//double[] strains = new double[6];
+			double[] GLvec_strain_minus_last_converged_value = new double[6];
+			for (int gpo = 0; gpo < QuadratureForStiffness.IntegrationPoints.Count; ++gpo)
 			{
-				strains = new double[6];
-				var jacobian = new IsoparametricJacobian3D(Nodes, shapeGradientsNatural[gp]);
+				//GLvec[gpo] = new double[6];
+				var jacobian = new IsoparametricJacobian3D(Nodes, shapeGradientsNatural[gpo]);
 				Matrix shapeGradientsCartesian =
-					jacobian.TransformNaturalDerivativesToCartesian(shapeGradientsNatural[gp]);
+					jacobian.TransformNaturalDerivativesToCartesian(shapeGradientsNatural[gpo]);
 				Matrix deformation = BuildDeformationMatrix(shapeGradientsCartesian);
-				strains = deformation.Multiply(localDisplacements);
-				materialsAtGaussPoints[gp].UpdateMaterial(strains);
+				GLvec[gpo] = deformation.Multiply(localDisplacements);
+				GLvec_strain_minus_last_converged_value = new double[6]
+				{
+					GLvec[gpo][0]- GLvec_last_converged[gpo][0],
+					GLvec[gpo][1]- GLvec_last_converged[gpo][1],
+					GLvec[gpo][2]- GLvec_last_converged[gpo][2],
+					GLvec[gpo][3]- GLvec_last_converged[gpo][3],
+					GLvec[gpo][4]- GLvec_last_converged[gpo][4],
+					GLvec[gpo][5]- GLvec_last_converged[gpo][5]
+				};
+				materialsAtGaussPoints[gpo].UpdateMaterial(GLvec_strain_minus_last_converged_value);
+				//To update with total strain simplY = materialsAtGaussPoints[npoint].UpdateMaterial(GLvec[npoint]);
 			}
-			return new Tuple<double[], double[]>(strains, materialsAtGaussPoints[materialsAtGaussPoints.Count - 1].Stresses);
+
+
+			return new Tuple<double[], double[]>(GLvec[materialsAtGaussPoints.Count-1], materialsAtGaussPoints[materialsAtGaussPoints.Count - 1].Stresses);
 		}
 
 		public double CalculateVolume()
@@ -273,6 +309,11 @@ namespace MGroup.FEM.Structural.Elements
 
 		public void SaveMaterialState()
 		{
+			for (int npoint = 0; npoint < materialsAtGaussPoints.Count; npoint++)
+			{
+				for (int i1 = 0; i1 < 6; i1++)
+				{ GLvec_last_converged[npoint][i1] = GLvec[npoint][i1]; }
+			}
 			foreach (var m in materialsAtGaussPoints) m.SaveState();
 		}
 

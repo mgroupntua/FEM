@@ -13,15 +13,15 @@ namespace MGroup.FEM.Interpolation
 	/// Implements singleton pattern.
 	/// Authors: Dimitris Tsapetis
 	/// </summary>
-	public class InterpolationHexa8 : IsoparametricInterpolation3DBase
+	public class InterpolationHexa8Old : IsoparametricInterpolation3DBase
 	{
 		public override CellType CellType { get; } = CellType.Hexa8;
 
 		private const double oneOverEight = 0.125;
 
-		private static readonly InterpolationHexa8 uniqueInstance = new InterpolationHexa8();
+		private static readonly InterpolationHexa8Old uniqueInstance = new InterpolationHexa8Old();
 
-		private InterpolationHexa8() : base(8)
+		private InterpolationHexa8Old() : base(8)
 		{
 			NodalNaturalCoordinates = new NaturalPoint[]
 			{
@@ -43,9 +43,9 @@ namespace MGroup.FEM.Interpolation
 		public override IReadOnlyList<NaturalPoint> NodalNaturalCoordinates { get; }
 
 		/// <summary>
-		/// Get the unique <see cref="InterpolationHexa8"/> object for the whole program. Thread safe.
+		/// Get the unique <see cref="InterpolationHexa8Old"/> object for the whole program. Thread safe.
 		/// </summary>
-		public static InterpolationHexa8 UniqueInstance => uniqueInstance;
+		public static InterpolationHexa8Old UniqueInstance => uniqueInstance;
 
 		/// <summary>
 		/// See <see cref="IIsoparametricInterpolation2D.CheckElementNodes(IReadOnlyList{Node})"/>

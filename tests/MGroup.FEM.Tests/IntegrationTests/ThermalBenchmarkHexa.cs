@@ -5,10 +5,13 @@ using MGroup.MSolve.Discretization.Commons;
 using MGroup.MSolve.Discretization.Loads;
 using MGroup.MSolve.Discretization.Mesh;
 using Xunit;
+using System.Linq;
 
 namespace MGroup.FEM.Tests.IntegrationTests
 {
+	using System.Collections.Generic;
 	using Constitutive.Thermal;
+	using MGroup.FEM.Structural.Elements.supportiveClasses;
 	using MGroup.FEM.Thermal.Elements;
 	using NumericalAnalyzers;
 	using Solvers.Direct;
@@ -88,20 +91,24 @@ namespace MGroup.FEM.Tests.IntegrationTests
 			// Elements
 			int numElements = 8;
 			var elementFactory = new ThermalElement3DFactory(new ThermalMaterial(density, c, k));
-			var elements = new ThermalElement3D[8];
-			elements[0] = elementFactory.CreateElement(CellType.Hexa8, new Node[] { nodes[13], nodes[4], nodes[3], nodes[12], nodes[10], nodes[1], nodes[0], nodes[9] });
-			elements[1] = elementFactory.CreateElement(CellType.Hexa8, new Node[] { nodes[14], nodes[5], nodes[4], nodes[13], nodes[11], nodes[2], nodes[1], nodes[10] });
-			elements[2] = elementFactory.CreateElement(CellType.Hexa8, new Node[] { nodes[16], nodes[7], nodes[6], nodes[15], nodes[13], nodes[4], nodes[3], nodes[12] });
-			elements[3] = elementFactory.CreateElement(CellType.Hexa8, new Node[] { nodes[17], nodes[8], nodes[7], nodes[16], nodes[14], nodes[5], nodes[4], nodes[13] });
-			elements[4] = elementFactory.CreateElement(CellType.Hexa8, new Node[] { nodes[22], nodes[13], nodes[12], nodes[21], nodes[19], nodes[10], nodes[9], nodes[18] });
-			elements[5] = elementFactory.CreateElement(CellType.Hexa8, new Node[] { nodes[23], nodes[14], nodes[13], nodes[22], nodes[20], nodes[11], nodes[10], nodes[19] });
-			elements[6] = elementFactory.CreateElement(CellType.Hexa8, new Node[] { nodes[25], nodes[16], nodes[15], nodes[24], nodes[22], nodes[13], nodes[12], nodes[21] });
-			elements[7] = elementFactory.CreateElement(CellType.Hexa8, new Node[] { nodes[26], nodes[17], nodes[16], nodes[25], nodes[23], nodes[14], nodes[13], nodes[22] });
+			var elementNodes = new List<Node>[8];
+			elementNodes[0] = new List<Node>() { nodes[13], nodes[4], nodes[3], nodes[12], nodes[10], nodes[1], nodes[0], nodes[9] };
+			elementNodes[1] = new List<Node>() { nodes[14], nodes[5], nodes[4], nodes[13], nodes[11], nodes[2], nodes[1], nodes[10] };
+			elementNodes[2] = new List<Node>() { nodes[16], nodes[7], nodes[6], nodes[15], nodes[13], nodes[4], nodes[3], nodes[12] };
+			elementNodes[3] = new List<Node>() { nodes[17], nodes[8], nodes[7], nodes[16], nodes[14], nodes[5], nodes[4], nodes[13] };
+			elementNodes[4] = new List<Node>() { nodes[22], nodes[13], nodes[12], nodes[21], nodes[19], nodes[10], nodes[9], nodes[18] };
+			elementNodes[5] = new List<Node>() { nodes[23], nodes[14], nodes[13], nodes[22], nodes[20], nodes[11], nodes[10], nodes[19] };
+			elementNodes[6] = new List<Node>() { nodes[25], nodes[16], nodes[15], nodes[24], nodes[22], nodes[13], nodes[12], nodes[21] };
+			elementNodes[7] = new List<Node>() { nodes[26], nodes[17], nodes[16], nodes[25], nodes[23], nodes[14], nodes[13], nodes[22] };
+
+			var nodeReordering = new GMeshElementLocalNodeOrdering();
+			var rearrangeNodes = elementNodes.Select(x => nodeReordering.ReorderNodes(x, CellType.Hexa8)).ToArray(); ;
 
 			for (int i = 0; i < numElements; ++i)
 			{
-				var elementWrapper = new Element() { ID = i, ElementType = elements[i] };
-				foreach (var node in elements[i].Nodes) elementWrapper.AddNode(node);
+
+				var elementWrapper = new Element() { ID = i, ElementType = elementFactory.CreateElement(CellType.Hexa8,rearrangeNodes[i])};
+				foreach (var node in elementNodes[i]) elementWrapper.AddNode(node);
 				model.ElementsDictionary[i] = elementWrapper;
 				model.SubdomainsDictionary[subdomainID].Elements.Add(elementWrapper);
 			}

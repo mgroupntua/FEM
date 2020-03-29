@@ -46,7 +46,7 @@ namespace MGroup.FEM.Thermal.Elements
 			//extrapolations.Add(CellType.Hexa8, ExtrapolationGaussLegendre2x2x2.UniqueInstance);
 
 			// Hexa8
-			interpolations.Add(CellType.Hexa8, InterpolationHexa8Reversed.UniqueInstance);
+			interpolations.Add(CellType.Hexa8, ISAAR.MSolve.FEM.Interpolation.InterpolationHexa8.UniqueInstance);
 			integrationsForStiffness.Add(CellType.Hexa8, GaussLegendre3D.GetQuadratureWithOrder(2, 2, 2));
 			integrationsForMass.Add(CellType.Hexa8, GaussLegendre3D.GetQuadratureWithOrder(2, 2, 2));
 			extrapolations.Add(CellType.Hexa8, ExtrapolationGaussLegendre2x2x2.UniqueInstance);
