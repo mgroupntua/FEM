@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ISAAR.MSolve.FEM.Interpolation;
 using MGroup.Constitutive.Structural;
 using MGroup.FEM.Embedding;
 using MGroup.FEM.Entities;
@@ -47,7 +48,7 @@ namespace MGroup.FEM.Structural.Elements
 		{
 			this.nGaussPoints = quadratureForStiffness.IntegrationPoints.Count;
 			this.QuadratureForStiffness = quadratureForStiffness;
-			this.Interpolation = InterpolationHexa8Reverse.UniqueInstance;
+			this.Interpolation = InterpolationHexa8.UniqueInstance;
 
 			materialsAtGaussPoints = new IContinuumMaterial3DDefGrad[nGaussPoints];
 			for (int i = 0; i < nGaussPoints; i++)
@@ -55,7 +56,7 @@ namespace MGroup.FEM.Structural.Elements
 
 		}
 
-		public InterpolationHexa8Reverse Interpolation { get; }
+		public InterpolationHexa8 Interpolation { get; }
 		public IQuadrature3D QuadratureForStiffness { get; }
 
 		public int ID => 13;

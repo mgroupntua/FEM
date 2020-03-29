@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using ISAAR.MSolve.FEM.Interpolation;
 using MGroup.FEM.Interpolation;
 using MGroup.MSolve.Geometry.Coordinates;
 using Xunit;
@@ -18,7 +19,7 @@ namespace MGroup.FEM.Tests.Interpolation
 		{
 			new object[]{InterpolationTet4.UniqueInstance},
 			new object[]{InterpolationTet10.UniqueInstance},
-			new object[]{InterpolationHexa8Old.UniqueInstance},
+			new object[]{InterpolationHexa8.UniqueInstance},
 			new object[]{InterpolationHexa20.UniqueInstance},
 			new object[]{InterpolationHexa27.UniqueInstance},
 			new object[]{InterpolationWedge6.UniqueInstance},
@@ -34,7 +35,7 @@ namespace MGroup.FEM.Tests.Interpolation
 			{
 				{InterpolationTet4.UniqueInstance, GenerateRandomPointsInTetrahedron},
 				{InterpolationTet10.UniqueInstance, GenerateRandomPointsInTetrahedron},
-				{InterpolationHexa8Old.UniqueInstance, GenerateRandomPointsInCube},
+				{InterpolationHexa8.UniqueInstance, GenerateRandomPointsInCube},
 				{InterpolationHexa20.UniqueInstance, GenerateRandomPointsInCube},
 				{InterpolationHexa27.UniqueInstance, GenerateRandomPointsInCube},
 				{InterpolationWedge6.UniqueInstance, GenerarandomPointsInWedge},

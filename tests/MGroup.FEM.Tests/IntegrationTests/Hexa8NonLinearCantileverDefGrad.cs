@@ -10,6 +10,8 @@ namespace MGroup.FEM.Tests.IntegrationTests
 {
 	using Constitutive.Structural;
 	using Constitutive.Structural.ContinuumElements;
+	using ISAAR.MSolve.FEM.Elements;
+	using ISAAR.MSolve.FEM.Interpolation;
 	using MSolve.Constitutive;
 	using MSolve.Solution;
 	using NumericalAnalyzers;
@@ -198,10 +200,18 @@ namespace MGroup.FEM.Tests.IntegrationTests
 			int subdomainID = 1;
 			for (int nElement = 0; nElement < elementData.GetLength(0); nElement++)
 			{
+				List<Node> nodeSet = new List<Node>(8);
+				for (int j = 0; j < 8; j++)
+				{
+					int nodeID = elementData[nElement, j + 1];
+					nodeSet.Add((Node)model.NodesDictionary[nodeID]);
+				}
 				e1 = new Element()
 				{
 					ID = nElement + 1,
-					ElementType = new Hexa8NonLinearDefGrad(material1, GaussLegendre3D.GetQuadratureWithOrder(3, 3, 3)) // dixws to e. exoume sfalma enw sto beambuilding oxi//edw kaleitai me ena orisma to Hexa8                    
+					ElementType  //new Hexa8NonLinearDefGrad(material1, GaussLegendre3D.GetQuadratureWithOrder(3, 3, 3)) // dixws to e. exoume sfalma enw sto beambuilding oxi//edw kaleitai me ena orisma to Hexa8                    
+					= new ContinummElement3DNonLinearDefGrad(nodeSet, material1, GaussLegendre3D.GetQuadratureWithOrder(3, 3, 3), InterpolationHexa8.UniqueInstance),
+
 				};
 				for (int j = 0; j < 8; j++)
 				{

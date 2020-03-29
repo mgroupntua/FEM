@@ -49,17 +49,19 @@ namespace ISAAR.MSolve.FEM.Interpolation
 
         protected override double[] EvaluateAt(double xi, double eta, double zeta)
         {
-            throw new NotImplementedException(); //TODO: fill these
-            //var shapeFunctions = new double[8];
-            //shapeFunctions[0] = ;
-            //shapeFunctions[1] = ;
-            //shapeFunctions[2] = ;
-            //shapeFunctions[3] = ;
-            //shapeFunctions[4] = ;
-            //shapeFunctions[5] = ;
-            //shapeFunctions[6] = ;
-            //shapeFunctions[7] = ;
-        }
+			double oneOverEight = 0.125;
+
+			var values = new double[8];
+			values[0] = oneOverEight * (1 + xi) * (1 + eta) * (1 + zeta);
+			values[1] = oneOverEight * (1 - xi) * (1 + eta) * (1 + zeta);
+			values[2] = oneOverEight * (1 - xi) * (1 - eta) * (1 + zeta);
+			values[3] = oneOverEight * (1 + xi) * (1 - eta) * (1 + zeta);
+			values[4] = oneOverEight * (1 + xi) * (1 + eta) * (1 - zeta);
+			values[5] = oneOverEight * (1 - xi) * (1 + eta) * (1 - zeta);
+			values[6] = oneOverEight * (1 - xi) * (1 - eta) * (1 - zeta);
+			values[7] = oneOverEight * (1 + xi) * (1 - eta) * (1 - zeta);
+			return values;
+		}
 
         protected override Matrix EvaluateGradientsAt(double xi, double eta, double zeta)
         {
