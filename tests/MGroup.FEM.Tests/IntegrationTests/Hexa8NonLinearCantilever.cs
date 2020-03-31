@@ -175,14 +175,14 @@ namespace MGroup.FEM.Tests.IntegrationTests
 			Element e1;
 			DynamicMaterial DynamicMaterial = new DynamicMaterial(1, 0, 0);
 			var factory = new ContinuumElement3DFactory(material1, DynamicMaterial);
-			
+
 			int subdomainID = Hexa8NonLinearCantilever.subdomainID;
 			for (int nElement = 0; nElement < elementData.GetLength(0); nElement++)
 			{
 				List<Node> nodeSet = new List<Node>(8);
 				for (int j = 0; j < 8; j++)
 				{
-					int nodeID = elementData[nElement, j+1];
+					int nodeID = elementData[nElement, j + 1];
 					nodeSet.Add((Node)model.NodesDictionary[nodeID]);
 				}
 				e1 = new Element()

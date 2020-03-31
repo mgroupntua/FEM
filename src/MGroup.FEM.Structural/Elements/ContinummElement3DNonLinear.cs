@@ -25,7 +25,7 @@ namespace ISAAR.MSolve.FEM.Elements
     /// Continuum finite Element for 3d problems with material and geometric nonlinearities
     /// Authors: Gerasimos Sotiropoulos
     /// </summary>
-    public class ContinummElement3DNonLinear : IStructuralFiniteElement, IEmbeddedHostElement
+    public class ContinummElement3DNonLinear : IStructuralFiniteElement//, IEmbeddedHostElement
     {
         protected readonly IDofType[] nodalDOFTypes = new IDofType[] { StructuralDof.TranslationX, StructuralDof.TranslationY, StructuralDof.TranslationZ };
         protected readonly IDofType[][] dofTypes;
@@ -708,7 +708,7 @@ namespace ISAAR.MSolve.FEM.Elements
         }
         #endregion
 
-
+		/*
         #region IEmbeddedHostElement
         protected double[,] GetCoordinatesTranspose(IElement element)
         {
@@ -938,7 +938,7 @@ namespace ISAAR.MSolve.FEM.Elements
         }
 
         #endregion
-
+*/
     }
 
 

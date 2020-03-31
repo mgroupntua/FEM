@@ -113,9 +113,9 @@ namespace MGroup.FEM.Tests.IntegrationTests
 				var hexa8NLelement = new Element()
 				{
 					ID = 1,
-					ElementType// factory.CreateNonLinearElement(CellType.Hexa8, nodeSet, solidMaterial, DynamicMaterial)
-					// new Hexa8NonLinear(solidMaterial, GaussLegendre3D.GetQuadratureWithOrder(3, 3, 3))
-					= new ContinummElement3DNonLinear(nodeSet, solidMaterial, GaussLegendre3D.GetQuadratureWithOrder(3, 3, 3), ISAAR.MSolve.FEM.Interpolation.InterpolationHexa8.UniqueInstance)
+					ElementType=// factory.CreateNonLinearElement(CellType.Hexa8, nodeSet, solidMaterial, DynamicMaterial)
+					 new Hexa8NonLinear(solidMaterial, GaussLegendre3D.GetQuadratureWithOrder(3, 3, 3))
+					// = new ContinummElement3DNonLinear(nodeSet, solidMaterial, GaussLegendre3D.GetQuadratureWithOrder(3, 3, 3), ISAAR.MSolve.FEM.Interpolation.InterpolationHexa8.UniqueInstance)
 				};
 
 				// Add nodes to the created element

@@ -51,7 +51,7 @@ namespace MGroup.FEM.Interpolation.Jacobians
 						J_0_hexa[gpoint][m, n] = 0;
 						for (int p = 0; p < 8; p++)
 						{
-							J_0_hexa[gpoint][m, n] += ll1_hexa[gpoint][m, p] * J_0b_hexa[gpoint][p, n];
+							J_0_hexa[gpoint][m, n] += ll1_hexa[gpoint][p,m] * J_0b_hexa[gpoint][p, n];
 						}
 					}
 				}
@@ -213,7 +213,7 @@ namespace MGroup.FEM.Interpolation.Jacobians
 						J_1[npoint][m, n] = 0;
 						for (int p = 0; p < 8; p++)
 						{
-							J_1[npoint][m, n] += ll1_hexa[npoint][m, p] * J_1b[p, n];
+							J_1[npoint][m, n] += ll1_hexa[npoint][p,m] * J_1b[p, n];
 						}
 					}
 				}
