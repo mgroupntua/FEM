@@ -210,7 +210,7 @@ namespace MGroup.FEM.Tests.IntegrationTests
 				{
 					ID = nElement + 1,
 					ElementType  //new Hexa8NonLinearDefGrad(material1, GaussLegendre3D.GetQuadratureWithOrder(3, 3, 3)) // dixws to e. exoume sfalma enw sto beambuilding oxi//edw kaleitai me ena orisma to Hexa8                    
-					= new ContinummElement3DNonLinearDefGrad(nodeSet, material1, GaussLegendre3D.GetQuadratureWithOrder(3, 3, 3), InterpolationHexa8.UniqueInstance),
+					= new ContinuumElement3DNonLinearDefGrad(nodeSet, material1, GaussLegendre3D.GetQuadratureWithOrder(3, 3, 3), InterpolationHexa8.UniqueInstance),
 
 				};
 				for (int j = 0; j < 8; j++)

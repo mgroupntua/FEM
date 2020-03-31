@@ -25,7 +25,7 @@ namespace ISAAR.MSolve.FEM.Elements
     /// Continuum finite Element for 3d problems with material and geometric nonlinearities
     /// Authors: Gerasimos Sotiropoulos
     /// </summary>
-    public class ContinummElement3DNonLinearDefGrad : IStructuralFiniteElement//, IEmbeddedHostElement
+    public class ContinuumElement3DNonLinearDefGrad : IStructuralFiniteElement//, IEmbeddedHostElement
     {
         protected readonly IDofType[] nodalDOFTypes = new IDofType[] { StructuralDof.TranslationX, StructuralDof.TranslationY, StructuralDof.TranslationZ };
         protected readonly IDofType[][] dofTypes;
@@ -43,11 +43,11 @@ namespace ISAAR.MSolve.FEM.Elements
 		//private double[][] GLvec_last_converged;
 		private double[][] DefGradVec;
 
-		protected ContinummElement3DNonLinearDefGrad()
+		protected ContinuumElement3DNonLinearDefGrad()
         {
         }
 
-        public ContinummElement3DNonLinearDefGrad(IReadOnlyList<Node> nodes, IContinuumMaterial3DDefGrad material, IQuadrature3D quadratureForStiffness,
+        public ContinuumElement3DNonLinearDefGrad(IReadOnlyList<Node> nodes, IContinuumMaterial3DDefGrad material, IQuadrature3D quadratureForStiffness,
              IIsoparametricInterpolation3D interpolation)
         {
             this.nGaussPoints = quadratureForStiffness.IntegrationPoints.Count;

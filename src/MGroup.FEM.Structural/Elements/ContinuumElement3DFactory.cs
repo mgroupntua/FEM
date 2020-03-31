@@ -142,10 +142,10 @@ namespace MGroup.FEM.Structural.Elements
 			return CreateElement(cellType, nodes, materialsAtGaussPoints, commonDynamicProperties);
 		}
 
-		public ContinummElement3DNonLinear CreateNonLinearElement(CellType cellType, IReadOnlyList<Node> nodes,
+		public ContinuumElement3DNonLinear CreateNonLinearElement(CellType cellType, IReadOnlyList<Node> nodes,
 			IContinuumMaterial3D commonMaterial, DynamicMaterial commonDynamicProperties)
 		{
-			return new ContinummElement3DNonLinear(nodes, commonMaterial, integrationsForStiffness[cellType], interpolations[cellType]);
+			return new ContinuumElement3DNonLinear(nodes, commonMaterial, integrationsForStiffness[cellType], interpolations[cellType]);
 		}
 
 		private ContinuumElement3D CreateElement(CellType cellType, IReadOnlyList<Node> nodes,
