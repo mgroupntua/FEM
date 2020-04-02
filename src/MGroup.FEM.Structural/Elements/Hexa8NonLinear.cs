@@ -32,12 +32,12 @@ namespace MGroup.FEM.Structural.Elements
 		private readonly int nGaussPoints;
 		private bool isInitialized = false;
 
-		private double[][] ox_i; //not defined by user. 8 arrays of 3 elements
-		private double[][] tu_i;
+		private double[][] initialCoordinates; //not defined by user. 8 arrays of 3 elements
+		private double[][] totalDisplacements;
 		private double[] integrationCoeffs;
 
-		private double[][] GLvec;
-		private double[][] GLvec_last_converged;
+		private double[][] strainsVec;
+		private double[][] strainsVec_last_converged;
 
 		protected Hexa8NonLinear()
 		{
@@ -79,130 +79,130 @@ namespace MGroup.FEM.Structural.Elements
 			}
 		}
 
-		private Matrix[] GetBL13Hexa(IReadOnlyList<Matrix> ll1_hexa)
+		private Matrix[] Getbl13DeformationMatrices(IReadOnlyList<Matrix> shapeFunctionNaturalDerivatives)
 		{
-			Matrix[] BL13_hexa;
-			BL13_hexa = new Matrix[nGaussPoints];
+			Matrix[] bl13Matrices;
+			bl13Matrices = new Matrix[nGaussPoints];
 			for (int npoint = 0; npoint < nGaussPoints; npoint++)
 			{
-				BL13_hexa[npoint] = Matrix.CreateZero(9, 24);
+				bl13Matrices[npoint] = Matrix.CreateZero(9, 24);
 				for (int m = 0; m < 8; m++)
 				{
 					for (int n = 0; n < 3; n++)
 					{
-						BL13_hexa[npoint][n, 3 * m + 0] = ll1_hexa[npoint][m,n];
-						BL13_hexa[npoint][n + 3, 3 * m + 1] = ll1_hexa[npoint][m,n];
-						BL13_hexa[npoint][n + 6, 3 * m + 2] = ll1_hexa[npoint][m,n];
+						bl13Matrices[npoint][n, 3 * m + 0] = shapeFunctionNaturalDerivatives[npoint][m,n];
+						bl13Matrices[npoint][n + 3, 3 * m + 1] = shapeFunctionNaturalDerivatives[npoint][m,n];
+						bl13Matrices[npoint][n + 6, 3 * m + 2] = shapeFunctionNaturalDerivatives[npoint][m,n];
 					}
 				}
 			}
-			return BL13_hexa;
+			return bl13Matrices;
 		}
 
-		private Matrix[] GetBL11a_hexa(Matrix[] J_0inv_hexa)
+		private Matrix[] Getbl11aDeformationMatrices(Matrix[] jacobianInverse)
 		{
-			Matrix[] BL11a_hexa = new Matrix[nGaussPoints];
+			Matrix[] bl11aMatrices = new Matrix[nGaussPoints];
 			for (int gpoint = 0; gpoint < nGaussPoints; gpoint++)
 			{
-				BL11a_hexa[gpoint] = Matrix.CreateZero(6, 9);
+				bl11aMatrices[gpoint] = Matrix.CreateZero(6, 9);
 				for (int m = 0; m < 3; m++) // calculate first three data lines of the matrix
 				{
 					for (int n = 0; n < 3; n++)
 					{
-						BL11a_hexa[gpoint][m, 3 * m + n] = J_0inv_hexa[gpoint][m, n];
+						bl11aMatrices[gpoint][m, 3 * m + n] = jacobianInverse[gpoint][m, n];
 					}
 				}
 				for (int n = 0; n < 3; n++)
 				{
-					BL11a_hexa[gpoint][3, n] = J_0inv_hexa[gpoint][1, n]; // calculate 4th data line
-					BL11a_hexa[gpoint][3, 3 + n] = J_0inv_hexa[gpoint][0, n];
-					BL11a_hexa[gpoint][4, 3 + n] = J_0inv_hexa[gpoint][2, n]; // calculate 5th data line
-					BL11a_hexa[gpoint][4, 6 + n] = J_0inv_hexa[gpoint][1, n];
-					BL11a_hexa[gpoint][5, 0 + n] = J_0inv_hexa[gpoint][2, n]; // calculate 6th data line
-					BL11a_hexa[gpoint][5, 6 + n] = J_0inv_hexa[gpoint][0, n];
+					bl11aMatrices[gpoint][3, n] = jacobianInverse[gpoint][1, n]; // calculate 4th data line
+					bl11aMatrices[gpoint][3, 3 + n] = jacobianInverse[gpoint][0, n];
+					bl11aMatrices[gpoint][4, 3 + n] = jacobianInverse[gpoint][2, n]; // calculate 5th data line
+					bl11aMatrices[gpoint][4, 6 + n] = jacobianInverse[gpoint][1, n];
+					bl11aMatrices[gpoint][5, 0 + n] = jacobianInverse[gpoint][2, n]; // calculate 6th data line
+					bl11aMatrices[gpoint][5, 6 + n] = jacobianInverse[gpoint][0, n];
 				}
 			}
 
-			return BL11a_hexa;
+			return bl11aMatrices;
 		}
 
-		private Matrix[] GetBL12_hexa(Matrix[] J_0inv_hexa)
+		private Matrix[] GetBL12DeformationMatrices(Matrix[] jacobianInverse)
 		{
-			Matrix[] BL12_hexa = new Matrix[nGaussPoints];
+			Matrix[] bl12Marices = new Matrix[nGaussPoints];
 			for (int gpoint = 0; gpoint < nGaussPoints; gpoint++)
 			{
-				BL12_hexa[gpoint] = Matrix.CreateZero(9, 9);
+				bl12Marices[gpoint] = Matrix.CreateZero(9, 9);
 				for (int m = 0; m < 3; m++) // calculate first three data lines of the matrix
 				{
 					for (int n = 0; n < 3; n++)
 					{
-						BL12_hexa[gpoint][m, 3 * m + n] = J_0inv_hexa[gpoint][0, n];
+						bl12Marices[gpoint][m, 3 * m + n] = jacobianInverse[gpoint][0, n];
 					}
 				}
 				for (int m = 0; m < 3; m++) // calculate  data lines 4:6
 				{
 					for (int n = 0; n < 3; n++)
 					{
-						BL12_hexa[gpoint][3 + m, 3 * m + n] = J_0inv_hexa[gpoint][1, n];
+						bl12Marices[gpoint][3 + m, 3 * m + n] = jacobianInverse[gpoint][1, n];
 					}
 				}
 				for (int m = 0; m < 3; m++) // calculate  data lines 7:8
 				{
 					for (int n = 0; n < 3; n++)
 					{
-						BL12_hexa[gpoint][6 + m, 3 * m + n] = J_0inv_hexa[gpoint][2, n];
+						bl12Marices[gpoint][6 + m, 3 * m + n] = jacobianInverse[gpoint][2, n];
 					}
 				}
 
 			}
 
-			return BL12_hexa;
+			return bl12Marices;
 		}
 
-		private Matrix[] GetBL01_hexa(Matrix[] J_0inv_hexa)
+		private Matrix[] Getbl01MDeformationMatrices(Matrix[] jacobianInverse)
 		{
-			Matrix[] BL01_hexa = new Matrix[nGaussPoints];
+			Matrix[] bl01Matrices = new Matrix[nGaussPoints];
 			for (int gpoint = 0; gpoint < nGaussPoints; gpoint++)
 			{
-				BL01_hexa[gpoint] = Matrix.CreateZero(6, 9);
+				bl01Matrices[gpoint] = Matrix.CreateZero(6, 9);
 				for (int m = 0; m < 3; m++) // calculate first three data lines of the matrix
 				{
 					for (int n = 0; n < 3; n++)
 					{
-						BL01_hexa[gpoint][m, 3 * m + n] = J_0inv_hexa[gpoint][m, n];
+						bl01Matrices[gpoint][m, 3 * m + n] = jacobianInverse[gpoint][m, n];
 					}
 				}
 				for (int n = 0; n < 3; n++)
 				{
-					BL01_hexa[gpoint][3, n] = J_0inv_hexa[gpoint][1, n]; // calculate 4th data line
-					BL01_hexa[gpoint][3, 3 + n] = J_0inv_hexa[gpoint][0, n];
-					BL01_hexa[gpoint][4, 3 + n] = J_0inv_hexa[gpoint][2, n]; // calculate 5th data line
-					BL01_hexa[gpoint][4, 6 + n] = J_0inv_hexa[gpoint][1, n];
-					BL01_hexa[gpoint][5, 0 + n] = J_0inv_hexa[gpoint][2, n]; // calculate 6th data line
-					BL01_hexa[gpoint][5, 6 + n] = J_0inv_hexa[gpoint][0, n];
+					bl01Matrices[gpoint][3, n] = jacobianInverse[gpoint][1, n]; // calculate 4th data line
+					bl01Matrices[gpoint][3, 3 + n] = jacobianInverse[gpoint][0, n];
+					bl01Matrices[gpoint][4, 3 + n] = jacobianInverse[gpoint][2, n]; // calculate 5th data line
+					bl01Matrices[gpoint][4, 6 + n] = jacobianInverse[gpoint][1, n];
+					bl01Matrices[gpoint][5, 0 + n] = jacobianInverse[gpoint][2, n]; // calculate 6th data line
+					bl01Matrices[gpoint][5, 6 + n] = jacobianInverse[gpoint][0, n];
 				}
 			}
-			return BL01_hexa;
+			return bl01Matrices;
 		}
 
-		private Matrix[] GetBNL1_hexa(Matrix[] J_0inv_hexa)
+		private Matrix[] GetAuxilliaryDeformationbnl1Matrices(Matrix[] jacobianInverse)
 		{
-			Matrix[] BNL1_hexa = new Matrix[nGaussPoints];
+			Matrix[] bnl1Matrices = new Matrix[nGaussPoints];
 			for (int gpoint = 0; gpoint < nGaussPoints; gpoint++)
 			{
-				BNL1_hexa[gpoint] = Matrix.CreateZero(9, 9);
+				bnl1Matrices[gpoint] = Matrix.CreateZero(9, 9);
 				for (int m = 0; m < 3; m++)
 				{
 					for (int n = 0; n < 3; n++)
 					{
 						for (int p = 0; p < 3; p++)
 						{
-							BNL1_hexa[gpoint][3 * m + n, 3 * m + p] = J_0inv_hexa[gpoint][n, p];
+							bnl1Matrices[gpoint][3 * m + n, 3 * m + p] = jacobianInverse[gpoint][n, p];
 						}
 					}
 				}
 			}
-			return BNL1_hexa;
+			return bnl1Matrices;
 		}
 
 		private void CalculateInitialConfigurationData(IElement element)
@@ -210,88 +210,88 @@ namespace MGroup.FEM.Structural.Elements
 			IReadOnlyList<Matrix> shapeFunctionNaturalDerivatives;
 			shapeFunctionNaturalDerivatives = Interpolation.EvaluateNaturalGradientsAtGaussPoints(QuadratureForStiffness);
 
-			Matrix[] BL13_hexa;
-			BL13_hexa = GetBL13Hexa(shapeFunctionNaturalDerivatives);
+			Matrix[] bl13Matrices;
+			bl13Matrices = Getbl13DeformationMatrices(shapeFunctionNaturalDerivatives);
 
-			Matrix[] BNL1_hexa;
+			Matrix[] bnl1Matrices;
 
-			ox_i = new double[8][];
-			tu_i = new double[8][];
+			initialCoordinates = new double[8][];
+			totalDisplacements = new double[8][];
 
-			(Matrix[] J_0inv_hexa, double[] detJ_0) = JacobianHexa8Reverse.GetJ_0invHexaAndDetJ_0(
+			(Matrix[] jacobianInverse, double[] jacobianDeterminants) = JacobianHexa8Reverse.GetJ_0invHexaAndjacobianDeterminants(
 				shapeFunctionNaturalDerivatives, element.Nodes, nGaussPoints);
 
 			integrationCoeffs = new double[nGaussPoints];
 
-			BNL1_hexa = GetBNL1_hexa(J_0inv_hexa);
+			bnl1Matrices = GetAuxilliaryDeformationbnl1Matrices(jacobianInverse);
 
 			for (int j = 0; j < 8; j++)
 			{
-				ox_i[j] = new double[] { element.Nodes[j].X, element.Nodes[j].Y, element.Nodes[j].Z, };
+				initialCoordinates[j] = new double[] { element.Nodes[j].X, element.Nodes[j].Y, element.Nodes[j].Z, };
 			}
 
 			for (int gpoint = 0; gpoint < nGaussPoints; gpoint++)
 			{
-				integrationCoeffs[gpoint] = detJ_0[gpoint] * QuadratureForStiffness.IntegrationPoints[gpoint].Weight;
+				integrationCoeffs[gpoint] = jacobianDeterminants[gpoint] * QuadratureForStiffness.IntegrationPoints[gpoint].Weight;
 
 			}
 
-			tu_i = new double[8][];
-			GLvec = new double[nGaussPoints][];
-			GLvec_last_converged = new double[nGaussPoints][];
+			totalDisplacements = new double[8][];
+			strainsVec = new double[nGaussPoints][];
+			strainsVec_last_converged = new double[nGaussPoints][];
 			for (int gpoint = 0; gpoint < nGaussPoints; gpoint++)
 			{
-				GLvec[gpoint] = new double[6];
-				GLvec_last_converged[gpoint] = new double[6];
+				strainsVec[gpoint] = new double[6];
+				strainsVec_last_converged[gpoint] = new double[6];
 			}
 			for (int k = 0; k < 8; k++)
 			{
-				tu_i[k] = new double[3];
+				totalDisplacements[k] = new double[3];
 			}
 			isInitialized = true;
 
 		}
 
-		private void UpdateCoordinateData(double[] localdisplacements, out double[][] tx_i)
+		private void UpdateCoordinateData(double[] localdisplacements, out double[][] deformedCoordinates)
 		{
-			tx_i = new double[8][];
+			deformedCoordinates = new double[8][];
 			for (int j = 0; j < 8; j++)
 			{
-				tx_i[j] = new double[3];
+				deformedCoordinates[j] = new double[3];
 				for (int k = 0; k < 3; k++)
 				{
-					tu_i[j][k] = localdisplacements[3 * j + k];
-					tx_i[j][k] = ox_i[j][k] + tu_i[j][k];
+					totalDisplacements[j][k] = localdisplacements[3 * j + k];
+					deformedCoordinates[j][k] = initialCoordinates[j][k] + totalDisplacements[j][k];
 				}
 			}
 		}
 
-		private void CalculateStrains(double[] localdisplacements, IElement element, double[][] tx_i)
+		private void CalculateStrains(double[] localdisplacements, IElement element, double[][] deformedCoordinates)
 		{
 			IReadOnlyList<Matrix> shapeFunctionNaturalDerivatives;
 			shapeFunctionNaturalDerivatives = Interpolation.EvaluateNaturalGradientsAtGaussPoints(QuadratureForStiffness);
-			(Matrix[] J_0inv_hexa, double[] detJ_0) = JacobianHexa8Reverse.GetJ_0invHexaAndDetJ_0(
+			(Matrix[] jacobianInverse, double[] jacobianDeterminants) = JacobianHexa8Reverse.GetJ_0invHexaAndjacobianDeterminants(
 				shapeFunctionNaturalDerivatives, element.Nodes, nGaussPoints);
-			//TODO: possibility of caching ll1_hexa or J_0inv
+			//TODO: possibility of caching shapeFunctionNaturalDerivatives or J_0inv
 
-			Matrix[] DGtr = new Matrix[nGaussPoints];
+			Matrix[] deformationGradientsTransposed = new Matrix[nGaussPoints];
 			Matrix[] GL = new Matrix[nGaussPoints];
 			for (int npoint = 0; npoint < nGaussPoints; npoint++)
 			{
-				DGtr[npoint] = Matrix.CreateZero(3, 3);
+				deformationGradientsTransposed[npoint] = Matrix.CreateZero(3, 3);
 				GL[npoint] = Matrix.CreateZero(3, 3);
 			}
 
-			Matrix[] J_1 = JacobianHexa8Reverse.Get_J_1(nGaussPoints, tx_i, shapeFunctionNaturalDerivatives);
+			Matrix[] jacobiansDeformedMatrices = JacobianHexa8Reverse.Get_jacobiansDeformedMatrices(nGaussPoints, deformedCoordinates, shapeFunctionNaturalDerivatives);
 
 			//
 			for (int npoint = 0; npoint < nGaussPoints; npoint++)
 			{
 				//
-				DGtr[npoint] = J_0inv_hexa[npoint] * J_1[npoint];
+				deformationGradientsTransposed[npoint] = jacobianInverse[npoint] * jacobiansDeformedMatrices[npoint];
 
 				//
-				GL[npoint] = DGtr[npoint] * DGtr[npoint].Transpose();
+				GL[npoint] = deformationGradientsTransposed[npoint] * deformationGradientsTransposed[npoint].Transpose();
 				for (int m = 0; m < 3; m++)
 				{
 					GL[npoint][m, m] += -1;
@@ -301,11 +301,11 @@ namespace MGroup.FEM.Structural.Elements
 				//
 				for (int m = 0; m < 3; m++)
 				{
-					GLvec[npoint][m] = GL[npoint][m, m];
+					strainsVec[npoint][m] = GL[npoint][m, m];
 				}
-				GLvec[npoint][3] = 2 * GL[npoint][0, 1];
-				GLvec[npoint][4] = 2 * GL[npoint][1, 2];
-				GLvec[npoint][5] = 2 * GL[npoint][2, 0];
+				strainsVec[npoint][3] = 2 * GL[npoint][0, 1];
+				strainsVec[npoint][4] = 2 * GL[npoint][1, 2];
+				strainsVec[npoint][5] = 2 * GL[npoint][2, 0];
 			}
 
 		}
@@ -320,53 +320,53 @@ namespace MGroup.FEM.Structural.Elements
 			{
 				for (int n = 0; n < 3; n++)
 				{
-					ll2[m, n] = tu_i[m][n];
+					ll2[m, n] = totalDisplacements[m][n];
 				}
 			}
 			IReadOnlyList<Matrix> shapeFunctionNaturalDerivatives;
 			shapeFunctionNaturalDerivatives = Interpolation.EvaluateNaturalGradientsAtGaussPoints(QuadratureForStiffness);
-			(Matrix[] J_0inv_hexa, double[] detJ_0) = JacobianHexa8Reverse.GetJ_0invHexaAndDetJ_0(
+			(Matrix[] jacobianInverse, double[] jacobianDeterminants) = JacobianHexa8Reverse.GetJ_0invHexaAndjacobianDeterminants(
 				shapeFunctionNaturalDerivatives, element.Nodes, nGaussPoints);
-			Matrix[] BL13_hexa;
-			BL13_hexa = GetBL13Hexa(shapeFunctionNaturalDerivatives);
-			Matrix[] BL11a_hexa; // dimension number of gpoints
-			Matrix[] BL12_hexa;
-			Matrix[] BL01_hexa;
-			BL11a_hexa = GetBL11a_hexa(J_0inv_hexa);
-			BL12_hexa = GetBL12_hexa(J_0inv_hexa);
-			BL01_hexa = GetBL01_hexa(J_0inv_hexa);
+			Matrix[] bl13Matrices;
+			bl13Matrices = Getbl13DeformationMatrices(shapeFunctionNaturalDerivatives);
+			Matrix[] bl11aMatrices; // dimension number of gpoints
+			Matrix[] bl12Marices;
+			Matrix[] bl01Matrices;
+			bl11aMatrices = Getbl11aDeformationMatrices(jacobianInverse);
+			bl12Marices = GetBL12DeformationMatrices(jacobianInverse);
+			bl01Matrices = Getbl01MDeformationMatrices(jacobianInverse);
 
 			//INITIALIZATION of MAtrixes that are currently not cached
-			double[][] integrCoeff_Spkvec = new double[nGaussPoints][];
+			double[][] integrCoeffsTimesStresses = new double[nGaussPoints][];
 			Matrix[] BL = new Matrix[nGaussPoints];
 			for (int gpoint = 0; gpoint < nGaussPoints; gpoint++)
 			{
-				integrCoeff_Spkvec[gpoint] = new double[6];
+				integrCoeffsTimesStresses[gpoint] = new double[6];
 				BL[gpoint] = Matrix.CreateZero(6, 24);
 			}
 
-			double[][] fxk1 = new double[nGaussPoints + 1][];
+			double[][] forces = new double[nGaussPoints + 1][];
 			for (int npoint = 0; npoint < nGaussPoints + 1; npoint++)
 			{
-				fxk1[npoint] = new double[24];
+				forces[npoint] = new double[24];
 			}
 
 			Matrix[] BL11 = new Matrix[nGaussPoints];
-			Matrix[] BL1112sun01_hexa = new Matrix[nGaussPoints];
+			Matrix[] bL1112Plus01Matrices = new Matrix[nGaussPoints];
 			for (int npoint = 0; npoint < nGaussPoints; npoint++)
 			{
 				BL11[npoint] = Matrix.CreateZero(6, 9);
-				BL1112sun01_hexa[npoint] = Matrix.CreateZero(6, 9);
+				bL1112Plus01Matrices[npoint] = Matrix.CreateZero(6, 9);
 			}
 
 			for (int npoint = 0; npoint < nGaussPoints; npoint++)
 			{
 
-				integrCoeff_Spkvec[npoint] = materialsAtGaussPoints[npoint].Stresses.Scale(integrationCoeffs[npoint]);
+				integrCoeffsTimesStresses[npoint] = materialsAtGaussPoints[npoint].Stresses.Scale(integrationCoeffs[npoint]);
 
 				//
-				Matrix l_cyrcumflex = Matrix.CreateZero(3, 3);
-				l_cyrcumflex = shapeFunctionNaturalDerivatives[npoint].Transpose() * ll2;
+				Matrix lcyrcumflex = Matrix.CreateZero(3, 3);
+				lcyrcumflex = shapeFunctionNaturalDerivatives[npoint].Transpose() * ll2;
 
 				for (int m = 0; m < 6; m++)
 				{
@@ -374,43 +374,43 @@ namespace MGroup.FEM.Structural.Elements
 					{
 						for (int p = 0; p < 3; p++)
 						{
-							BL11[npoint][m, n] += BL11a_hexa[npoint][m, p] * l_cyrcumflex[p, n];
-							BL11[npoint][m, 3 + n] += BL11a_hexa[npoint][m, 3 + p] * l_cyrcumflex[p, n];
-							BL11[npoint][m, 6 + n] += BL11a_hexa[npoint][m, 6 + p] * l_cyrcumflex[p, n];
+							BL11[npoint][m, n] += bl11aMatrices[npoint][m, p] * lcyrcumflex[p, n];
+							BL11[npoint][m, 3 + n] += bl11aMatrices[npoint][m, 3 + p] * lcyrcumflex[p, n];
+							BL11[npoint][m, 6 + n] += bl11aMatrices[npoint][m, 6 + p] * lcyrcumflex[p, n];
 						}
 					}
 				}
 
 				//
-				BL1112sun01_hexa[npoint] = BL11[npoint] * BL12_hexa[npoint];
-				BL1112sun01_hexa[npoint].AddIntoThis(BL01_hexa[npoint]);
+				bL1112Plus01Matrices[npoint] = BL11[npoint] * bl12Marices[npoint];
+				bL1112Plus01Matrices[npoint].AddIntoThis(bl01Matrices[npoint]);
 
 				// 
-				BL[npoint] = BL1112sun01_hexa[npoint] * BL13_hexa[npoint];
+				BL[npoint] = bL1112Plus01Matrices[npoint] * bl13Matrices[npoint];
 
 				//              
-				fxk1[npoint] = BL[npoint].Multiply(integrCoeff_Spkvec[npoint], true);
+				forces[npoint] = BL[npoint].Multiply(integrCoeffsTimesStresses[npoint], true);
 			}
 
 			for (int npoint = 0; npoint < nGaussPoints; npoint++)
 			{
-				fxk1[nGaussPoints].AddIntoThis(fxk1[npoint]);
+				forces[nGaussPoints].AddIntoThis(forces[npoint]);
 			}
 
-			return fxk1[nGaussPoints];
+			return forces[nGaussPoints];
 		}
 
 		private Matrix UpdateKmatrices(IElement element)
 		{
-			Matrix k_element = Matrix.CreateZero(24, 24);
+			Matrix elementStiffnessMatrix = Matrix.CreateZero(24, 24);
 
 
 			// initialization of matrices that are not cached currently
-			double[][] integrCoeff_Spkvec = new double[nGaussPoints][];
+			double[][] integrCoeffsTimesStresses = new double[nGaussPoints][];
 			Matrix[] BL = new Matrix[nGaussPoints];
 			for (int gpoint = 0; gpoint < nGaussPoints; gpoint++)
 			{
-				integrCoeff_Spkvec[gpoint] = new double[6];
+				integrCoeffsTimesStresses[gpoint] = new double[6];
 				BL[gpoint] = Matrix.CreateZero(6, 24);
 
 			}
@@ -419,28 +419,28 @@ namespace MGroup.FEM.Structural.Elements
 			{
 				for (int n = 0; n < 3; n++)
 				{
-					ll2[m, n] = tu_i[m][n];
+					ll2[m, n] = totalDisplacements[m][n];
 				}
 			}
 			IReadOnlyList<Matrix> shapeFunctionNaturalDerivatives;
 			shapeFunctionNaturalDerivatives = Interpolation.EvaluateNaturalGradientsAtGaussPoints(QuadratureForStiffness);
-			(Matrix[] J_0inv_hexa, double[] detJ_0) = JacobianHexa8Reverse.GetJ_0invHexaAndDetJ_0(
+			(Matrix[] jacobianInverse, double[] jacobianDeterminants) = JacobianHexa8Reverse.GetJ_0invHexaAndjacobianDeterminants(
 				shapeFunctionNaturalDerivatives, element.Nodes, nGaussPoints);
-			Matrix[] BL13_hexa;
-			BL13_hexa = GetBL13Hexa(shapeFunctionNaturalDerivatives);
-			Matrix[] BL11a_hexa; // dimension: gpoints
-			Matrix[] BL12_hexa;
-			Matrix[] BL01_hexa;
-			BL11a_hexa = GetBL11a_hexa(J_0inv_hexa);
-			BL12_hexa = GetBL12_hexa(J_0inv_hexa);
-			BL01_hexa = GetBL01_hexa(J_0inv_hexa);
+			Matrix[] bl13Matrices;
+			bl13Matrices = Getbl13DeformationMatrices(shapeFunctionNaturalDerivatives);
+			Matrix[] bl11aMatrices; // dimension: gpoints
+			Matrix[] bl12Marices;
+			Matrix[] bl01Matrices;
+			bl11aMatrices = Getbl11aDeformationMatrices(jacobianInverse);
+			bl12Marices = GetBL12DeformationMatrices(jacobianInverse);
+			bl01Matrices = Getbl01MDeformationMatrices(jacobianInverse);
 
 			Matrix[] BL11 = new Matrix[nGaussPoints];
-			Matrix[] BL1112sun01_hexa = new Matrix[nGaussPoints];
+			Matrix[] bL1112Plus01Matrices = new Matrix[nGaussPoints];
 			for (int npoint = 0; npoint < nGaussPoints; npoint++)
 			{
 				BL11[npoint] = Matrix.CreateZero(6, 9);
-				BL1112sun01_hexa[npoint] = Matrix.CreateZero(6, 9); //TODO this may be unnescessary
+				bL1112Plus01Matrices[npoint] = Matrix.CreateZero(6, 9); //TODO this may be unnescessary
 			}
 
 
@@ -449,11 +449,11 @@ namespace MGroup.FEM.Structural.Elements
 			{
 
 				// 
-				integrCoeff_Spkvec[npoint] = materialsAtGaussPoints[npoint].Stresses.Scale(integrationCoeffs[npoint]);
+				integrCoeffsTimesStresses[npoint] = materialsAtGaussPoints[npoint].Stresses.Scale(integrationCoeffs[npoint]);
 
 				//
-				Matrix l_cyrcumflex = Matrix.CreateZero(3, 3);
-				l_cyrcumflex = shapeFunctionNaturalDerivatives[npoint].Transpose() * ll2;
+				Matrix lcyrcumflex = Matrix.CreateZero(3, 3);
+				lcyrcumflex = shapeFunctionNaturalDerivatives[npoint].Transpose() * ll2;
 
 				for (int m = 0; m < 6; m++)
 				{
@@ -461,32 +461,32 @@ namespace MGroup.FEM.Structural.Elements
 					{
 						for (int p = 0; p < 3; p++)
 						{
-							BL11[npoint][m, n] += BL11a_hexa[npoint][m, p] * l_cyrcumflex[p, n];
-							BL11[npoint][m, 3 + n] += BL11a_hexa[npoint][m, 3 + p] * l_cyrcumflex[p, n];
-							BL11[npoint][m, 6 + n] += BL11a_hexa[npoint][m, 6 + p] * l_cyrcumflex[p, n];
+							BL11[npoint][m, n] += bl11aMatrices[npoint][m, p] * lcyrcumflex[p, n];
+							BL11[npoint][m, 3 + n] += bl11aMatrices[npoint][m, 3 + p] * lcyrcumflex[p, n];
+							BL11[npoint][m, 6 + n] += bl11aMatrices[npoint][m, 6 + p] * lcyrcumflex[p, n];
 						}
 					}
 				}
 
 				// 
-				BL1112sun01_hexa[npoint] = BL11[npoint] * BL12_hexa[npoint];
-				BL1112sun01_hexa[npoint].AddIntoThis(BL01_hexa[npoint]);
+				bL1112Plus01Matrices[npoint] = BL11[npoint] * bl12Marices[npoint];
+				bL1112Plus01Matrices[npoint].AddIntoThis(bl01Matrices[npoint]);
 
 				//
-				BL[npoint] = BL1112sun01_hexa[npoint] * BL13_hexa[npoint];
+				BL[npoint] = bL1112Plus01Matrices[npoint] * bl13Matrices[npoint];
 
 			}
 			// TODO: BL and above calculations can cached from calculate forces method
 
-			Matrix[] BNL1_hexa;
-			Matrix[] BNL_hexa;
-			BNL1_hexa = GetBNL1_hexa(J_0inv_hexa);
-			BNL_hexa = new Matrix[nGaussPoints];
+			Matrix[] bnl1Matrices;
+			Matrix[] bnlMatrices;
+			bnl1Matrices = GetAuxilliaryDeformationbnl1Matrices(jacobianInverse);
+			bnlMatrices = new Matrix[nGaussPoints];
 			for (int gpoint = 0; gpoint < nGaussPoints; gpoint++)
 			{
-				BNL_hexa[gpoint] = Matrix.CreateZero(9, 24); //todo this may be unnescessary
+				bnlMatrices[gpoint] = Matrix.CreateZero(9, 24); //todo this may be unnescessary
 
-				BNL_hexa[gpoint] = BNL1_hexa[gpoint] * BL13_hexa[gpoint];
+				bnlMatrices[gpoint] = bnl1Matrices[gpoint] * bl13Matrices[gpoint];
 
 			}
 
@@ -509,20 +509,20 @@ namespace MGroup.FEM.Structural.Elements
 
 			for (int npoint = 0; npoint < nGaussPoints; npoint++)
 			{
-				Matrix integrCoeff_SPK_epi_BNL_hexa = Matrix.CreateZero(9, 24); //TODO
+				Matrix integrCoeff_SPK_epi_bnlMatrices = Matrix.CreateZero(9, 24); //TODO
 				Matrix integrCoeff_cons_disp = Matrix.CreateZero(6, 6); //TODO
 				Matrix integrCoeff_cons_disp_epi_BL = Matrix.CreateZero(6, 24);//TODO
 
 				//
-				integrCoeff_Spk[npoint][0, 0] = integrCoeff_Spkvec[npoint][0];
-				integrCoeff_Spk[npoint][0, 1] = integrCoeff_Spkvec[npoint][3];
-				integrCoeff_Spk[npoint][0, 2] = integrCoeff_Spkvec[npoint][5];
-				integrCoeff_Spk[npoint][1, 0] = integrCoeff_Spkvec[npoint][3];
-				integrCoeff_Spk[npoint][1, 1] = integrCoeff_Spkvec[npoint][1];
-				integrCoeff_Spk[npoint][1, 2] = integrCoeff_Spkvec[npoint][4];
-				integrCoeff_Spk[npoint][2, 0] = integrCoeff_Spkvec[npoint][5];
-				integrCoeff_Spk[npoint][2, 1] = integrCoeff_Spkvec[npoint][4];
-				integrCoeff_Spk[npoint][2, 2] = integrCoeff_Spkvec[npoint][2];
+				integrCoeff_Spk[npoint][0, 0] = integrCoeffsTimesStresses[npoint][0];
+				integrCoeff_Spk[npoint][0, 1] = integrCoeffsTimesStresses[npoint][3];
+				integrCoeff_Spk[npoint][0, 2] = integrCoeffsTimesStresses[npoint][5];
+				integrCoeff_Spk[npoint][1, 0] = integrCoeffsTimesStresses[npoint][3];
+				integrCoeff_Spk[npoint][1, 1] = integrCoeffsTimesStresses[npoint][1];
+				integrCoeff_Spk[npoint][1, 2] = integrCoeffsTimesStresses[npoint][4];
+				integrCoeff_Spk[npoint][2, 0] = integrCoeffsTimesStresses[npoint][5];
+				integrCoeff_Spk[npoint][2, 1] = integrCoeffsTimesStresses[npoint][4];
+				integrCoeff_Spk[npoint][2, 2] = integrCoeffsTimesStresses[npoint][2];
 
 				//
 				IMatrixView consDisp = materialsAtGaussPoints[npoint].ConstitutiveMatrix;
@@ -548,18 +548,18 @@ namespace MGroup.FEM.Structural.Elements
 					{
 						for (int p = 0; p < 3; p++)
 						{
-							integrCoeff_SPK_epi_BNL_hexa[m, n] += integrCoeff_Spk[npoint][m, p] * BNL_hexa[npoint][p, n];
-							integrCoeff_SPK_epi_BNL_hexa[3 + m, n] += integrCoeff_Spk[npoint][m, p] * BNL_hexa[npoint][3 + p, n];
-							integrCoeff_SPK_epi_BNL_hexa[6 + m, n] += integrCoeff_Spk[npoint][m, p] * BNL_hexa[npoint][6 + p, n];
+							integrCoeff_SPK_epi_bnlMatrices[m, n] += integrCoeff_Spk[npoint][m, p] * bnlMatrices[npoint][p, n];
+							integrCoeff_SPK_epi_bnlMatrices[3 + m, n] += integrCoeff_Spk[npoint][m, p] * bnlMatrices[npoint][3 + p, n];
+							integrCoeff_SPK_epi_bnlMatrices[6 + m, n] += integrCoeff_Spk[npoint][m, p] * bnlMatrices[npoint][6 + p, n];
 						}
 					}
 				}
 
 				//
-				knl_[npoint] = BNL_hexa[npoint].Transpose() * integrCoeff_SPK_epi_BNL_hexa;
+				knl_[npoint] = bnlMatrices[npoint].Transpose() * integrCoeff_SPK_epi_bnlMatrices;
 			}
 
-			// Add contributions of each gp on the total element stiffness matrix k_element            
+			// Add contributions of each gp on the total element stiffness matrix elementStiffnessMatrix            
 			for (int npoint = 0; npoint < nGaussPoints; npoint++)
 			{
 				for (int m = 0; m < 24; m++)
@@ -575,36 +575,36 @@ namespace MGroup.FEM.Structural.Elements
 			{
 				for (int n = 0; n < 24; n++)
 				{
-					k_element[m, n] = kl_[nGaussPoints][m, n] + knl_[nGaussPoints][m, n];
+					elementStiffnessMatrix[m, n] = kl_[nGaussPoints][m, n] + knl_[nGaussPoints][m, n];
 				}
 			}
 
-			return k_element;
+			return elementStiffnessMatrix;
 		}
 
 		public Tuple<double[], double[]> CalculateStresses(IElement element, double[] localTotalDisplacements, double[] localdDisplacements)
 		{
-			this.UpdateCoordinateData(localTotalDisplacements, out double[][] tx_i);
-			this.CalculateStrains(localTotalDisplacements, element, tx_i);
-			double[] GLvec_strain_minus_last_converged_value = new double[6];
+			this.UpdateCoordinateData(localTotalDisplacements, out double[][] deformedCoordinates);
+			this.CalculateStrains(localTotalDisplacements, element, deformedCoordinates);
+			double[] strainsVec_strain_minus_last_converged_value = new double[6];
 			for (int npoint = 0; npoint < materialsAtGaussPoints.Length; npoint++)
 			{
-				GLvec_strain_minus_last_converged_value = new double[6]
+				strainsVec_strain_minus_last_converged_value = new double[6]
 				{
-					GLvec[npoint][0]- GLvec_last_converged[npoint][0],
-					GLvec[npoint][1] - GLvec_last_converged[npoint][1],
-					GLvec[npoint][2] - GLvec_last_converged[npoint][2],
-					GLvec[npoint][3]- GLvec_last_converged[npoint][3],
-					GLvec[npoint][4]- GLvec_last_converged[npoint][4],
-					GLvec[npoint][5]- GLvec_last_converged[npoint][5]
+					strainsVec[npoint][0]- strainsVec_last_converged[npoint][0],
+					strainsVec[npoint][1] - strainsVec_last_converged[npoint][1],
+					strainsVec[npoint][2] - strainsVec_last_converged[npoint][2],
+					strainsVec[npoint][3]- strainsVec_last_converged[npoint][3],
+					strainsVec[npoint][4]- strainsVec_last_converged[npoint][4],
+					strainsVec[npoint][5]- strainsVec_last_converged[npoint][5]
 				};
-				materialsAtGaussPoints[npoint].UpdateMaterial(GLvec_strain_minus_last_converged_value);
-				//To update with total strain simplY = materialsAtGaussPoints[npoint].UpdateMaterial(GLvec[npoint]);
+				materialsAtGaussPoints[npoint].UpdateMaterial(strainsVec_strain_minus_last_converged_value);
+				//To update with total strain simplY = materialsAtGaussPoints[npoint].UpdateMaterial(strainsVec[npoint]);
 			}
-			return new Tuple<double[], double[]>(GLvec_strain_minus_last_converged_value,
+			return new Tuple<double[], double[]>(strainsVec_strain_minus_last_converged_value,
 				materialsAtGaussPoints[materialsAtGaussPoints.Length - 1].Stresses);
 			//TODO return data with total strains data would be:
-			//return new Tuple<double[], double[]>(GLvec[materialsAtGaussPoints.Length - 1], materialsAtGaussPoints[materialsAtGaussPoints.Length - 1].Stresses);
+			//return new Tuple<double[], double[]>(strainsVec[materialsAtGaussPoints.Length - 1], materialsAtGaussPoints[materialsAtGaussPoints.Length - 1].Stresses);
 			//TODO: why return only the strain- stress of the gausspoint that is last on the array, Where is it needed?
 		}
 
@@ -620,8 +620,8 @@ namespace MGroup.FEM.Structural.Elements
 			{
 				this.CalculateInitialConfigurationData(element);
 				var localTotalDisplacements = new double[24];
-				this.UpdateCoordinateData(localTotalDisplacements, out double[][] tx_i);
-				this.CalculateStrains(localTotalDisplacements, element, tx_i);
+				this.UpdateCoordinateData(localTotalDisplacements, out double[][] deformedCoordinates);
+				this.CalculateStrains(localTotalDisplacements, element, deformedCoordinates);
 			}
 			Matrix elementStiffness = this.UpdateKmatrices(element);
 			//It doesn't implement Iembedded to return dof.Enumerator.GetTransformedMatrix
@@ -644,7 +644,7 @@ namespace MGroup.FEM.Structural.Elements
 			for (int npoint = 0; npoint < materialsAtGaussPoints.Length; npoint++)
 			{
 				for (int i1 = 0; i1 < 6; i1++)
-				{ GLvec_last_converged[npoint][i1] = GLvec[npoint][i1]; }
+				{ strainsVec_last_converged[npoint][i1] = strainsVec[npoint][i1]; }
 			}
 
 			foreach (IContinuumMaterial3D m in materialsAtGaussPoints) m.SaveState();
@@ -678,124 +678,124 @@ namespace MGroup.FEM.Structural.Elements
 		#region IEmbeddedHostElement
 		protected double[,] GetCoordinatesTranspose(IElement element)
 		{
-			double[,] faXYZ = new double[3, dofTypes.Length];
+			double[,] nodeCoordinatesXYZ = new double[3, dofTypes.Length];
 			for (int i = 0; i < dofTypes.Length; i++)
 			{
-				faXYZ[0, i] = element.Nodes[i].X;
-				faXYZ[1, i] = element.Nodes[i].Y;
-				faXYZ[2, i] = element.Nodes[i].Z;
+				nodeCoordinatesXYZ[0, i] = element.Nodes[i].X;
+				nodeCoordinatesXYZ[1, i] = element.Nodes[i].Y;
+				nodeCoordinatesXYZ[2, i] = element.Nodes[i].Z;
 			}
-			return faXYZ;
+			return nodeCoordinatesXYZ;
 		}
 
 		//TODO: This should be handled by InterpolationHexa8Reverse
 		private double[] CalcH8Shape(double fXi, double fEta, double fZeta)
 		{
 			const double fSqC125 = 0.5;
-			double fXiP = (1.0 + fXi) * fSqC125;
-			double fEtaP = (1.0 + fEta) * fSqC125;
-			double fZetaP = (1.0 + fZeta) * fSqC125;
-			double fXiM = (1.0 - fXi) * fSqC125;
-			double fEtaM = (1.0 - fEta) * fSqC125;
-			double fZetaM = (1.0 - fZeta) * fSqC125;
+			double auxilliaryfXiP = (1.0 + fXi) * fSqC125;
+			double auxilliaryfEtaP = (1.0 + fEta) * fSqC125;
+			double auxilliaryfZetaP = (1.0 + fZeta) * fSqC125;
+			double auxilliaryfXiM = (1.0 - fXi) * fSqC125;
+			double auxilliaryfEtaM = (1.0 - fEta) * fSqC125;
+			double auxilliaryfZetaM = (1.0 - fZeta) * fSqC125;
 
-			double[] H8Shape = new double[8]; // Warning: shape function data not in hexa8fixed order.
+			double[] auxH8ShapeFunctiondata = new double[8]; // Warning: shape function data not in hexa8fixed order.
 
-			H8Shape[6] = fXiM * fEtaM * fZetaM;
-			H8Shape[7] = fXiP * fEtaM * fZetaM;
-			H8Shape[4] = fXiP * fEtaP * fZetaM;
-			H8Shape[5] = fXiM * fEtaP * fZetaM;
-			H8Shape[2] = fXiM * fEtaM * fZetaP;
-			H8Shape[3] = fXiP * fEtaM * fZetaP;
-			H8Shape[0] = fXiP * fEtaP * fZetaP;
-			H8Shape[1] = fXiM * fEtaP * fZetaP;
+			auxH8ShapeFunctiondata[6] = auxilliaryfXiM * auxilliaryfEtaM * auxilliaryfZetaM;
+			auxH8ShapeFunctiondata[7] = auxilliaryfXiP * auxilliaryfEtaM * auxilliaryfZetaM;
+			auxH8ShapeFunctiondata[4] = auxilliaryfXiP * auxilliaryfEtaP * auxilliaryfZetaM;
+			auxH8ShapeFunctiondata[5] = auxilliaryfXiM * auxilliaryfEtaP * auxilliaryfZetaM;
+			auxH8ShapeFunctiondata[2] = auxilliaryfXiM * auxilliaryfEtaM * auxilliaryfZetaP;
+			auxH8ShapeFunctiondata[3] = auxilliaryfXiP * auxilliaryfEtaM * auxilliaryfZetaP;
+			auxH8ShapeFunctiondata[0] = auxilliaryfXiP * auxilliaryfEtaP * auxilliaryfZetaP;
+			auxH8ShapeFunctiondata[1] = auxilliaryfXiM * auxilliaryfEtaP * auxilliaryfZetaP;
 
-			return H8Shape;
+			return auxH8ShapeFunctiondata;
 		}
 
 		//TODO: This should be handled by InterpolationHexa8Reverse
 		private double[] CalcH8NablaShape(double fXi, double fEta, double fZeta)
 		{
 			const double fSq125 = 0.35355339059327376220042218105242;
-			double fXiP = (1.0 + fXi) * fSq125;
-			double fEtaP = (1.0 + fEta) * fSq125;
-			double fZetaP = (1.0 + fZeta) * fSq125;
-			double fXiM = (1.0 - fXi) * fSq125;
-			double fEtaM = (1.0 - fEta) * fSq125;
-			double fZetaM = (1.0 - fZeta) * fSq125;
+			double auxilliaryfXiP = (1.0 + fXi) * fSq125;
+			double auxilliaryfEtaP = (1.0 + fEta) * fSq125;
+			double auxilliaryfZetaP = (1.0 + fZeta) * fSq125;
+			double auxilliaryfXiM = (1.0 - fXi) * fSq125;
+			double auxilliaryfEtaM = (1.0 - fEta) * fSq125;
+			double auxilliaryfZetaM = (1.0 - fZeta) * fSq125;
 
-			double[] faDS = new double[24];
-			faDS[6] = -fEtaM * fZetaM;
-			faDS[4] = fEtaP * fZetaM;
-			faDS[2] = -fEtaM * fZetaP;
-			faDS[0] = fEtaP * fZetaP;
-			faDS[7] = -faDS[6];
-			faDS[5] = -faDS[4];
-			faDS[3] = -faDS[2];
-			faDS[1] = -faDS[0];
-
-
-			faDS[14] = -fXiM * fZetaM;
-			faDS[15] = -fXiP * fZetaM;
-			faDS[10] = -fXiM * fZetaP;
-			faDS[11] = -fXiP * fZetaP;
-			faDS[12] = -faDS[15];
-			faDS[13] = -faDS[14];
-			faDS[8] = -faDS[11];
-			faDS[9] = -faDS[10];
+			double[] auxilliaryfaDS = new double[24];
+			auxilliaryfaDS[6] = -auxilliaryfEtaM * auxilliaryfZetaM;
+			auxilliaryfaDS[4] = auxilliaryfEtaP * auxilliaryfZetaM;
+			auxilliaryfaDS[2] = -auxilliaryfEtaM * auxilliaryfZetaP;
+			auxilliaryfaDS[0] = auxilliaryfEtaP * auxilliaryfZetaP;
+			auxilliaryfaDS[7] = -auxilliaryfaDS[6];
+			auxilliaryfaDS[5] = -auxilliaryfaDS[4];
+			auxilliaryfaDS[3] = -auxilliaryfaDS[2];
+			auxilliaryfaDS[1] = -auxilliaryfaDS[0];
 
 
-			faDS[22] = -fXiM * fEtaM;
-			faDS[23] = -fXiP * fEtaM;
-			faDS[20] = -fXiP * fEtaP;
-			faDS[21] = -fXiM * fEtaP;
-			faDS[18] = -faDS[22];
-			faDS[19] = -faDS[23];
-			faDS[16] = -faDS[20];
-			faDS[17] = -faDS[21];
+			auxilliaryfaDS[14] = -auxilliaryfXiM * auxilliaryfZetaM;
+			auxilliaryfaDS[15] = -auxilliaryfXiP * auxilliaryfZetaM;
+			auxilliaryfaDS[10] = -auxilliaryfXiM * auxilliaryfZetaP;
+			auxilliaryfaDS[11] = -auxilliaryfXiP * auxilliaryfZetaP;
+			auxilliaryfaDS[12] = -auxilliaryfaDS[15];
+			auxilliaryfaDS[13] = -auxilliaryfaDS[14];
+			auxilliaryfaDS[8] = -auxilliaryfaDS[11];
+			auxilliaryfaDS[9] = -auxilliaryfaDS[10];
 
-			return faDS;
+
+			auxilliaryfaDS[22] = -auxilliaryfXiM * auxilliaryfEtaM;
+			auxilliaryfaDS[23] = -auxilliaryfXiP * auxilliaryfEtaM;
+			auxilliaryfaDS[20] = -auxilliaryfXiP * auxilliaryfEtaP;
+			auxilliaryfaDS[21] = -auxilliaryfXiM * auxilliaryfEtaP;
+			auxilliaryfaDS[18] = -auxilliaryfaDS[22];
+			auxilliaryfaDS[19] = -auxilliaryfaDS[23];
+			auxilliaryfaDS[16] = -auxilliaryfaDS[20];
+			auxilliaryfaDS[17] = -auxilliaryfaDS[21];
+
+			return auxilliaryfaDS;
 		}
 
 		protected static double determinantTolerance = 0.00000001;
 		//TODO: This should be handled by JacobianHexa8Reverse
 		private Tuple<double[,], double[,], double> CalcH8JDetJ(double[,] faXYZ, double[] faDS)
 		{
-			double[,] faJ = new double[3, 3];
-			faJ[0, 0] = faDS[0] * faXYZ[0, 0] + faDS[1] * faXYZ[0, 1] + faDS[2] * faXYZ[0, 2] + faDS[3] * faXYZ[0, 3] + faDS[4] * faXYZ[0, 4] + faDS[5] * faXYZ[0, 5] + faDS[6] * faXYZ[0, 6] + faDS[7] * faXYZ[0, 7];
-			faJ[0, 1] = faDS[0] * faXYZ[1, 0] + faDS[1] * faXYZ[1, 1] + faDS[2] * faXYZ[1, 2] + faDS[3] * faXYZ[1, 3] + faDS[4] * faXYZ[1, 4] + faDS[5] * faXYZ[1, 5] + faDS[6] * faXYZ[1, 6] + faDS[7] * faXYZ[1, 7];
-			faJ[0, 2] = faDS[0] * faXYZ[2, 0] + faDS[1] * faXYZ[2, 1] + faDS[2] * faXYZ[2, 2] + faDS[3] * faXYZ[2, 3] + faDS[4] * faXYZ[2, 4] + faDS[5] * faXYZ[2, 5] + faDS[6] * faXYZ[2, 6] + faDS[7] * faXYZ[2, 7];
-			faJ[1, 0] = faDS[8] * faXYZ[0, 0] + faDS[9] * faXYZ[0, 1] + faDS[10] * faXYZ[0, 2] + faDS[11] * faXYZ[0, 3] + faDS[12] * faXYZ[0, 4] + faDS[13] * faXYZ[0, 5] + faDS[14] * faXYZ[0, 6] + faDS[15] * faXYZ[0, 7];
-			faJ[1, 1] = faDS[8] * faXYZ[1, 0] + faDS[9] * faXYZ[1, 1] + faDS[10] * faXYZ[1, 2] + faDS[11] * faXYZ[1, 3] + faDS[12] * faXYZ[1, 4] + faDS[13] * faXYZ[1, 5] + faDS[14] * faXYZ[1, 6] + faDS[15] * faXYZ[1, 7];
-			faJ[1, 2] = faDS[8] * faXYZ[2, 0] + faDS[9] * faXYZ[2, 1] + faDS[10] * faXYZ[2, 2] + faDS[11] * faXYZ[2, 3] + faDS[12] * faXYZ[2, 4] + faDS[13] * faXYZ[2, 5] + faDS[14] * faXYZ[2, 6] + faDS[15] * faXYZ[2, 7];
-			faJ[2, 0] = faDS[16] * faXYZ[0, 0] + faDS[17] * faXYZ[0, 1] + faDS[18] * faXYZ[0, 2] + faDS[19] * faXYZ[0, 3] + faDS[20] * faXYZ[0, 4] + faDS[21] * faXYZ[0, 5] + faDS[22] * faXYZ[0, 6] + faDS[23] * faXYZ[0, 7];
-			faJ[2, 1] = faDS[16] * faXYZ[1, 0] + faDS[17] * faXYZ[1, 1] + faDS[18] * faXYZ[1, 2] + faDS[19] * faXYZ[1, 3] + faDS[20] * faXYZ[1, 4] + faDS[21] * faXYZ[1, 5] + faDS[22] * faXYZ[1, 6] + faDS[23] * faXYZ[1, 7];
-			faJ[2, 2] = faDS[16] * faXYZ[2, 0] + faDS[17] * faXYZ[2, 1] + faDS[18] * faXYZ[2, 2] + faDS[19] * faXYZ[2, 3] + faDS[20] * faXYZ[2, 4] + faDS[21] * faXYZ[2, 5] + faDS[22] * faXYZ[2, 6] + faDS[23] * faXYZ[2, 7];
+			double[,] auxilliaryfaJ = new double[3, 3];
+			auxilliaryfaJ[0, 0] = faDS[0] * faXYZ[0, 0] + faDS[1] * faXYZ[0, 1] + faDS[2] * faXYZ[0, 2] + faDS[3] * faXYZ[0, 3] + faDS[4] * faXYZ[0, 4] + faDS[5] * faXYZ[0, 5] + faDS[6] * faXYZ[0, 6] + faDS[7] * faXYZ[0, 7];
+			auxilliaryfaJ[0, 1] = faDS[0] * faXYZ[1, 0] + faDS[1] * faXYZ[1, 1] + faDS[2] * faXYZ[1, 2] + faDS[3] * faXYZ[1, 3] + faDS[4] * faXYZ[1, 4] + faDS[5] * faXYZ[1, 5] + faDS[6] * faXYZ[1, 6] + faDS[7] * faXYZ[1, 7];
+			auxilliaryfaJ[0, 2] = faDS[0] * faXYZ[2, 0] + faDS[1] * faXYZ[2, 1] + faDS[2] * faXYZ[2, 2] + faDS[3] * faXYZ[2, 3] + faDS[4] * faXYZ[2, 4] + faDS[5] * faXYZ[2, 5] + faDS[6] * faXYZ[2, 6] + faDS[7] * faXYZ[2, 7];
+			auxilliaryfaJ[1, 0] = faDS[8] * faXYZ[0, 0] + faDS[9] * faXYZ[0, 1] + faDS[10] * faXYZ[0, 2] + faDS[11] * faXYZ[0, 3] + faDS[12] * faXYZ[0, 4] + faDS[13] * faXYZ[0, 5] + faDS[14] * faXYZ[0, 6] + faDS[15] * faXYZ[0, 7];
+			auxilliaryfaJ[1, 1] = faDS[8] * faXYZ[1, 0] + faDS[9] * faXYZ[1, 1] + faDS[10] * faXYZ[1, 2] + faDS[11] * faXYZ[1, 3] + faDS[12] * faXYZ[1, 4] + faDS[13] * faXYZ[1, 5] + faDS[14] * faXYZ[1, 6] + faDS[15] * faXYZ[1, 7];
+			auxilliaryfaJ[1, 2] = faDS[8] * faXYZ[2, 0] + faDS[9] * faXYZ[2, 1] + faDS[10] * faXYZ[2, 2] + faDS[11] * faXYZ[2, 3] + faDS[12] * faXYZ[2, 4] + faDS[13] * faXYZ[2, 5] + faDS[14] * faXYZ[2, 6] + faDS[15] * faXYZ[2, 7];
+			auxilliaryfaJ[2, 0] = faDS[16] * faXYZ[0, 0] + faDS[17] * faXYZ[0, 1] + faDS[18] * faXYZ[0, 2] + faDS[19] * faXYZ[0, 3] + faDS[20] * faXYZ[0, 4] + faDS[21] * faXYZ[0, 5] + faDS[22] * faXYZ[0, 6] + faDS[23] * faXYZ[0, 7];
+			auxilliaryfaJ[2, 1] = faDS[16] * faXYZ[1, 0] + faDS[17] * faXYZ[1, 1] + faDS[18] * faXYZ[1, 2] + faDS[19] * faXYZ[1, 3] + faDS[20] * faXYZ[1, 4] + faDS[21] * faXYZ[1, 5] + faDS[22] * faXYZ[1, 6] + faDS[23] * faXYZ[1, 7];
+			auxilliaryfaJ[2, 2] = faDS[16] * faXYZ[2, 0] + faDS[17] * faXYZ[2, 1] + faDS[18] * faXYZ[2, 2] + faDS[19] * faXYZ[2, 3] + faDS[20] * faXYZ[2, 4] + faDS[21] * faXYZ[2, 5] + faDS[22] * faXYZ[2, 6] + faDS[23] * faXYZ[2, 7];
 
-			double fDet1 = faJ[0, 0] * (faJ[1, 1] * faJ[2, 2] - faJ[2, 1] * faJ[1, 2]);
-			double fDet2 = -faJ[0, 1] * (faJ[1, 0] * faJ[2, 2] - faJ[2, 0] * faJ[1, 2]);
-			double fDet3 = faJ[0, 2] * (faJ[1, 0] * faJ[2, 1] - faJ[2, 0] * faJ[1, 1]);
-			double fDetJ = fDet1 + fDet2 + fDet3;
-			if (fDetJ < determinantTolerance)
+			double auxilliaryfDet1 = auxilliaryfaJ[0, 0] * (auxilliaryfaJ[1, 1] * auxilliaryfaJ[2, 2] - auxilliaryfaJ[2, 1] * auxilliaryfaJ[1, 2]);
+			double auxilliaryfDet2 = -auxilliaryfaJ[0, 1] * (auxilliaryfaJ[1, 0] * auxilliaryfaJ[2, 2] - auxilliaryfaJ[2, 0] * auxilliaryfaJ[1, 2]);
+			double auxilliaryfDet3 = auxilliaryfaJ[0, 2] * (auxilliaryfaJ[1, 0] * auxilliaryfaJ[2, 1] - auxilliaryfaJ[2, 0] * auxilliaryfaJ[1, 1]);
+			double auxilliaryfDetJ = auxilliaryfDet1 + auxilliaryfDet2 + auxilliaryfDet3;
+			if (auxilliaryfDetJ < determinantTolerance)
 			{
 				throw new ArgumentException(
-					$"Jacobian determinant is negative or under tolerance ({fDetJ} < {determinantTolerance})."
+					$"Jacobian determinant is negative or under tolerance ({auxilliaryfDetJ} < {determinantTolerance})."
 					 + " Check the order of nodes or the element geometry.");
 			}
 
-			double fDetInv = 1.0 / fDetJ;
-			double[,] faJInv = new double[3, 3];
-			faJInv[0, 0] = (faJ[1, 1] * faJ[2, 2] - faJ[2, 1] * faJ[1, 2]) * fDetInv;
-			faJInv[1, 0] = (faJ[2, 0] * faJ[1, 2] - faJ[1, 0] * faJ[2, 2]) * fDetInv;
-			faJInv[2, 0] = (faJ[1, 0] * faJ[2, 1] - faJ[2, 0] * faJ[1, 1]) * fDetInv;
-			faJInv[0, 1] = (faJ[2, 1] * faJ[0, 2] - faJ[0, 1] * faJ[2, 2]) * fDetInv;
-			faJInv[1, 1] = (faJ[0, 0] * faJ[2, 2] - faJ[2, 0] * faJ[0, 2]) * fDetInv;
-			faJInv[2, 1] = (faJ[2, 0] * faJ[0, 1] - faJ[2, 1] * faJ[0, 0]) * fDetInv;
-			faJInv[0, 2] = (faJ[0, 1] * faJ[1, 2] - faJ[1, 1] * faJ[0, 2]) * fDetInv;
-			faJInv[1, 2] = (faJ[1, 0] * faJ[0, 2] - faJ[0, 0] * faJ[1, 2]) * fDetInv;
-			faJInv[2, 2] = (faJ[0, 0] * faJ[1, 1] - faJ[1, 0] * faJ[0, 1]) * fDetInv;
+			double auxilliaryfDetInv = 1.0 / auxilliaryfDetJ;
+			double[,] auxilliaryfaJInv = new double[3, 3];
+			auxilliaryfaJInv[0, 0] = (auxilliaryfaJ[1, 1] * auxilliaryfaJ[2, 2] - auxilliaryfaJ[2, 1] * auxilliaryfaJ[1, 2]) * auxilliaryfDetInv;
+			auxilliaryfaJInv[1, 0] = (auxilliaryfaJ[2, 0] * auxilliaryfaJ[1, 2] - auxilliaryfaJ[1, 0] * auxilliaryfaJ[2, 2]) * auxilliaryfDetInv;
+			auxilliaryfaJInv[2, 0] = (auxilliaryfaJ[1, 0] * auxilliaryfaJ[2, 1] - auxilliaryfaJ[2, 0] * auxilliaryfaJ[1, 1]) * auxilliaryfDetInv;
+			auxilliaryfaJInv[0, 1] = (auxilliaryfaJ[2, 1] * auxilliaryfaJ[0, 2] - auxilliaryfaJ[0, 1] * auxilliaryfaJ[2, 2]) * auxilliaryfDetInv;
+			auxilliaryfaJInv[1, 1] = (auxilliaryfaJ[0, 0] * auxilliaryfaJ[2, 2] - auxilliaryfaJ[2, 0] * auxilliaryfaJ[0, 2]) * auxilliaryfDetInv;
+			auxilliaryfaJInv[2, 1] = (auxilliaryfaJ[2, 0] * auxilliaryfaJ[0, 1] - auxilliaryfaJ[2, 1] * auxilliaryfaJ[0, 0]) * auxilliaryfDetInv;
+			auxilliaryfaJInv[0, 2] = (auxilliaryfaJ[0, 1] * auxilliaryfaJ[1, 2] - auxilliaryfaJ[1, 1] * auxilliaryfaJ[0, 2]) * auxilliaryfDetInv;
+			auxilliaryfaJInv[1, 2] = (auxilliaryfaJ[1, 0] * auxilliaryfaJ[0, 2] - auxilliaryfaJ[0, 0] * auxilliaryfaJ[1, 2]) * auxilliaryfDetInv;
+			auxilliaryfaJInv[2, 2] = (auxilliaryfaJ[0, 0] * auxilliaryfaJ[1, 1] - auxilliaryfaJ[1, 0] * auxilliaryfaJ[0, 1]) * auxilliaryfDetInv;
 
-			return new Tuple<double[,], double[,], double>(faJ, faJInv, fDetJ);
+			return new Tuple<double[,], double[,], double>(auxilliaryfaJ, auxilliaryfaJInv, auxilliaryfDetJ);
 		}
 
 		public EmbeddedNode BuildHostElementEmbeddedNode(Element element, Node node,

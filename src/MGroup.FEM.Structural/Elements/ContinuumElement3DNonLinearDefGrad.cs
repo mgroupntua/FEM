@@ -35,12 +35,12 @@ namespace ISAAR.MSolve.FEM.Elements
         private readonly int nGaussPoints;
         private bool isInitialized = false;
 
-        private double[][] ox_i; //not defined by user. 8 arrays of 3 elements
-        private double[][] tu_i;
+        private double[][] initialCoordinates; //not defined by user. 8 arrays of 3 elements
+        private double[][] totalDisplacements;
         private double[] integrationCoeffs;
 
-		private double[][] GLvec;
-		//private double[][] GLvec_last_converged;
+		private double[][] strainsVec;
+		//private double[][] strainsVec_last_converged;
 		private double[][] DefGradVec;
 
 		protected ContinuumElement3DNonLinearDefGrad()
@@ -95,130 +95,130 @@ namespace ISAAR.MSolve.FEM.Elements
             }
         }
 
-        private Matrix[] GetBL13Hexa(IReadOnlyList<Matrix> ll1_hexa)
+        private Matrix[] Getbl13DeformationMatrices(IReadOnlyList<Matrix> shapeFunctionNaturalDerivatives)
         {
-            Matrix[] BL13_hexa;
-            BL13_hexa = new Matrix[nGaussPoints];
+            Matrix[] bl13Matrices;
+            bl13Matrices = new Matrix[nGaussPoints];
             for (int npoint = 0; npoint < nGaussPoints; npoint++)
             {
-                BL13_hexa[npoint] = Matrix.CreateZero(9, 3*ll1_hexa[npoint].NumRows);
-                for (int m = 0; m < ll1_hexa[npoint].NumRows; m++)
+                bl13Matrices[npoint] = Matrix.CreateZero(9, 3*shapeFunctionNaturalDerivatives[npoint].NumRows);
+                for (int m = 0; m < shapeFunctionNaturalDerivatives[npoint].NumRows; m++)
                 {
                     for (int n = 0; n < 3; n++)
                     {
-                        BL13_hexa[npoint][n, 3 * m + 0] = ll1_hexa[npoint][ m,n];
-                        BL13_hexa[npoint][n + 3, 3 * m + 1] = ll1_hexa[npoint][m,n];
-                        BL13_hexa[npoint][n + 6, 3 * m + 2] = ll1_hexa[npoint][m, n];
+                        bl13Matrices[npoint][n, 3 * m + 0] = shapeFunctionNaturalDerivatives[npoint][ m,n];
+                        bl13Matrices[npoint][n + 3, 3 * m + 1] = shapeFunctionNaturalDerivatives[npoint][m,n];
+                        bl13Matrices[npoint][n + 6, 3 * m + 2] = shapeFunctionNaturalDerivatives[npoint][m, n];
                     }
                 }
             }
-            return BL13_hexa;
+            return bl13Matrices;
         }
 
-        private Matrix[] GetBL11a_hexa(Matrix[] J_0inv_hexa)
+        private Matrix[] Getbl11aDeformationMatrices(Matrix[] jacobianInverse)
         {
-            Matrix[] BL11a_hexa = new Matrix[nGaussPoints];
+            Matrix[] bl11aMatrices = new Matrix[nGaussPoints];
             for (int gpoint = 0; gpoint < nGaussPoints; gpoint++)
             {
-                BL11a_hexa[gpoint] = Matrix.CreateZero(6, 9);
+                bl11aMatrices[gpoint] = Matrix.CreateZero(6, 9);
                 for (int m = 0; m < 3; m++) // calculate first three data lines of the matrix
                 {
                     for (int n = 0; n < 3; n++)
                     {
-                        BL11a_hexa[gpoint][m, 3 * m + n] = J_0inv_hexa[gpoint][m, n];
+                        bl11aMatrices[gpoint][m, 3 * m + n] = jacobianInverse[gpoint][m, n];
                     }
                 }
                 for (int n = 0; n < 3; n++)
                 {
-                    BL11a_hexa[gpoint][3, n] = J_0inv_hexa[gpoint][1, n]; // calculate 4th data line
-                    BL11a_hexa[gpoint][3, 3 + n] = J_0inv_hexa[gpoint][0, n];
-                    BL11a_hexa[gpoint][4, 3 + n] = J_0inv_hexa[gpoint][2, n]; // calculate 5th data line
-                    BL11a_hexa[gpoint][4, 6 + n] = J_0inv_hexa[gpoint][1, n];
-                    BL11a_hexa[gpoint][5, 0 + n] = J_0inv_hexa[gpoint][2, n]; // calculate 6th data line
-                    BL11a_hexa[gpoint][5, 6 + n] = J_0inv_hexa[gpoint][0, n];
+                    bl11aMatrices[gpoint][3, n] = jacobianInverse[gpoint][1, n]; // calculate 4th data line
+                    bl11aMatrices[gpoint][3, 3 + n] = jacobianInverse[gpoint][0, n];
+                    bl11aMatrices[gpoint][4, 3 + n] = jacobianInverse[gpoint][2, n]; // calculate 5th data line
+                    bl11aMatrices[gpoint][4, 6 + n] = jacobianInverse[gpoint][1, n];
+                    bl11aMatrices[gpoint][5, 0 + n] = jacobianInverse[gpoint][2, n]; // calculate 6th data line
+                    bl11aMatrices[gpoint][5, 6 + n] = jacobianInverse[gpoint][0, n];
                 }
             }
 
-            return BL11a_hexa;
+            return bl11aMatrices;
         }
 
-        private Matrix[] GetBL12_hexa(Matrix[] J_0inv_hexa)
+        private Matrix[] GetBL12DeformationMatrices(Matrix[] jacobianInverse)
         {
-            Matrix[] BL12_hexa = new Matrix[nGaussPoints];
+            Matrix[] bl12Marices = new Matrix[nGaussPoints];
             for (int gpoint = 0; gpoint < nGaussPoints; gpoint++)
             {
-                BL12_hexa[gpoint] = Matrix.CreateZero(9, 9);
+                bl12Marices[gpoint] = Matrix.CreateZero(9, 9);
                 for (int m = 0; m < 3; m++) // calculate first three data lines of the matrix
                 {
                     for (int n = 0; n < 3; n++)
                     {
-                        BL12_hexa[gpoint][m, 3 * m + n] = J_0inv_hexa[gpoint][0, n];
+                        bl12Marices[gpoint][m, 3 * m + n] = jacobianInverse[gpoint][0, n];
                     }
                 }
                 for (int m = 0; m < 3; m++) // calculate  data lines 4:6
                 {
                     for (int n = 0; n < 3; n++)
                     {
-                        BL12_hexa[gpoint][3 + m, 3 * m + n] = J_0inv_hexa[gpoint][1, n];
+                        bl12Marices[gpoint][3 + m, 3 * m + n] = jacobianInverse[gpoint][1, n];
                     }
                 }
                 for (int m = 0; m < 3; m++) // calculate  data lines 7:8
                 {
                     for (int n = 0; n < 3; n++)
                     {
-                        BL12_hexa[gpoint][6 + m, 3 * m + n] = J_0inv_hexa[gpoint][2, n];
+                        bl12Marices[gpoint][6 + m, 3 * m + n] = jacobianInverse[gpoint][2, n];
                     }
                 }
 
             }
 
-            return BL12_hexa;
+            return bl12Marices;
         }
 
-        private Matrix[] GetBL01_hexa(Matrix[] J_0inv_hexa)
+        private Matrix[] Getbl01MDeformationMatrices(Matrix[] jacobianInverse)
         {
-            Matrix[] BL01_hexa = new Matrix[nGaussPoints];
+            Matrix[] bl01Matrices = new Matrix[nGaussPoints];
             for (int gpoint = 0; gpoint < nGaussPoints; gpoint++)
             {
-                BL01_hexa[gpoint] = Matrix.CreateZero(6, 9);
+                bl01Matrices[gpoint] = Matrix.CreateZero(6, 9);
                 for (int m = 0; m < 3; m++) // calculate first three data lines of the matrix
                 {
                     for (int n = 0; n < 3; n++)
                     {
-                        BL01_hexa[gpoint][m, 3 * m + n] = J_0inv_hexa[gpoint][m, n];
+                        bl01Matrices[gpoint][m, 3 * m + n] = jacobianInverse[gpoint][m, n];
                     }
                 }
                 for (int n = 0; n < 3; n++)
                 {
-                    BL01_hexa[gpoint][3, n] = J_0inv_hexa[gpoint][1, n]; // calculate 4th data line
-                    BL01_hexa[gpoint][3, 3 + n] = J_0inv_hexa[gpoint][0, n];
-                    BL01_hexa[gpoint][4, 3 + n] = J_0inv_hexa[gpoint][2, n]; // calculate 5th data line
-                    BL01_hexa[gpoint][4, 6 + n] = J_0inv_hexa[gpoint][1, n];
-                    BL01_hexa[gpoint][5, 0 + n] = J_0inv_hexa[gpoint][2, n]; // calculate 6th data line
-                    BL01_hexa[gpoint][5, 6 + n] = J_0inv_hexa[gpoint][0, n];
+                    bl01Matrices[gpoint][3, n] = jacobianInverse[gpoint][1, n]; // calculate 4th data line
+                    bl01Matrices[gpoint][3, 3 + n] = jacobianInverse[gpoint][0, n];
+                    bl01Matrices[gpoint][4, 3 + n] = jacobianInverse[gpoint][2, n]; // calculate 5th data line
+                    bl01Matrices[gpoint][4, 6 + n] = jacobianInverse[gpoint][1, n];
+                    bl01Matrices[gpoint][5, 0 + n] = jacobianInverse[gpoint][2, n]; // calculate 6th data line
+                    bl01Matrices[gpoint][5, 6 + n] = jacobianInverse[gpoint][0, n];
                 }
             }
-            return BL01_hexa;
+            return bl01Matrices;
         }
 
-        private Matrix[] GetBNL1_hexa(Matrix[] J_0inv_hexa)
+        private Matrix[] GetAuxilliaryDeformationbnl1Matrices(Matrix[] jacobianInverse)
         {
-            Matrix[] BNL1_hexa = new Matrix[nGaussPoints];
+            Matrix[] bnl1Matrices = new Matrix[nGaussPoints];
             for (int gpoint = 0; gpoint < nGaussPoints; gpoint++)
             {
-                BNL1_hexa[gpoint] = Matrix.CreateZero(9, 9);
+                bnl1Matrices[gpoint] = Matrix.CreateZero(9, 9);
                 for (int m = 0; m < 3; m++)
                 {
                     for (int n = 0; n < 3; n++)
                     {
                         for (int p = 0; p < 3; p++)
                         {
-                            BNL1_hexa[gpoint][3 * m + n, 3 * m + p] = J_0inv_hexa[gpoint][n, p];
+                            bnl1Matrices[gpoint][3 * m + n, 3 * m + p] = jacobianInverse[gpoint][n, p];
                         }
                     }
                 }
             }
-            return BNL1_hexa;
+            return bnl1Matrices;
         }
 
         private void CalculateInitialConfigurationData(IElement element)
@@ -226,19 +226,19 @@ namespace ISAAR.MSolve.FEM.Elements
             int numNodes = element.Nodes.Count;
             IReadOnlyList<Matrix> shapeFunctionNaturalDerivatives;
             shapeFunctionNaturalDerivatives = Interpolation.EvaluateNaturalGradientsAtGaussPoints(QuadratureForStiffness);
-            Matrix[] BL13_hexa;
-            BL13_hexa = GetBL13Hexa(shapeFunctionNaturalDerivatives);
+            Matrix[] bl13Matrices;
+            bl13Matrices = Getbl13DeformationMatrices(shapeFunctionNaturalDerivatives);
             
 
-            Matrix[] BNL1_hexa;
+            Matrix[] bnl1Matrices;
 
-            ox_i = new double[numNodes][];
-            tu_i = new double[numNodes][];
+            initialCoordinates = new double[numNodes][];
+            totalDisplacements = new double[numNodes][];
 
             var jacobians = shapeFunctionNaturalDerivatives.Select(x=> new IsoparametricJacobian3D(element.Nodes,x));
 
-            Matrix[] J_0inv_hexa = jacobians.Select(x => x.InverseMatrix.Transpose()).ToArray();
-            double[] detJ_0 = jacobians.Select(x => x.DirectDeterminant).ToArray();
+            Matrix[] jacobianInverse = jacobians.Select(x => x.InverseMatrix.Transpose()).ToArray();
+            double[] jacobianDeterminants = jacobians.Select(x => x.DirectDeterminant).ToArray();
 
             
 
@@ -246,81 +246,81 @@ namespace ISAAR.MSolve.FEM.Elements
 
             integrationCoeffs = new double[nGaussPoints];
 
-            BNL1_hexa = GetBNL1_hexa(J_0inv_hexa);
+            bnl1Matrices = GetAuxilliaryDeformationbnl1Matrices(jacobianInverse);
 
             for (int j = 0; j < numNodes; j++)
             {
-                ox_i[j] = new double[] { element.Nodes[j].X, element.Nodes[j].Y, element.Nodes[j].Z, };
+                initialCoordinates[j] = new double[] { element.Nodes[j].X, element.Nodes[j].Y, element.Nodes[j].Z, };
                 }
 
             for (int gpoint = 0; gpoint < nGaussPoints; gpoint++)
             {
-                integrationCoeffs[gpoint] = detJ_0[gpoint] * QuadratureForStiffness.IntegrationPoints[gpoint].Weight;
+                integrationCoeffs[gpoint] = jacobianDeterminants[gpoint] * QuadratureForStiffness.IntegrationPoints[gpoint].Weight;
 
             }
 
-            tu_i = new double[numNodes][];
-			//GLvec = new double[nGaussPoints][]; //MS
-			//GLvec_last_converged = new double[nGaussPoints][];
+            totalDisplacements = new double[numNodes][];
+			//strainsVec = new double[nGaussPoints][]; //MS
+			//strainsVec_last_converged = new double[nGaussPoints][];
 			DefGradVec = new double[nGaussPoints][];
 			for (int gpoint = 0; gpoint < nGaussPoints; gpoint++)
             {
-				//GLvec[gpoint] = new double[6]; //MS
-				//GLvec_last_converged[gpoint] = new double[6];
+				//strainsVec[gpoint] = new double[6]; //MS
+				//strainsVec_last_converged[gpoint] = new double[6];
 				DefGradVec[gpoint] = new double[9];
 			}
             for (int k = 0; k < numNodes; k++)
             {
-                tu_i[k] = new double[3];
+                totalDisplacements[k] = new double[3];
             }
             isInitialized = true;
 
         }
 
-        private void UpdateCoordinateData(double[] localdisplacements, out double[][] tx_i)
+        private void UpdateCoordinateData(double[] localdisplacements, out double[][] deformedCoordinates)
         {
             int numNodes = localdisplacements.Length / 3;
-            tx_i = new double[numNodes][];
+            deformedCoordinates = new double[numNodes][];
             for (int j = 0; j < numNodes; j++)
             {
-                tx_i[j] = new double[3];
+                deformedCoordinates[j] = new double[3];
                 for (int k = 0; k < 3; k++)
                 {
-                    tu_i[j][k] = localdisplacements[3 * j + k];
-                    tx_i[j][k] = ox_i[j][k] + tu_i[j][k];
+                    totalDisplacements[j][k] = localdisplacements[3 * j + k];
+                    deformedCoordinates[j][k] = initialCoordinates[j][k] + totalDisplacements[j][k];
                 }
             }
         }
 
-        private void CalculateStrains(double[] localdisplacements, IElement element, double[][] tx_i) 
+        private void CalculateStrains(double[] localdisplacements, IElement element, double[][] deformedCoordinates) 
         {
             IReadOnlyList<Matrix> shapeFunctionNaturalDerivatives;
             shapeFunctionNaturalDerivatives = Interpolation.EvaluateNaturalGradientsAtGaussPoints(QuadratureForStiffness);
             var jacobians = shapeFunctionNaturalDerivatives.Select(x => new IsoparametricJacobian3D(element.Nodes, x));
-            Matrix[] J_0inv_hexa = jacobians.Select(x => x.InverseMatrix.Transpose()).ToArray();
-            double[] detJ_0 = jacobians.Select(x => x.DirectDeterminant).ToArray();
-            //TODO: possibility of caching ll1_hexa or J_0inv
+            Matrix[] jacobianInverse = jacobians.Select(x => x.InverseMatrix.Transpose()).ToArray();
+            double[] jacobianDeterminants = jacobians.Select(x => x.DirectDeterminant).ToArray();
+            //TODO: possibility of caching shapeFunctionNaturalDerivatives or J_0inv
 
-            Matrix[] DGtr = new Matrix[nGaussPoints];
+            Matrix[] deformationGradientsTransposed = new Matrix[nGaussPoints];
             //Matrix[] GL = new Matrix[nGaussPoints];
             for (int npoint = 0; npoint < nGaussPoints; npoint++)
             {
-                DGtr[npoint] = Matrix.CreateZero(3, 3);
+                deformationGradientsTransposed[npoint] = Matrix.CreateZero(3, 3);
                 //GL[npoint] = Matrix.CreateZero(3, 3);
             }
 
-            var jacobiansDeformed = shapeFunctionNaturalDerivatives.Select(x => new IsoparametricJacobian3D(tx_i, x,false)).ToArray();
-            Matrix[] J_1 = jacobiansDeformed.Select(x => x.DirectMatrix).ToArray();
+            var jacobiansDeformed = shapeFunctionNaturalDerivatives.Select(x => new IsoparametricJacobian3D(deformedCoordinates, x,false)).ToArray();
+            Matrix[] jacobiansDeformedMatrices = jacobiansDeformed.Select(x => x.DirectMatrix).ToArray();
 
 
             //
             for (int npoint = 0; npoint < nGaussPoints; npoint++)
             {
                 //
-                DGtr[npoint] = J_0inv_hexa[npoint] * J_1[npoint];
-				DefGradVec[npoint] = new double[9] { DGtr[npoint][0, 0], DGtr[npoint][1, 1], DGtr[npoint][2, 2], DGtr[npoint][1, 0], DGtr[npoint][2, 1], DGtr[npoint][0, 2], DGtr[npoint][2, 0], DGtr[npoint][0, 1], DGtr[npoint][1, 2], };//MS
+                deformationGradientsTransposed[npoint] = jacobianInverse[npoint] * jacobiansDeformedMatrices[npoint];
+				DefGradVec[npoint] = new double[9] { deformationGradientsTransposed[npoint][0, 0], deformationGradientsTransposed[npoint][1, 1], deformationGradientsTransposed[npoint][2, 2], deformationGradientsTransposed[npoint][1, 0], deformationGradientsTransposed[npoint][2, 1], deformationGradientsTransposed[npoint][0, 2], deformationGradientsTransposed[npoint][2, 0], deformationGradientsTransposed[npoint][0, 1], deformationGradientsTransposed[npoint][1, 2], };//MS
 																																																										   ////
-																																																										   //GL[npoint] = DGtr[npoint] * DGtr[npoint].Transpose();
+																																																										   //GL[npoint] = deformationGradientsTransposed[npoint] * deformationGradientsTransposed[npoint].Transpose();
 																																																										   //for (int m = 0; m < 3; m++)
 
 			}
@@ -339,55 +339,55 @@ namespace ISAAR.MSolve.FEM.Elements
             {
                 for (int n = 0; n < 3; n++)
                 {
-                    ll2[m, n] = tu_i[m][n];
+                    ll2[m, n] = totalDisplacements[m][n];
                 }
             }
             IReadOnlyList<Matrix> shapeFunctionNaturalDerivatives;
             shapeFunctionNaturalDerivatives = Interpolation.EvaluateNaturalGradientsAtGaussPoints(QuadratureForStiffness);
             var jacobians = shapeFunctionNaturalDerivatives.Select(x => new IsoparametricJacobian3D(element.Nodes, x));
-            Matrix[] J_0inv_hexa = jacobians.Select(x => x.InverseMatrix.Transpose()).ToArray();
-            double[] detJ_0 = jacobians.Select(x => x.DirectDeterminant).ToArray();
+            Matrix[] jacobianInverse = jacobians.Select(x => x.InverseMatrix.Transpose()).ToArray();
+            double[] jacobianDeterminants = jacobians.Select(x => x.DirectDeterminant).ToArray();
 
-            Matrix[] BL13_hexa;
-            BL13_hexa = GetBL13Hexa(shapeFunctionNaturalDerivatives);
-            Matrix[] BL11a_hexa; // dimension number of gpoints
-            Matrix[] BL12_hexa;
-            Matrix[] BL01_hexa;
-            BL11a_hexa = GetBL11a_hexa(J_0inv_hexa);
-            BL12_hexa = GetBL12_hexa(J_0inv_hexa);
-            BL01_hexa = GetBL01_hexa(J_0inv_hexa);
+            Matrix[] bl13Matrices;
+            bl13Matrices = Getbl13DeformationMatrices(shapeFunctionNaturalDerivatives);
+            Matrix[] bl11aMatrices; // dimension number of gpoints
+            Matrix[] bl12Marices;
+            Matrix[] bl01Matrices;
+            bl11aMatrices = Getbl11aDeformationMatrices(jacobianInverse);
+            bl12Marices = GetBL12DeformationMatrices(jacobianInverse);
+            bl01Matrices = Getbl01MDeformationMatrices(jacobianInverse);
 
             //INITIALIZATION of MAtrixes that are currently not cached
-            double[][] integrCoeff_Spkvec = new double[nGaussPoints][];
-            Matrix[] BL = new Matrix[nGaussPoints];
+            double[][] integrCoeffsTimesStresses = new double[nGaussPoints][];
+            Matrix[] blMatrices = new Matrix[nGaussPoints];
             for (int gpoint = 0; gpoint < nGaussPoints; gpoint++)
             {
-                integrCoeff_Spkvec[gpoint] = new double[6];
-                BL[gpoint] = Matrix.CreateZero(6, 3*numNodes);
+                integrCoeffsTimesStresses[gpoint] = new double[6];
+                blMatrices[gpoint] = Matrix.CreateZero(6, 3*numNodes);
             }
 
-            double[][] fxk1 = new double[nGaussPoints + 1][];
+            double[][] forces = new double[nGaussPoints + 1][];
             for (int npoint = 0; npoint < nGaussPoints + 1; npoint++)
             {
-                fxk1[npoint] = new double[3*numNodes];
+                forces[npoint] = new double[3*numNodes];
             }
 
-            Matrix[] BL11 = new Matrix[nGaussPoints];
-            Matrix[] BL1112sun01_hexa = new Matrix[nGaussPoints];
+            Matrix[] bl11Matrices = new Matrix[nGaussPoints];
+            Matrix[] bL1112Plus01Matrices = new Matrix[nGaussPoints];
             for (int npoint = 0; npoint < nGaussPoints; npoint++)
             {
-                BL11[npoint] = Matrix.CreateZero(6, 9);
-                BL1112sun01_hexa[npoint] = Matrix.CreateZero(6, 9);
+                bl11Matrices[npoint] = Matrix.CreateZero(6, 9);
+                bL1112Plus01Matrices[npoint] = Matrix.CreateZero(6, 9);
             }
 
             for (int npoint = 0; npoint < nGaussPoints; npoint++)
             {
 
-                integrCoeff_Spkvec[npoint] = materialsAtGaussPoints[npoint].Stresses.Scale(integrationCoeffs[npoint]);
+                integrCoeffsTimesStresses[npoint] = materialsAtGaussPoints[npoint].Stresses.Scale(integrationCoeffs[npoint]);
 
                 //
-                Matrix l_cyrcumflex;//= Matrix.CreateZero(3, 3);
-                l_cyrcumflex = shapeFunctionNaturalDerivatives[npoint].Transpose() * ll2;
+                Matrix lcyrcumflex;//= Matrix.CreateZero(3, 3);
+                lcyrcumflex = shapeFunctionNaturalDerivatives[npoint].Transpose() * ll2;
 
                 for (int m = 0; m < 6; m++)
                 {
@@ -395,76 +395,76 @@ namespace ISAAR.MSolve.FEM.Elements
                     {
                         for (int p = 0; p < 3; p++)
                         {
-                            BL11[npoint][m, n] += BL11a_hexa[npoint][m, p] * l_cyrcumflex[p, n];
-                            BL11[npoint][m, 3 + n] += BL11a_hexa[npoint][m, 3 + p] * l_cyrcumflex[p, n];
-                            BL11[npoint][m, 6 + n] += BL11a_hexa[npoint][m, 6 + p] * l_cyrcumflex[p, n];
+                            bl11Matrices[npoint][m, n] += bl11aMatrices[npoint][m, p] * lcyrcumflex[p, n];
+                            bl11Matrices[npoint][m, 3 + n] += bl11aMatrices[npoint][m, 3 + p] * lcyrcumflex[p, n];
+                            bl11Matrices[npoint][m, 6 + n] += bl11aMatrices[npoint][m, 6 + p] * lcyrcumflex[p, n];
                         }
                     }
                 }
 
                 //
-                BL1112sun01_hexa[npoint] = BL11[npoint] * BL12_hexa[npoint];
-                BL1112sun01_hexa[npoint].AddIntoThis(BL01_hexa[npoint]);
+                bL1112Plus01Matrices[npoint] = bl11Matrices[npoint] * bl12Marices[npoint];
+                bL1112Plus01Matrices[npoint].AddIntoThis(bl01Matrices[npoint]);
                 
                 // 
-                BL[npoint] = BL1112sun01_hexa[npoint] * BL13_hexa[npoint];
+                blMatrices[npoint] = bL1112Plus01Matrices[npoint] * bl13Matrices[npoint];
                 
                 //              
-                fxk1[npoint] = BL[npoint].Multiply(integrCoeff_Spkvec[npoint], true);
+                forces[npoint] = blMatrices[npoint].Multiply(integrCoeffsTimesStresses[npoint], true);
             }
 
             for (int npoint = 0; npoint < nGaussPoints; npoint++)
             {
-                fxk1[nGaussPoints].AddIntoThis(fxk1[npoint]);                
+                forces[nGaussPoints].AddIntoThis(forces[npoint]);                
             }
 
-            return fxk1[nGaussPoints];
+            return forces[nGaussPoints];
         }
 
         private Matrix UpdateKmatrices(IElement element)
         {
             int numNodes = element.Nodes.Count();
-            Matrix k_element = Matrix.CreateZero(3*numNodes, 3*numNodes);
+            Matrix elementStiffnessMatrix = Matrix.CreateZero(3*numNodes, 3*numNodes);
 
 
             // initialization of matrices that are not cached currently
-            double[][] integrCoeff_Spkvec = new double[nGaussPoints][];
-            Matrix[] BL = new Matrix[nGaussPoints];
+            double[][] integrCoeffsTimesSpkvec = new double[nGaussPoints][];
+            Matrix[] blMatrices = new Matrix[nGaussPoints];
             for (int gpoint = 0; gpoint < nGaussPoints; gpoint++)
             {
-                integrCoeff_Spkvec[gpoint] = new double[6];
-                BL[gpoint] = Matrix.CreateZero(6, 3*numNodes);
+                integrCoeffsTimesSpkvec[gpoint] = new double[6];
+                blMatrices[gpoint] = Matrix.CreateZero(6, 3*numNodes);
 
             }
-            Matrix ll2 = Matrix.CreateZero(numNodes, 3);
+            Matrix totalDisplacementsMatrixReordered = Matrix.CreateZero(numNodes, 3);
             for (int m = 0; m < numNodes; m++)
             {
                 for (int n = 0; n < 3; n++)
                 {
-                    ll2[m, n] = tu_i[m][n];
+                    totalDisplacementsMatrixReordered[m, n] = totalDisplacements[m][n];
                 }
             }
             IReadOnlyList<Matrix> shapeFunctionNaturalDerivatives;
             shapeFunctionNaturalDerivatives = Interpolation.EvaluateNaturalGradientsAtGaussPoints(QuadratureForStiffness);
             var jacobians = shapeFunctionNaturalDerivatives.Select(x => new IsoparametricJacobian3D(element.Nodes, x));
-            Matrix[] J_0inv_hexa = jacobians.Select(x => x.InverseMatrix.Transpose()).ToArray();
-            double[] detJ_0 = jacobians.Select(x => x.DirectDeterminant).ToArray();
+            Matrix[] jacobianInverse = jacobians.Select(x => x.InverseMatrix.Transpose()).ToArray();
+            double[] jacobianDeterminants = jacobians.Select(x => x.DirectDeterminant).ToArray();
 
-            Matrix[] BL13_hexa;
-            BL13_hexa = GetBL13Hexa(shapeFunctionNaturalDerivatives);
-            Matrix[] BL11a_hexa; // dimension: gpoints
-            Matrix[] BL12_hexa;
-            Matrix[] BL01_hexa;
-            BL11a_hexa = GetBL11a_hexa(J_0inv_hexa);
-            BL12_hexa = GetBL12_hexa(J_0inv_hexa);
-            BL01_hexa = GetBL01_hexa(J_0inv_hexa);
+            Matrix[] bl13Matrices;
+            bl13Matrices = Getbl13DeformationMatrices(shapeFunctionNaturalDerivatives);
+            Matrix[] bl11aMatrices; // dimension: gpoints
+            Matrix[] bl12Marices;
+            Matrix[] bl01Matrices;
+            bl11aMatrices = Getbl11aDeformationMatrices(jacobianInverse);
+            bl12Marices = GetBL12DeformationMatrices(jacobianInverse);
+            bl01Matrices = Getbl01MDeformationMatrices(jacobianInverse);
 
-            Matrix[] BL11 = new Matrix[nGaussPoints];
-            Matrix[] BL1112sun01_hexa = new Matrix[nGaussPoints];
+            Matrix[] bl11Matrices = new Matrix[nGaussPoints];
+            Matrix[] bL1112Plus01Matrices = new Matrix[nGaussPoints];
             for (int npoint = 0; npoint < nGaussPoints; npoint++)
             {
-                BL11[npoint] = Matrix.CreateZero(6, 9);
-                BL1112sun01_hexa[npoint] = Matrix.CreateZero(6, 9); //TODO this may be unnescessary
+                bl11Matrices[npoint] = Matrix.CreateZero(6, 9);
+                bL1112Plus01Matrices[npoint] = Matrix.CreateZero(6, 9); //TODO this may be unnescessary
             }
 
 
@@ -473,11 +473,11 @@ namespace ISAAR.MSolve.FEM.Elements
             {
 
                 // 
-                integrCoeff_Spkvec[npoint] = materialsAtGaussPoints[npoint].Stresses.Scale(integrationCoeffs[npoint]);
+                integrCoeffsTimesSpkvec[npoint] = materialsAtGaussPoints[npoint].Stresses.Scale(integrationCoeffs[npoint]);
                 
                 //
-                Matrix l_cyrcumflex = Matrix.CreateZero(3, 3);
-                l_cyrcumflex = shapeFunctionNaturalDerivatives[npoint].Transpose() * ll2;
+                Matrix lcyrcumflex = Matrix.CreateZero(3, 3);
+                lcyrcumflex = shapeFunctionNaturalDerivatives[npoint].Transpose() * totalDisplacementsMatrixReordered;
                  
                 for (int m = 0; m < 6; m++)
                 {
@@ -485,68 +485,68 @@ namespace ISAAR.MSolve.FEM.Elements
                     {
                         for (int p = 0; p < 3; p++)
                         {
-                            BL11[npoint][m, n] += BL11a_hexa[npoint][m, p] * l_cyrcumflex[p, n];
-                            BL11[npoint][m, 3 + n] += BL11a_hexa[npoint][m, 3 + p] * l_cyrcumflex[p, n];
-                            BL11[npoint][m, 6 + n] += BL11a_hexa[npoint][m, 6 + p] * l_cyrcumflex[p, n];
+                            bl11Matrices[npoint][m, n] += bl11aMatrices[npoint][m, p] * lcyrcumflex[p, n];
+                            bl11Matrices[npoint][m, 3 + n] += bl11aMatrices[npoint][m, 3 + p] * lcyrcumflex[p, n];
+                            bl11Matrices[npoint][m, 6 + n] += bl11aMatrices[npoint][m, 6 + p] * lcyrcumflex[p, n];
                         }
                     }
                 }
 
                 // 
-                BL1112sun01_hexa[npoint] = BL11[npoint] * BL12_hexa[npoint];
-                BL1112sun01_hexa[npoint].AddIntoThis(BL01_hexa[npoint]);
+                bL1112Plus01Matrices[npoint] = bl11Matrices[npoint] * bl12Marices[npoint];
+                bL1112Plus01Matrices[npoint].AddIntoThis(bl01Matrices[npoint]);
                 
                 //
-                BL[npoint] = BL1112sun01_hexa[npoint] * BL13_hexa[npoint];
+                blMatrices[npoint] = bL1112Plus01Matrices[npoint] * bl13Matrices[npoint];
                 
             }
             // TODO: BL and above calculations can cached from calculate forces method
 
-            Matrix[] BNL1_hexa;
-            Matrix[] BNL_hexa;
-            BNL1_hexa = GetBNL1_hexa(J_0inv_hexa);
-            BNL_hexa = new Matrix[nGaussPoints];
+            Matrix[] bnl1Matrices;
+            Matrix[] bnlMatrices;
+            bnl1Matrices = GetAuxilliaryDeformationbnl1Matrices(jacobianInverse);
+            bnlMatrices = new Matrix[nGaussPoints];
             for (int gpoint = 0; gpoint < nGaussPoints; gpoint++)
             {
-               //BNL_hexa[gpoint] = Matrix.CreateZero(9, 3*numNodes); //todo this may be unnescessary
+               //bnlMatrices[gpoint] = Matrix.CreateZero(9, 3*numNodes); //todo this may be unnescessary
 
-                BNL_hexa[gpoint] = BNL1_hexa[gpoint] * BL13_hexa[gpoint];
+                bnlMatrices[gpoint] = bnl1Matrices[gpoint] * bl13Matrices[gpoint];
                 
             }
 
 
-            Matrix[] integrCoeff_Spk = new Matrix[nGaussPoints];
+            Matrix[] integrCoeffsTimesStresses = new Matrix[nGaussPoints];
             for (int npoint = 0; npoint < nGaussPoints; npoint++)
             {
-                integrCoeff_Spk[npoint] = Matrix.CreateZero(3, 3);
+                integrCoeffsTimesStresses[npoint] = Matrix.CreateZero(3, 3);
             }
 
-            Matrix[] kl_ = new Matrix[nGaussPoints + 1];
-            Matrix[] knl_ = new Matrix[nGaussPoints + 1];
+            Matrix[] klStiffnessMatrixContributions = new Matrix[nGaussPoints + 1];
+            Matrix[] knlStiffnessMatrixContributions = new Matrix[nGaussPoints + 1];
             for (int npoint = 0; npoint < nGaussPoints + 1; npoint++)
             {
-                kl_[npoint] = Matrix.CreateZero(3*numNodes, 3*numNodes);
-                knl_[npoint] = Matrix.CreateZero(3 * numNodes, 3 * numNodes);
+                klStiffnessMatrixContributions[npoint] = Matrix.CreateZero(3*numNodes, 3*numNodes);
+                knlStiffnessMatrixContributions[npoint] = Matrix.CreateZero(3 * numNodes, 3 * numNodes);
             }
 
 
 
             for (int npoint = 0; npoint < nGaussPoints; npoint++)
             {
-                Matrix integrCoeff_SPK_epi_BNL_hexa = Matrix.CreateZero(9, 3*numNodes); //TODO
-                Matrix integrCoeff_cons_disp = Matrix.CreateZero(6, 6); //TODO
-                Matrix integrCoeff_cons_disp_epi_BL = Matrix.CreateZero(6, 3*numNodes);//TODO
+                Matrix integrCoeffsTimesStressesTimesbnlMatrices = Matrix.CreateZero(9, 3*numNodes); //TODO
+                Matrix integrCoeffsTimesConsMatrix = Matrix.CreateZero(6, 6); //TODO
+                Matrix integrCoeffTimesConsMatrixTimesBLMatrices = Matrix.CreateZero(6, 3*numNodes);//TODO
 
                 //
-                integrCoeff_Spk[npoint][0, 0] = integrCoeff_Spkvec[npoint][0];
-                integrCoeff_Spk[npoint][0, 1] = integrCoeff_Spkvec[npoint][3];
-                integrCoeff_Spk[npoint][0, 2] = integrCoeff_Spkvec[npoint][5];
-                integrCoeff_Spk[npoint][1, 0] = integrCoeff_Spkvec[npoint][3];
-                integrCoeff_Spk[npoint][1, 1] = integrCoeff_Spkvec[npoint][1];
-                integrCoeff_Spk[npoint][1, 2] = integrCoeff_Spkvec[npoint][4];
-                integrCoeff_Spk[npoint][2, 0] = integrCoeff_Spkvec[npoint][5];
-                integrCoeff_Spk[npoint][2, 1] = integrCoeff_Spkvec[npoint][4];
-                integrCoeff_Spk[npoint][2, 2] = integrCoeff_Spkvec[npoint][2];
+                integrCoeffsTimesStresses[npoint][0, 0] = integrCoeffsTimesSpkvec[npoint][0];
+                integrCoeffsTimesStresses[npoint][0, 1] = integrCoeffsTimesSpkvec[npoint][3];
+                integrCoeffsTimesStresses[npoint][0, 2] = integrCoeffsTimesSpkvec[npoint][5];
+                integrCoeffsTimesStresses[npoint][1, 0] = integrCoeffsTimesSpkvec[npoint][3];
+                integrCoeffsTimesStresses[npoint][1, 1] = integrCoeffsTimesSpkvec[npoint][1];
+                integrCoeffsTimesStresses[npoint][1, 2] = integrCoeffsTimesSpkvec[npoint][4];
+                integrCoeffsTimesStresses[npoint][2, 0] = integrCoeffsTimesSpkvec[npoint][5];
+                integrCoeffsTimesStresses[npoint][2, 1] = integrCoeffsTimesSpkvec[npoint][4];
+                integrCoeffsTimesStresses[npoint][2, 2] = integrCoeffsTimesSpkvec[npoint][2];
 
                 //
                 IMatrixView consDisp = materialsAtGaussPoints[npoint].ConstitutiveMatrix;
@@ -555,15 +555,15 @@ namespace ISAAR.MSolve.FEM.Elements
                 {
                     for (int n = 0; n < 6; n++)
                     {
-                        integrCoeff_cons_disp[m, n] = integrationCoeffs[npoint] * consDisp[m, n];
+                        integrCoeffsTimesConsMatrix[m, n] = integrationCoeffs[npoint] * consDisp[m, n];
                     }
                 }
 
                 //
-                integrCoeff_cons_disp_epi_BL = integrCoeff_cons_disp * BL[npoint];
+                integrCoeffTimesConsMatrixTimesBLMatrices = integrCoeffsTimesConsMatrix * blMatrices[npoint];
                 
                 //
-                kl_[npoint] = BL[npoint].Transpose() * integrCoeff_cons_disp_epi_BL;                
+                klStiffnessMatrixContributions[npoint] = blMatrices[npoint].Transpose() * integrCoeffTimesConsMatrixTimesBLMatrices;                
 
                 //
                 for (int m = 0; m < 3; m++) // 3x24 dimensions
@@ -572,26 +572,26 @@ namespace ISAAR.MSolve.FEM.Elements
                     {
                         for (int p = 0; p < 3; p++)
                         {
-                            integrCoeff_SPK_epi_BNL_hexa[m, n] += integrCoeff_Spk[npoint][m, p] * BNL_hexa[npoint][p, n];
-                            integrCoeff_SPK_epi_BNL_hexa[3 + m, n] += integrCoeff_Spk[npoint][m, p] * BNL_hexa[npoint][3 + p, n];
-                            integrCoeff_SPK_epi_BNL_hexa[6 + m, n] += integrCoeff_Spk[npoint][m, p] * BNL_hexa[npoint][6 + p, n];
+                            integrCoeffsTimesStressesTimesbnlMatrices[m, n] += integrCoeffsTimesStresses[npoint][m, p] * bnlMatrices[npoint][p, n];
+                            integrCoeffsTimesStressesTimesbnlMatrices[3 + m, n] += integrCoeffsTimesStresses[npoint][m, p] * bnlMatrices[npoint][3 + p, n];
+                            integrCoeffsTimesStressesTimesbnlMatrices[6 + m, n] += integrCoeffsTimesStresses[npoint][m, p] * bnlMatrices[npoint][6 + p, n];
                         }
                     }
                 }
 
                 //
-                knl_[npoint] = BNL_hexa[npoint].Transpose() * integrCoeff_SPK_epi_BNL_hexa;                
+                knlStiffnessMatrixContributions[npoint] = bnlMatrices[npoint].Transpose() * integrCoeffsTimesStressesTimesbnlMatrices;                
             }
 
-            // Add contributions of each gp on the total element stiffness matrix k_element            
+            // Add contributions of each gp on the total element stiffness matrix elementStiffnessMatrix            
             for (int npoint = 0; npoint < nGaussPoints; npoint++)
             {
                 for (int m = 0; m < 3*numNodes; m++)
                 {
                     for (int n = 0; n < 3*numNodes; n++)
                     {
-                        kl_[nGaussPoints][m, n] += kl_[npoint][m, n];
-                        knl_[nGaussPoints][m, n] += knl_[npoint][m, n];
+                        klStiffnessMatrixContributions[nGaussPoints][m, n] += klStiffnessMatrixContributions[npoint][m, n];
+                        knlStiffnessMatrixContributions[nGaussPoints][m, n] += knlStiffnessMatrixContributions[npoint][m, n];
                     }
                 }
             }
@@ -599,40 +599,40 @@ namespace ISAAR.MSolve.FEM.Elements
             {
                 for (int n = 0; n < 3 * numNodes; n++)
                 {
-                    k_element[m, n] = kl_[nGaussPoints][m, n] + knl_[nGaussPoints][m, n];
+                    elementStiffnessMatrix[m, n] = klStiffnessMatrixContributions[nGaussPoints][m, n] + knlStiffnessMatrixContributions[nGaussPoints][m, n];
                 }
             }
 
-            return k_element;
+            return elementStiffnessMatrix;
         }
         
         public Tuple<double[], double[]> CalculateStresses(IElement element, double[] localTotalDisplacements, double[] localdDisplacements)
         {
-            this.UpdateCoordinateData(localTotalDisplacements, out double[][] tx_i);
-            this.CalculateStrains(localTotalDisplacements, element, tx_i);
-            //double[] GLvec_strain_minus_last_converged_value = new double[6];
+            this.UpdateCoordinateData(localTotalDisplacements, out double[][] deformedCoordinates);
+            this.CalculateStrains(localTotalDisplacements, element, deformedCoordinates);
+            //double[] strainsVec_strain_minus_last_converged_value = new double[6];
             for (int npoint = 0; npoint < materialsAtGaussPoints.Length; npoint++)
             {
-				//GLvec_strain_minus_last_converged_value = new double[6] 
+				//strainsVec_strain_minus_last_converged_value = new double[6] 
 				//{
-				//    GLvec[npoint][0]- GLvec_last_converged[npoint][0],
-				//    GLvec[npoint][1] - GLvec_last_converged[npoint][1],
-				//    GLvec[npoint][2] - GLvec_last_converged[npoint][2],
-				//    GLvec[npoint][3]- GLvec_last_converged[npoint][3],
-				//    GLvec[npoint][4]- GLvec_last_converged[npoint][4],
-				//    GLvec[npoint][5]- GLvec_last_converged[npoint][5]
+				//    strainsVec[npoint][0]- strainsVec_last_converged[npoint][0],
+				//    strainsVec[npoint][1] - strainsVec_last_converged[npoint][1],
+				//    strainsVec[npoint][2] - strainsVec_last_converged[npoint][2],
+				//    strainsVec[npoint][3]- strainsVec_last_converged[npoint][3],
+				//    strainsVec[npoint][4]- strainsVec_last_converged[npoint][4],
+				//    strainsVec[npoint][5]- strainsVec_last_converged[npoint][5]
 				//};
-				//materialsAtGaussPoints[npoint].UpdateMaterial(GLvec_strain_minus_last_converged_value); 
-				// //To update with total strain simplY = materialsAtGaussPoints[npoint].UpdateMaterial(GLvec[npoint]);
+				//materialsAtGaussPoints[npoint].UpdateMaterial(strainsVec_strain_minus_last_converged_value); 
+				// //To update with total strain simplY = materialsAtGaussPoints[npoint].UpdateMaterial(strainsVec[npoint]);
 				materialsAtGaussPoints[npoint].UpdateMaterial(DefGradVec[npoint]); //MS
 			};
-			//return new Tuple<double[], double[]>(GLvec_strain_minus_last_converged_value, 
+			//return new Tuple<double[], double[]>(strainsVec_strain_minus_last_converged_value, 
 			//    materialsAtGaussPoints[materialsAtGaussPoints.Length - 1].Stresses);
 
 			return new Tuple<double[], double[]>(DefGradVec[materialsAtGaussPoints.Length - 1], materialsAtGaussPoints[materialsAtGaussPoints.Length - 1].Stresses);
 
 			//TODO return data with total strains data would be:
-			//return new Tuple<double[], double[]>(GLvec[materialsAtGaussPoints.Length - 1], materialsAtGaussPoints[materialsAtGaussPoints.Length - 1].Stresses);
+			//return new Tuple<double[], double[]>(strainsVec[materialsAtGaussPoints.Length - 1], materialsAtGaussPoints[materialsAtGaussPoints.Length - 1].Stresses);
 			//TODO: why return only the strain- stress of the gausspoint that is last on the array, Where is it needed?
 		}
 
@@ -649,8 +649,8 @@ namespace ISAAR.MSolve.FEM.Elements
                 int numNodes = element.Nodes.Count();
                 this.CalculateInitialConfigurationData(element);
                 var localTotalDisplacements = new double[3*numNodes];
-                this.UpdateCoordinateData(localTotalDisplacements, out double[][] tx_i);
-                this.CalculateStrains(localTotalDisplacements, element, tx_i);
+                this.UpdateCoordinateData(localTotalDisplacements, out double[][] deformedCoordinates);
+                this.CalculateStrains(localTotalDisplacements, element, deformedCoordinates);
             }
             Matrix elementStiffness = this.UpdateKmatrices(element);
             //It doesn't implement Iembedded to return dof.Enumerator.GetTransformedMatrix
@@ -673,7 +673,7 @@ namespace ISAAR.MSolve.FEM.Elements
             //for (int npoint = 0; npoint < materialsAtGaussPoints.Length; npoint++)
             //{
             //    for (int i1 = 0; i1 < 6; i1++)
-            //    { GLvec_last_converged[npoint][i1] = GLvec[npoint][i1]; }
+            //    { strainsVec_last_converged[npoint][i1] = strainsVec[npoint][i1]; }
             //}
 
             foreach (IContinuumMaterial3DDefGrad m in materialsAtGaussPoints) m.SaveState();

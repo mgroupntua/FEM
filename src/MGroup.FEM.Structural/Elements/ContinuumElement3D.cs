@@ -228,16 +228,16 @@ namespace MGroup.FEM.Structural.Elements
 			//}
 
 			//double[] strains = new double[6];
-			double[] GLvec_strain_minus_last_converged_value = new double[6];
+			double[] strainsVecMinusLastConvergedValue = new double[6];
 			for (int gpo = 0; gpo < QuadratureForStiffness.IntegrationPoints.Count; ++gpo)
 			{
-				//GLvec[gpo] = new double[6];
+				//strainsVec[gpo] = new double[6];
 				var jacobian = new IsoparametricJacobian3D(Nodes, shapeGradientsNatural[gpo]);
 				Matrix shapeGradientsCartesian =
 					jacobian.TransformNaturalDerivativesToCartesian(shapeGradientsNatural[gpo]);
 				Matrix deformation = BuildDeformationMatrix(shapeGradientsCartesian);
 				strainsVec[gpo] = deformation.Multiply(localDisplacements);
-				GLvec_strain_minus_last_converged_value = new double[6]
+				strainsVecMinusLastConvergedValue = new double[6]
 				{
 					strainsVec[gpo][0]- strainsVecLastConverged[gpo][0],
 					strainsVec[gpo][1]- strainsVecLastConverged[gpo][1],
@@ -246,8 +246,8 @@ namespace MGroup.FEM.Structural.Elements
 					strainsVec[gpo][4]- strainsVecLastConverged[gpo][4],
 					strainsVec[gpo][5]- strainsVecLastConverged[gpo][5]
 				};
-				materialsAtGaussPoints[gpo].UpdateMaterial(GLvec_strain_minus_last_converged_value);
-				//To update with total strain simplY = materialsAtGaussPoints[npoint].UpdateMaterial(GLvec[npoint]);
+				materialsAtGaussPoints[gpo].UpdateMaterial(strainsVecMinusLastConvergedValue);
+				//To update with total strain simplY = materialsAtGaussPoints[npoint].UpdateMaterial(strainsVec[npoint]);
 			}
 
 

@@ -94,7 +94,7 @@ namespace ISAAR.MSolve.FEM.Elements
             }
         }
 
-        private Matrix[] Getbl13Matrices(IReadOnlyList<Matrix> shapeFunctionNaturalDerivatives)
+        private Matrix[] Getbl13DeformationMatrices(IReadOnlyList<Matrix> shapeFunctionNaturalDerivatives)
         {
             Matrix[] bl13Matrices;
             bl13Matrices = new Matrix[nGaussPoints];
@@ -114,7 +114,7 @@ namespace ISAAR.MSolve.FEM.Elements
             return bl13Matrices;
         }
 
-        private Matrix[] Getbl11aMatrices(Matrix[] jacobianInverse)
+        private Matrix[] Getbl11aDeformationMatrices(Matrix[] jacobianInverse)
         {
             Matrix[] bl11aMatrices = new Matrix[nGaussPoints];
             for (int gpoint = 0; gpoint < nGaussPoints; gpoint++)
@@ -141,7 +141,7 @@ namespace ISAAR.MSolve.FEM.Elements
             return bl11aMatrices;
         }
 
-        private Matrix[] GetBL12Matrices(Matrix[] jacobianInverse)
+        private Matrix[] GetBL12DeformationMatrices(Matrix[] jacobianInverse)
         {
             Matrix[] bl12Marices = new Matrix[nGaussPoints];
             for (int gpoint = 0; gpoint < nGaussPoints; gpoint++)
@@ -174,7 +174,7 @@ namespace ISAAR.MSolve.FEM.Elements
             return bl12Marices;
         }
 
-        private Matrix[] Getbl01Matrices(Matrix[] jacobianInverse)
+        private Matrix[] Getbl01MDeformationMatrices(Matrix[] jacobianInverse)
         {
             Matrix[] bl01Matrices = new Matrix[nGaussPoints];
             for (int gpoint = 0; gpoint < nGaussPoints; gpoint++)
@@ -226,7 +226,7 @@ namespace ISAAR.MSolve.FEM.Elements
             IReadOnlyList<Matrix> shapeFunctionNaturalDerivatives;
             shapeFunctionNaturalDerivatives = Interpolation.EvaluateNaturalGradientsAtGaussPoints(QuadratureForStiffness);
             Matrix[] bl13Matrices;
-            bl13Matrices = Getbl13Matrices(shapeFunctionNaturalDerivatives);
+            bl13Matrices = Getbl13DeformationMatrices(shapeFunctionNaturalDerivatives);
             
 
             Matrix[] bnl1Matrices;
@@ -296,7 +296,7 @@ namespace ISAAR.MSolve.FEM.Elements
             var jacobians = shapeFunctionNaturalDerivatives.Select(x => new IsoparametricJacobian3D(element.Nodes, x));
             Matrix[] jacobianInverse = jacobians.Select(x => x.InverseMatrix.Transpose()).ToArray();
             double[] jacobianDeterminants = jacobians.Select(x => x.DirectDeterminant).ToArray();
-            //TODO: possibility of caching ll1_hexa or J_0inv
+            //TODO: possibility of caching shapeFunctionNaturalDerivatives or J_0inv
 
             Matrix[] deformationGradients = new Matrix[nGaussPoints];
             Matrix[] strains = new Matrix[nGaussPoints];
@@ -343,12 +343,12 @@ namespace ISAAR.MSolve.FEM.Elements
 
             // Matrices that are not currently cached are calculated here.
             int numNodes = element.Nodes.Count();
-            Matrix ll2 = Matrix.CreateZero(numNodes, 3);
+            Matrix totalDisplacementsMatrixReordered = Matrix.CreateZero(numNodes, 3);
             for (int m = 0; m < numNodes; m++)
             {
                 for (int n = 0; n < 3; n++)
                 {
-                    ll2[m, n] = totalDisplacements[m][n];
+                    totalDisplacementsMatrixReordered[m, n] = totalDisplacements[m][n];
                 }
             }
             IReadOnlyList<Matrix> shapeFunctionNaturalDerivatives;
@@ -358,20 +358,20 @@ namespace ISAAR.MSolve.FEM.Elements
             double[] jacobianDeterminants = jacobians.Select(x => x.DirectDeterminant).ToArray();
 
             Matrix[] bl13Matrices;
-            bl13Matrices = Getbl13Matrices(shapeFunctionNaturalDerivatives);
+            bl13Matrices = Getbl13DeformationMatrices(shapeFunctionNaturalDerivatives);
             Matrix[] bl11aMatrices; // dimension number of gpoints
             Matrix[] BL12Matrices;
             Matrix[] bl01Matrices;
-            bl11aMatrices = Getbl11aMatrices(jacobianInverse);
-            BL12Matrices = GetBL12Matrices(jacobianInverse);
-            bl01Matrices = Getbl01Matrices(jacobianInverse);
+            bl11aMatrices = Getbl11aDeformationMatrices(jacobianInverse);
+            BL12Matrices = GetBL12DeformationMatrices(jacobianInverse);
+            bl01Matrices = Getbl01MDeformationMatrices(jacobianInverse);
 
             //INITIALIZATION of MAtrixes that are currently not cached
-            double[][] integrCoeffsTimesSpkvec = new double[nGaussPoints][];
+            double[][] integrCoeffsTimesStresses = new double[nGaussPoints][];
             Matrix[] blMatrices = new Matrix[nGaussPoints];
             for (int gpoint = 0; gpoint < nGaussPoints; gpoint++)
             {
-                integrCoeffsTimesSpkvec[gpoint] = new double[6];
+                integrCoeffsTimesStresses[gpoint] = new double[6];
                 blMatrices[gpoint] = Matrix.CreateZero(6, 3*numNodes);
             }
 
@@ -392,11 +392,11 @@ namespace ISAAR.MSolve.FEM.Elements
             for (int npoint = 0; npoint < nGaussPoints; npoint++)
             {
 
-                integrCoeffsTimesSpkvec[npoint] = materialsAtGaussPoints[npoint].Stresses.Scale(integrationCoeffs[npoint]);
+                integrCoeffsTimesStresses[npoint] = materialsAtGaussPoints[npoint].Stresses.Scale(integrationCoeffs[npoint]);
 
                 //
                 Matrix lcyrcumflex;//= Matrix.CreateZero(3, 3);
-                lcyrcumflex = shapeFunctionNaturalDerivatives[npoint].Transpose() * ll2;
+                lcyrcumflex = shapeFunctionNaturalDerivatives[npoint].Transpose() * totalDisplacementsMatrixReordered;
 
                 for (int m = 0; m < 6; m++)
                 {
@@ -419,7 +419,7 @@ namespace ISAAR.MSolve.FEM.Elements
                 blMatrices[npoint] = bL1112Plus01Matrices[npoint] * bl13Matrices[npoint];
                 
                 //              
-                forces[npoint] = blMatrices[npoint].Multiply(integrCoeffsTimesSpkvec[npoint], true);
+                forces[npoint] = blMatrices[npoint].Multiply(integrCoeffsTimesStresses[npoint], true);
             }
 
             for (int npoint = 0; npoint < nGaussPoints; npoint++)
@@ -460,13 +460,13 @@ namespace ISAAR.MSolve.FEM.Elements
             double[] jacobianDeterminants = jacobians.Select(x => x.DirectDeterminant).ToArray();
 
             Matrix[] bl13Matrices;
-            bl13Matrices = Getbl13Matrices(shapeFunctionNaturalDerivatives);
+            bl13Matrices = Getbl13DeformationMatrices(shapeFunctionNaturalDerivatives);
             Matrix[] bl11aMatrices; // dimension: gpoints
             Matrix[] BL12Matrices;
             Matrix[] bl01Matrices;
-            bl11aMatrices = Getbl11aMatrices(jacobianInverse);
-            BL12Matrices = GetBL12Matrices(jacobianInverse);
-            bl01Matrices = Getbl01Matrices(jacobianInverse);
+            bl11aMatrices = Getbl11aDeformationMatrices(jacobianInverse);
+            BL12Matrices = GetBL12DeformationMatrices(jacobianInverse);
+            bl01Matrices = Getbl01MDeformationMatrices(jacobianInverse);
 
             Matrix[] BL11Matrices = new Matrix[nGaussPoints];
             Matrix[] bl1112Plus01Mtrices = new Matrix[nGaussPoints];
@@ -592,7 +592,7 @@ namespace ISAAR.MSolve.FEM.Elements
                 knlStiffnessMatrixContributions[npoint] = bnlMatrices[npoint].Transpose() * integrCoeffsTimesStressesTimesbnlMatrices;                
             }
 
-            // Add contributions of each gp on the total element stiffness matrix k_element            
+            // Add contributions of each gp on the total element stiffness matrix elementStiffnessMatrix            
             for (int npoint = 0; npoint < nGaussPoints; npoint++)
             {
                 for (int m = 0; m < 3*numNodes; m++)

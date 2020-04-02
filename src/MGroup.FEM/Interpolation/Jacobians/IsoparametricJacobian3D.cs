@@ -123,9 +123,9 @@ namespace MGroup.FEM.Interpolation.Jacobians
 			//return Matrix3by3.CreateFromArray(jacobianMatrix, false);
 		}
 
-		private Matrix CalculateJacobianMatrix(double[][] tx_i, Matrix naturalDerivatives)
+		private Matrix CalculateJacobianMatrix(double[][] stateCoordinates, Matrix naturalDerivatives)
 		{
-			var J_1 = Matrix.CreateZero(3, 3);
+			var stateJacobian = Matrix.CreateZero(3, 3);
 
 			for (int m = 0; m < 3; m++)
 			{
@@ -133,12 +133,12 @@ namespace MGroup.FEM.Interpolation.Jacobians
 				{
 					for (int p = 0; p < naturalDerivatives.NumRows; p++)
 					{
-						J_1[m, n] += naturalDerivatives[p, m] * tx_i[p][n];
+						stateJacobian[m, n] += naturalDerivatives[p, m] * stateCoordinates[p][n];
 					}
 				}
 			}
 
-			return J_1;
+			return stateJacobian;
 		}
 
 		//private static (Matrix inverse, double determinant) InvertAndDeterminant(Matrix directMatrix)
