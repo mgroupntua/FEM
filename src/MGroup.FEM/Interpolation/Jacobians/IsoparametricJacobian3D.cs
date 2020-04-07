@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using MGroup.FEM.Entities;
 using MGroup.LinearAlgebra.Matrices;
+using MGroup.MSolve.Discretization;
 
 //TODO: Use Matrix3by3 after benchmarking it.
 namespace MGroup.FEM.Interpolation.Jacobians
@@ -24,7 +25,7 @@ namespace MGroup.FEM.Interpolation.Jacobians
 		/// </summary>
 		/// <param name="nodes">The nodes used for the interpolation.</param>
 		/// <param name="naturalCoordinates">The shape function derivatives at a specific integration point.</param>
-		public IsoparametricJacobian3D(IReadOnlyList<Node> nodes, Matrix naturalDerivatives)
+		public IsoparametricJacobian3D(IReadOnlyList<INode> nodes, Matrix naturalDerivatives)
 		{
 			DirectMatrix = CalculateJacobianMatrix(nodes, naturalDerivatives);
 			(InverseMatrix, DirectDeterminant) = DirectMatrix.InvertAndDeterminant();
@@ -35,6 +36,22 @@ namespace MGroup.FEM.Interpolation.Jacobians
 					+ $" ({DirectDeterminant} < {determinantTolerance}). Check the order of nodes or the element geometry.");
 			}
 		}
+
+		public IsoparametricJacobian3D(double[][] deformedStateNodeCoordinates, Matrix naturalDerivatives, bool CalculateInverseAndDetereminant)
+		{
+			DirectMatrix = CalculateJacobianMatrix(deformedStateNodeCoordinates, naturalDerivatives);
+			if (CalculateInverseAndDetereminant)
+			{
+				(InverseMatrix, DirectDeterminant) = DirectMatrix.InvertAndDeterminant();
+				//(InverseMatrix, DirectDeterminant) = InvertAndDeterminant(DirectMatrix);
+				if (DirectDeterminant < determinantTolerance)
+				{
+					throw new ArgumentException("Jacobian determinant is negative or under the allowed tolerance"
+						+ $" ({DirectDeterminant} < {determinantTolerance}). Check the order of nodes or the element geometry.");
+				}
+			}
+		}
+
 
 		/// <summary>
 		/// The determinant of the direct Jacobian matrix <see cref="DirectMatrix"/>.
@@ -81,7 +98,8 @@ namespace MGroup.FEM.Interpolation.Jacobians
 			return result;
 		}
 
-		private static Matrix CalculateJacobianMatrix(IReadOnlyList<Node> nodes, Matrix naturalDerivatives)
+
+		private static Matrix CalculateJacobianMatrix(IReadOnlyList<INode> nodes, Matrix naturalDerivatives)
 		{
 			var jacobianMatrix = Matrix.CreateZero(3, 3);
 			//var jacobianMatrix = new double[3,3];
@@ -103,6 +121,24 @@ namespace MGroup.FEM.Interpolation.Jacobians
 
 			return jacobianMatrix;
 			//return Matrix3by3.CreateFromArray(jacobianMatrix, false);
+		}
+
+		private Matrix CalculateJacobianMatrix(double[][] stateCoordinates, Matrix naturalDerivatives)
+		{
+			var stateJacobian = Matrix.CreateZero(3, 3);
+
+			for (int m = 0; m < 3; m++)
+			{
+				for (int n = 0; n < 3; n++)
+				{
+					for (int p = 0; p < naturalDerivatives.NumRows; p++)
+					{
+						stateJacobian[m, n] += naturalDerivatives[p, m] * stateCoordinates[p][n];
+					}
+				}
+			}
+
+			return stateJacobian;
 		}
 
 		//private static (Matrix inverse, double determinant) InvertAndDeterminant(Matrix directMatrix)

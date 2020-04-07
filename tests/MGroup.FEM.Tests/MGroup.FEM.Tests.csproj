@@ -34,4 +34,8 @@
     <ProjectReference Include="..\..\src\MGroup.FEM\MGroup.FEM.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="IntegrationTests\Supportive Classes\" />
+  </ItemGroup>
+
 </Project>

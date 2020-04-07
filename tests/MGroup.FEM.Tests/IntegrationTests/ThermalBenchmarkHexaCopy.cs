@@ -16,7 +16,7 @@ namespace MGroup.FEM.Tests.IntegrationTests
 	using NumericalAnalyzers;
 	using Solvers.Direct;
 
-	public class ThermalBenchmarkHexa
+	public class ThermalBenchmarkHexaCopy
 	{
 		private const int subdomainID = 0;
 
@@ -41,6 +41,26 @@ namespace MGroup.FEM.Tests.IntegrationTests
 				if (!comparer.AreEqual(expectedSolution[i], solution[i])) return false;
 			}
 			return true;
+
+			// original element node ordering solution
+			//135.05402160864347
+			//158.8235294117647
+			//135.05402160864347
+			//469.00437594392588
+			//147.05882352941177
+			//159.32695658908725
+			//178.17836812144211
+			//147.29891956782711
+			//139.46869070208729
+			//147.05882352941174
+			//191.71668667466983
+			//147.05882352941177
+			//135.05402160864344
+			//158.82352941176467
+			//135.05402160864344
+			//469.00437594392588
+			//147.05882352941174
+			//159.32695658908719
 		}
 
 		private static Model CreateModel()
@@ -91,24 +111,29 @@ namespace MGroup.FEM.Tests.IntegrationTests
 			// Elements
 			int numElements = 8;
 			var elementFactory = new ThermalElement3DFactory(new ThermalMaterial(density, c, k));
-			var elementNodes = new List<Node>[8];
-			elementNodes[0] = new List<Node>() { nodes[13], nodes[4], nodes[3], nodes[12], nodes[10], nodes[1], nodes[0], nodes[9] };
-			elementNodes[1] = new List<Node>() { nodes[14], nodes[5], nodes[4], nodes[13], nodes[11], nodes[2], nodes[1], nodes[10] };
-			elementNodes[2] = new List<Node>() { nodes[16], nodes[7], nodes[6], nodes[15], nodes[13], nodes[4], nodes[3], nodes[12] };
-			elementNodes[3] = new List<Node>() { nodes[17], nodes[8], nodes[7], nodes[16], nodes[14], nodes[5], nodes[4], nodes[13] };
-			elementNodes[4] = new List<Node>() { nodes[22], nodes[13], nodes[12], nodes[21], nodes[19], nodes[10], nodes[9], nodes[18] };
-			elementNodes[5] = new List<Node>() { nodes[23], nodes[14], nodes[13], nodes[22], nodes[20], nodes[11], nodes[10], nodes[19] };
-			elementNodes[6] = new List<Node>() { nodes[25], nodes[16], nodes[15], nodes[24], nodes[22], nodes[13], nodes[12], nodes[21] };
-			elementNodes[7] = new List<Node>() { nodes[26], nodes[17], nodes[16], nodes[25], nodes[23], nodes[14], nodes[13], nodes[22] };
+			//var elements = new ThermalElement3D[8];
 
-			var nodeReordering = new GMeshElementLocalNodeOrdering();
-			var rearrangeNodes = elementNodes.Select(x => nodeReordering.ReorderNodes(x, CellType.Hexa8)).ToArray(); ;
+			var elementNodes = new List<Node>[8];
+			elementNodes[0] = new List<Node> { nodes[13], nodes[4], nodes[3], nodes[12], nodes[10], nodes[1], nodes[0], nodes[9] };
+			elementNodes[1] = new List<Node> { nodes[14], nodes[5], nodes[4], nodes[13], nodes[11], nodes[2], nodes[1], nodes[10] };
+			elementNodes[2] = new List<Node> { nodes[16], nodes[7], nodes[6], nodes[15], nodes[13], nodes[4], nodes[3], nodes[12] };
+			elementNodes[3] = new List<Node> { nodes[17], nodes[8], nodes[7], nodes[16], nodes[14], nodes[5], nodes[4], nodes[13] };
+			elementNodes[4] = new List<Node> { nodes[22], nodes[13], nodes[12], nodes[21], nodes[19], nodes[10], nodes[9], nodes[18] };
+			elementNodes[5] = new List<Node> { nodes[23], nodes[14], nodes[13], nodes[22], nodes[20], nodes[11], nodes[10], nodes[19] };
+			elementNodes[6] = new List<Node> { nodes[25], nodes[16], nodes[15], nodes[24], nodes[22], nodes[13], nodes[12], nodes[21] };
+			elementNodes[7] = new List<Node> { nodes[26], nodes[17], nodes[16], nodes[25], nodes[23], nodes[14], nodes[13], nodes[22] };
+
+			var reordering = /*new GenericElementLocalNodeOrdering();*/  new GMeshElementLocalNodeOrdering();
+
+			var reordered_element_nodes = elementNodes.Select(x => reordering.ReorderNodes(x, CellType.Hexa8));
+
+			var elements = reordered_element_nodes.Select(x => elementFactory.CreateElement(CellType.Hexa8, x.ToArray())).ToArray();
+
 
 			for (int i = 0; i < numElements; ++i)
 			{
-
-				var elementWrapper = new Element() { ID = i, ElementType = elementFactory.CreateElement(CellType.Hexa8,rearrangeNodes[i])};
-				foreach (var node in elementNodes[i]) elementWrapper.AddNode(node);
+				var elementWrapper = new Element() { ID = i, ElementType = elements[i] };
+				foreach (var node in elements[i].Nodes) elementWrapper.AddNode(node);
 				model.ElementsDictionary[i] = elementWrapper;
 				model.SubdomainsDictionary[subdomainID].Elements.Add(elementWrapper);
 			}

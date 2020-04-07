@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using ISAAR.MSolve.FEM.Interpolation;
 using MGroup.FEM.Interpolation;
 using MGroup.MSolve.Geometry.Coordinates;
 using Xunit;

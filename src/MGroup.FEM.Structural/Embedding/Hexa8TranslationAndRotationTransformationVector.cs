@@ -6,6 +6,7 @@ using MGroup.FEM.Embedding;
 using MGroup.FEM.Interfaces;
 using MGroup.FEM.Structural.Elements;
 using MGroup.MSolve.Discretization;
+using MGroup.MSolve.Discretization.Mesh;
 
 namespace MGroup.FEM.Structural.Embedding
 {
@@ -41,11 +42,8 @@ namespace MGroup.FEM.Structural.Embedding
 
 		private double[][] GetTransformationVectorForTranslationsOnly(EmbeddedNode node)
 		{
-			if (node.EmbeddedInElement.ElementType is Hexa8 == false
-				&& node.EmbeddedInElement.ElementType is Hexa8Fixed == false
-				&& node.EmbeddedInElement.ElementType is Hexa8NonLinear == false)
-				//&& node.EmbeddedInElement.ElementType is Hexa8u8p == false)
-				throw new ArgumentException("Host element is not Hexa8.");
+			if (!(node.EmbeddedInElement.ElementType.CellType == CellType.Hexa8)
+				)throw new ArgumentException("Host element is not Hexa8.");
 
 			double[] hostShapeFunctions = ((IEmbeddedHostElement)node.EmbeddedInElement.ElementType).GetShapeFunctionsForNode(node.EmbeddedInElement, node);
 			var transformation = new double[commonDofsPerNode + rotationalDofsPerNode][];
