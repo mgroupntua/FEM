@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGroup.FEM.PorousMedia", "s
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGroup.FEM.Tests", "tests\MGroup.FEM.Tests\MGroup.FEM.Tests.csproj", "{AF94B94E-657E-471D-9782-25AE3FDA8C3A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MGroup.FEM.Structural.Contact", "src\MGroup.FEM.Structural.Contact\MSolve.FEM.Structural.Contact.csproj", "{542F231A-C4AE-4072-97D0-70FBC64271D7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MGroup.FEM.Structural.Contact", "src\MGroup.FEM.Structural.Contact\MGroup.FEM.Structural.Contact.csproj", "{542F231A-C4AE-4072-97D0-70FBC64271D7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
