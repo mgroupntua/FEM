@@ -32,6 +32,7 @@
     <ProjectReference Include="..\..\src\MGroup.FEM.Structural\MGroup.FEM.Structural.csproj" />
     <ProjectReference Include="..\..\src\MGroup.FEM.Thermal\MGroup.FEM.Thermal.csproj" />
     <ProjectReference Include="..\..\src\MGroup.FEM\MGroup.FEM.csproj" />
+    <ProjectReference Include="..\..\src\MGroup.FEM.Structural.Contact\MGroup.FEM.Structural.Contact.csproj" />
   </ItemGroup>
 
   <ItemGroup>

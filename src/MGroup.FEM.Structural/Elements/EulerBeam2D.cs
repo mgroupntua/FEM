@@ -157,14 +157,19 @@ namespace MGroup.FEM.Structural.Elements
 		}
 
 		public Tuple<double[], double[]> CalculateStresses(IElement element, double[] localDisplacements, double[] localdDisplacements)
-			=> throw new NotImplementedException();
+			=> new Tuple<double[], double[]>(new double[6], new double[6]);
 
 		public double[] CalculateForcesForLogging(IElement element, double[] localDisplacements)
 			=> CalculateForces(element, localDisplacements, new double[localDisplacements.Length]);
 
 		public double[] CalculateForces(IElement element, double[] localDisplacements, double[] localdDisplacements)
-			=> throw new NotImplementedException();
+		{
+			var globalStiffnessMatrix = StiffnessMatrix(element);
+			double[] forces = globalStiffnessMatrix.Multiply(localDisplacements);
 
+			return forces;
+		}
+		
 		public double[] CalculateAccelerationForces(IElement element, IList<MassAccelerationLoad> loads)
 		{
 			var accelerations = new double[6];
@@ -182,7 +187,10 @@ namespace MGroup.FEM.Structural.Elements
 			return massMatrix.Multiply(accelerations);
 		}
 
-		public void SaveMaterialState() => throw new NotImplementedException();
+		public void SaveMaterialState()
+		{
+			// Method left intentionally blank
+		}
 
 		#endregion
 
