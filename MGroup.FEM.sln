@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGroup.FEM.PorousMedia", "s
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGroup.FEM.Tests", "tests\MGroup.FEM.Tests\MGroup.FEM.Tests.csproj", "{AF94B94E-657E-471D-9782-25AE3FDA8C3A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSolve.FEM.Structural.Contact", "src\MSolve.FEM.Structural.Contact\MSolve.FEM.Structural.Contact.csproj", "{542F231A-C4AE-4072-97D0-70FBC64271D7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +45,10 @@ Global
 		{AF94B94E-657E-471D-9782-25AE3FDA8C3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AF94B94E-657E-471D-9782-25AE3FDA8C3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AF94B94E-657E-471D-9782-25AE3FDA8C3A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{542F231A-C4AE-4072-97D0-70FBC64271D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{542F231A-C4AE-4072-97D0-70FBC64271D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{542F231A-C4AE-4072-97D0-70FBC64271D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{542F231A-C4AE-4072-97D0-70FBC64271D7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -53,6 +59,7 @@ Global
 		{2042A3FE-94F9-4FD8-8AA6-558F15FA37E1} = {B0C87C19-1B55-4255-ADC8-97FC240EB363}
 		{37714488-F640-4529-B888-D7A4ACA3431E} = {B0C87C19-1B55-4255-ADC8-97FC240EB363}
 		{AF94B94E-657E-471D-9782-25AE3FDA8C3A} = {F7BB06C4-D249-41C7-832F-6E03F526800D}
+		{542F231A-C4AE-4072-97D0-70FBC64271D7} = {B0C87C19-1B55-4255-ADC8-97FC240EB363}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D4E306A5-E12C-49DD-92A6-1D6687B9C4B9}
