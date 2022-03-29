@@ -30,12 +30,9 @@ namespace MGroup.FEM.Structural.Contact.Elements
 
 		public double RayleighBeta { get; set; }
 
-		#region contactProperties
-		public double[] DisplacementVector { get; set; }
+		private double[] DisplacementVector { get; set; }
 
 		private double PenaltyFactor { get; set; }
-
-		#endregion contactProperties
 
 		public NodeToNodeContact2D(double youngModulus, double A, double I)
 		{
@@ -43,8 +40,7 @@ namespace MGroup.FEM.Structural.Contact.Elements
 			#region contact
 			SectionArea = A;
 			MomentOfInertia = I;
-			//PenaltyFactor = youngModulus * 100.0;
-			PenaltyFactor = youngModulus * 2.0 / 100;
+			PenaltyFactor = youngModulus * 2.0 / 100; // was youngModulus * 100.0;
 			DisplacementVector = new double[4];
 			#endregion contact
 
@@ -70,34 +66,6 @@ namespace MGroup.FEM.Structural.Contact.Elements
 
 		public virtual IMatrix StiffnessMatrix(IElement element)
 		{
-			#region backup
-			//double x2 = Math.Pow(element.Nodes[1].X - element.Nodes[0].X, 2);
-			//double y2 = Math.Pow(element.Nodes[1].Y - element.Nodes[0].Y, 2);
-			//double L = Math.Sqrt(x2 + y2);
-			//double c = (element.Nodes[1].X - element.Nodes[0].X) / L;
-			//double c2 = c * c;
-			//double s = (element.Nodes[1].Y - element.Nodes[0].Y) / L;
-			//double s2 = s * s;
-			//double EL = this.youngModulus / L;
-			//double EAL = EL * SectionArea;
-			//double EIL = EL * MomentOfInertia;
-			//double EIL2 = EIL / L;
-			//double EIL3 = EIL2 / L;
-
-			////TODO: optimize this
-			//int order = 6;
-			//var k = SymmetricMatrix.CreateFromPackedRowMajorArray(new double[]
-			//{
-			//	c2*EAL+12*s2*EIL3, c*s*EAL-12*c*s*EIL3, -6*s*EIL2, -c2*EAL-12*s2*EIL3, -c*s*EAL+12*c*s*EIL3, -6*s*EIL2,
-			//	s2*EAL+12*c2*EIL3, 6*c*EIL2, -s*c*EAL+12*c*s*EIL3, -s2*EAL-12*c2*EIL3, 6*c*EIL2,
-			//	4*EIL, 6*s*EIL2, -6*c*EIL2, 2*EIL,
-			//	c2*EAL+12*s2*EIL3, s*c*EAL-12*c*s*EIL3, 6*s*EIL2,
-			//	s2*EAL+12*c2*EIL3, -6*c*EIL2,
-			//	4*EIL
-			//}, order);
-
-			//return dofEnumerator.GetTransformedMatrix(k);
-			#endregion backup
 			double penetration = CalculateNormalGap(element);
 			if (penetration <= 0)
 			{
@@ -117,7 +85,6 @@ namespace MGroup.FEM.Structural.Contact.Elements
 			}
 		}
 
-		#region contactFunctions
 		private double CalculateNormalGap(IElement element)
 		{
 			double[,] A = CalculatePositionMatrix();
@@ -155,51 +122,10 @@ namespace MGroup.FEM.Structural.Contact.Elements
 				};
 			return aMatrix;
 		}
-		#endregion contactFunctions
 
+		public IMatrix MassMatrix(IElement element) =>  SymmetricMatrix.CreateFromArray(new double[4, 4]);
 
-		public IMatrix MassMatrix(IElement element)
-		{
-			#region backup
-			//double x2 = Math.Pow(element.Nodes[1].X - element.Nodes[0].X, 2);
-			//double y2 = Math.Pow(element.Nodes[1].Y - element.Nodes[0].Y, 2);
-			//double L = Math.Sqrt(x2 + y2);
-			//double L2 = L * L;
-			//double c = (element.Nodes[1].X - element.Nodes[0].X) / L;
-			//double c2 = c * c;
-			//double s = (element.Nodes[1].Y - element.Nodes[0].Y) / L;
-			//double s2 = s * s;
-			//double dAL420 = Density * SectionArea * L / 420;
-
-			//double totalMass = Density * SectionArea * L;
-			//double totalMassOfDiagonalTerms = 2 * dAL420 * (140 * c2 + 156 * s2) + 2 * dAL420 * (140 * s2 + 156 * c2);
-			//double scale = totalMass / totalMassOfDiagonalTerms;
-
-			////TODO: optimize this
-			//int order = 6;
-			//return SymmetricMatrix.CreateFromPackedRowMajorArray(new double[]
-			//{
-			//	dAL420 *(140*c2+156*s2)*scale, 0, 0, 0, 0, 0,
-			//	dAL420*(140*s2+156*c2)*scale, 0, 0, 0, 0,
-			//	0, 0, 0, 0,
-			//	dAL420*(140*c2+156*s2)*scale, 0, 0,
-			//	dAL420*(140*s2+156*c2)*scale, 0,
-			//	0
-			//}, order);
-			#endregion backup
-			return SymmetricMatrix.CreateFromArray(new double[4, 4]);
-		}
-
-		public IMatrix DampingMatrix(IElement element)
-		{
-			#region backup
-			var k = StiffnessMatrix(element);
-			var m = MassMatrix(element);
-			k.LinearCombinationIntoThis(RayleighBeta, m, RayleighAlpha);
-			return k;
-			#endregion backup
-			return SymmetricMatrix.CreateFromArray(new double[4, 4]);
-		}
+		public IMatrix DampingMatrix(IElement element) => SymmetricMatrix.CreateFromArray(new double[4, 4]);
 
 		public Tuple<double[], double[]> CalculateStresses(IElement element, double[] localDisplacements, double[] localdDisplacements)
 			=> new Tuple<double[], double[]>(new double[4], new double[4]);
@@ -233,24 +159,8 @@ namespace MGroup.FEM.Structural.Contact.Elements
 			}
 		}
 
-		public double[] CalculateAccelerationForces(IElement element, IList<MassAccelerationLoad> loads)
-			=> throw new NotImplementedException();
-		#region backup
-		//{
-		//	var accelerations = new double[6];
-		//	int index = 0;
-		//	foreach (MassAccelerationLoad load in loads)
-		//		foreach (IDofType[] nodalDOFTypes in dofs)
-		//			foreach (IDofType dofType in nodalDOFTypes)
-		//			{
-		//				if (dofType == load.DOF) accelerations[index] += load.Amount;
-		//				index++;
-		//			}
+		public double[] CalculateAccelerationForces(IElement element, IList<MassAccelerationLoad> loads) => throw new NotImplementedException();
 
-		//	IMatrix massMatrix = MassMatrix(element);
-		//	return massMatrix.Multiply(accelerations);
-		//}
-		#endregion backup
 		public void SaveMaterialState()
 		{
 			// Method intentionally left empty.
@@ -273,7 +183,11 @@ namespace MGroup.FEM.Structural.Contact.Elements
 			DisplacementVector = new double[4];
 		}
 
-		public void ClearMaterialStresses() => throw new NotImplementedException();
+		public void ClearMaterialStresses()
+		{
+			// Method intentionally left empty.
+		}
+
 		#endregion
 	}
 }

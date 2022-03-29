@@ -5,7 +5,6 @@ using System.Text;
 
 using Xunit;
 
-
 using MGroup.FEM.Entities;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.MSolve.Discretization;
@@ -22,20 +21,6 @@ using MGroup.NumericalAnalyzers;
 using MGroup.NumericalAnalyzers.NonLinear;
 using MGroup.NumericalAnalyzers.Logging;
 
-////Contact Target Results
-//-0.00519468508280831
-//- 0.0538764715202809
-//- 0.327339234626631
-//- 0.0293078272969774
-//- 0.171260306513492
-//- 0.439743768928421
-//0.0394338615650435
-//- 0.200376995093406
-//0.503793567072066
-//0.00751206523085321
-//- 0.0657141690451133
-//0.388934455052851
-
 namespace MGroup.FEM.Tests.Elements
 {
 	public class TwoBeamsInContactNoFriction
@@ -44,7 +29,7 @@ namespace MGroup.FEM.Tests.Elements
         static Dictionary<int, Element> elements { get; set; }
         static Model model { get; set; }
 
-        private static void CreateAssembly()
+        private static void CreateModel()
         {
             model = new Model();
             model.SubdomainsDictionary.Add(1, new Subdomain(1));
@@ -61,6 +46,8 @@ namespace MGroup.FEM.Tests.Elements
             model.NodesDictionary[6].Constraints.Add(new Constraint { DOF = StructuralDof.TranslationX });
             model.NodesDictionary[6].Constraints.Add(new Constraint { DOF = StructuralDof.TranslationY });
             model.NodesDictionary[6].Constraints.Add(new Constraint { DOF = StructuralDof.RotationZ });
+
+			model.Loads.Add(new Load() { Amount = -2200000, Node = model.NodesDictionary[3], DOF = StructuralDof.TranslationY });
         }
 
         private static void CreateNodes()
@@ -72,9 +59,6 @@ namespace MGroup.FEM.Tests.Elements
             nodes[4] = new Node(4, 0.6, 0.0);
             nodes[5] = new Node(5, 0.9, 0.0);
             nodes[6] = new Node(6, 1.1, 0.0);
-			//nodes[4] = new Node(4, 0.45, 0.0);
-			//nodes[5] = new Node(5, 0.75, 0.0);
-			//nodes[6] = new Node(6, 1.05, 0.0);
 		}
 
 		private static void CreateConnectivity()
@@ -135,33 +119,16 @@ namespace MGroup.FEM.Tests.Elements
 		}
 
 		[Fact]
-        public static void RunStaticExample()
+        public static void RunNodeToNodeContact()
         {
+            CreateModel();
 
-            CreateAssembly();
-			//double[,] globalStiffnessMatrix = elementsAssembly.CreateTotalStiffnessMatrix();
-
-			//ISolver newSolu = new ;
-			//newSolu.LinearScheme = new BiCGSTABSolver();
-			//newSolu.NonLinearScheme = new NewtonIterations();
-			//newSolu.ActivateNonLinearSolver = true;
-			//newSolu.NonLinearScheme.numberOfLoadSteps = 15;
-
-			//double[] externalForces = new double[] { 0, 0, 0, 0, -4 * 2200000, 0, 0, 0, 0, 0, 0, 0 };
-			//newSolu.AssemblyData = elementsAssembly;
-			//newSolu.Solve(externalForces);
-			//newSolu.PrintSolution();
-			//Assert.True(true);
-
-			model.Loads.Add(new Load() { Amount = -2200000, Node = model.NodesDictionary[3], DOF = StructuralDof.TranslationY });
 			var solverBuilder = new SkylineSolver.Builder();
 			ISolver solver = solverBuilder.BuildSolver(model);
 			var provider = new ProblemStructural(model, solver);
             int increments = 15;
             var childAnalyzerBuilder = new LoadControlAnalyzer.Builder(model, solver, provider, increments);
             LoadControlAnalyzer childAnalyzer = childAnalyzerBuilder.Build();
-
-            // Choose parent analyzer -> Parent: Static
             var parentAnalyzer = new StaticAnalyzer(model, solver, provider, childAnalyzer);
 
             // Request output
@@ -170,7 +137,6 @@ namespace MGroup.FEM.Tests.Elements
             // Run the analysis
             parentAnalyzer.Initialize();
             parentAnalyzer.Solve();
-
         }
     }
 }
