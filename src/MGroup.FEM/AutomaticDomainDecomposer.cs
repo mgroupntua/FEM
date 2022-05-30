@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
-using MGroup.FEM.Entities;
+using MGroup.MSolve.Discretization;
+using MGroup.MSolve.Discretization.Entities;
 
 namespace MGroup.FEM
 {
@@ -9,9 +10,9 @@ namespace MGroup.FEM
 		private readonly Model Model;
 		private readonly int NumberOfProcessors;
 		private int numberOfElementsPerSubdomain;
-		Dictionary<Element, List<Element>> ElementAdjacency;
-		List<Element> ElementsRenumbered = new List<Element>();
-		Dictionary<int, List<Node>> SubdomainInterfaceNodes = new Dictionary<int, List<Node>>();
+		Dictionary<IElementType, List<IElementType>> ElementAdjacency;
+		List<IElementType> ElementsRenumbered = new List<IElementType>();
+		Dictionary<int, List<INode>> SubdomainInterfaceNodes = new Dictionary<int, List<INode>>();
 
 		public AutomaticDomainDecomposer(Model model, int numberOfProcessors)
 		{
@@ -56,14 +57,14 @@ namespace MGroup.FEM
 		{
 			foreach (Subdomain subdomain in Model.SubdomainsDictionary.Values)
 			{
-				foreach (Element element in subdomain.Elements)
-					element.Subdomain = subdomain;
+				foreach (IElementType element in subdomain.Elements)
+					element.SubdomainID = subdomain.ID;
 			}
 
 			foreach (Node node in Model.NodesDictionary.Values)
 			{
-				node.SubdomainsDictionary.Clear();
-				node.BuildSubdomainDictionary();
+				node.Subdomains.Clear();
+				node.FindAssociatedSubdomains();
 			}
 
 			foreach (Subdomain subdomain in Model.SubdomainsDictionary.Values)
@@ -75,18 +76,18 @@ namespace MGroup.FEM
 
 		private void Adjacency()
 		{
-			ElementAdjacency = new Dictionary<Element, List<Element>>();
+			ElementAdjacency = new Dictionary<IElementType, List<IElementType>>();
 			// mask is an integer that shows if the element is used
 
 
 			foreach (var element in Model.ElementsDictionary.Values)
 			{
 				bool[] usedElement = new bool[Model.ElementsDictionary.Count];//mask
-				ElementAdjacency.Add(element, new List<Element>());
+				ElementAdjacency.Add(element, new List<IElementType>());
 				usedElement[element.ID] = true;
-				foreach (var node in element.NodesDictionary.Values)
+				foreach (var node in element.Nodes)
 				{
-					foreach (Element nodeElement in node.ElementsDictionary.Values)
+					foreach (IElementType nodeElement in node.ElementsDictionary.Values)
 					{
 						if (usedElement[nodeElement.ID]) continue;
 						ElementAdjacency[element].Add(nodeElement);
@@ -106,7 +107,7 @@ namespace MGroup.FEM
 			numberOfElementsPerSubdomain = (Model.ElementsDictionary.Count % NumberOfProcessors == 0) ?
 				Model.ElementsDictionary.Count / NumberOfProcessors : Model.ElementsDictionary.Count / NumberOfProcessors + 1;
 
-			Dictionary<Node, int> nodeWeight = new Dictionary<Node, int>();
+			Dictionary<INode, int> nodeWeight = new Dictionary<INode, int>();
 			foreach (Node node in Model.NodesDictionary.Values)
 				nodeWeight.Add(node, node.ElementsDictionary.Count);
 
@@ -135,7 +136,7 @@ namespace MGroup.FEM
 
 				// Start fill list with elements connected to node with minimum weight
 				var counterSubdomainElements = 0;
-				foreach (Element element in Model.NodesDictionary[nodeID].ElementsDictionary.Values)
+				foreach (IElementType element in Model.NodesDictionary[nodeID].ElementsDictionary.Values)
 				{
 					var elementID = element.ID;
 					if (isInteriorBoundaryElement[elementID]) continue;
@@ -145,7 +146,7 @@ namespace MGroup.FEM
 
 					#region nomask
 					//Reduce nodeWeight for all nodes connected to this element
-					foreach (Node node in Model.ElementsDictionary[elementID].NodesDictionary.Values)
+					foreach (Node node in Model.ElementsDictionary[elementID].Nodes)
 						nodeWeight[node]--;
 					#endregion
 
@@ -178,7 +179,7 @@ namespace MGroup.FEM
 								ElementsRenumbered.Add(Model.ElementsDictionary.First(x => x.Value.ID == elementID).Value);
 
 								#region nomask
-								foreach (Node node in Model.ElementsDictionary[elementID].NodesDictionary.Values)
+								foreach (Node node in Model.ElementsDictionary[elementID].Nodes)
 									nodeWeight[node]--;
 								#endregion
 
@@ -215,16 +216,16 @@ namespace MGroup.FEM
 		}
 
 		//isInteriorBoundaryNode-> if node is on the interior interface
-		private List<Node> CalculateInterface(Dictionary<Node, int> nodeWeight, bool[] isInteriorBoundaryNode,
-			List<Element> ElementsRenumbered, int usedElementsCounter, int counterSubdomainElements, int counterSubdomain)
+		private List<INode> CalculateInterface(Dictionary<INode, int> nodeWeight, bool[] isInteriorBoundaryNode,
+			List<IElementType> ElementsRenumbered, int usedElementsCounter, int counterSubdomainElements, int counterSubdomain)
 		{
 			var locmask = new bool[Model.NodesDictionary.Count];
-			List<Node> SubdomainInterfaceNodes = new List<Node>();
+			List<INode> SubdomainInterfaceNodes = new List<INode>();
 
 			for (int i = usedElementsCounter; i < usedElementsCounter + counterSubdomainElements; i++)
 			{
 				int elementID = ElementsRenumbered[i].ID;
-				foreach (Node node in Model.ElementsDictionary[elementID].NodesDictionary.Values)
+				foreach (Node node in Model.ElementsDictionary[elementID].Nodes)
 				{
 					if ((nodeWeight[node] != 0 || isInteriorBoundaryNode[node.ID]) && !locmask[node.ID])
 					{
@@ -237,10 +238,10 @@ namespace MGroup.FEM
 			return SubdomainInterfaceNodes;
 		}
 
-		private void ColorDisconnectedElements(List<Element> purgedElements)
+		private void ColorDisconnectedElements(List<IElementType> purgedElements)
 		{
 			int numberOfColors = 1;
-			Dictionary<int, List<Element>> elementsPerColor = new Dictionary<int, List<Element>>();
+			Dictionary<int, List<IElementType>> elementsPerColor = new Dictionary<int, List<IElementType>>();
 			int indexColor = 0;
 			int counterElement = 0;
 
@@ -249,7 +250,7 @@ namespace MGroup.FEM
 			// Form the list of distinct colors
 			do
 			{
-				elementsPerColor.Add(indexColor, new List<Element>());
+				elementsPerColor.Add(indexColor, new List<IElementType>());
 				bool[] usedNodes = new bool[Model.NodesDictionary.Count];
 				foreach (var element in purgedElements)
 				{
@@ -263,7 +264,7 @@ namespace MGroup.FEM
 						elementsPerColor[indexColor].Add(Model.ElementsDictionary[element.ID]);
 
 						#region marker
-						foreach (Node node in Model.ElementsDictionary[element.ID].NodesDictionary.Values)
+						foreach (Node node in Model.ElementsDictionary[element.ID].Nodes)
 							usedNodes[node.ID] = true;
 						#endregion
 
@@ -277,29 +278,29 @@ namespace MGroup.FEM
 
 		private bool CheckIfElementDisjoint(bool[] usedNodes, int elementID)
 		{
-			foreach (Node node in Model.ElementsDictionary[elementID].NodesDictionary.Values)
+			foreach (Node node in Model.ElementsDictionary[elementID].Nodes)
 				if (usedNodes[node.ID])
 					return false;
 			return true;
 		}
 
 
-		private List<Element> Purge()
+		private List<IElementType> Purge()
 		{
 			bool[] isElementUsed = new bool[Model.ElementsDictionary.Count];
 
-			List<Node> interfaceNodes = new List<Node>();
+			List<INode> interfaceNodes = new List<INode>();
 			foreach (var nodeList in SubdomainInterfaceNodes.Values)
 				interfaceNodes.AddRange(nodeList);
 
 			interfaceNodes = interfaceNodes.Distinct().ToList();
 			int numberOfInterfaceNodes = interfaceNodes.Count;
 
-			List<Element> purgedElements = new List<Element>();
+			List<IElementType> purgedElements = new List<IElementType>();
 			int numberOfPurgedElements = 0;
 			for (int indexInterfaceNode = 0; indexInterfaceNode < numberOfInterfaceNodes; indexInterfaceNode++)
 			{
-				foreach (Element element in interfaceNodes[indexInterfaceNode].ElementsDictionary.Values)
+				foreach (IElementType element in interfaceNodes[indexInterfaceNode].ElementsDictionary.Values)
 				{
 					if (!isElementUsed[element.ID])
 					{

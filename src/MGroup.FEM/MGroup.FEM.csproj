@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <Authors>George Stavroulakis, Dimitris Tsapetis</Authors>
     <Product>MSolve</Product>
     <Description>A series of generic classes and interfaces for spatially discretizing computational mechanics problems using the finite element method</Description>
@@ -11,10 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MGroup.LinearAlgebra" Version="0.1.0-unstable.21" />
-    <PackageReference Include="MGroup.MSolve.Constitutive" Version="0.1.0-unstable.37" />
-    <PackageReference Include="MGroup.MSolve.Discretization" Version="0.1.0-unstable.37" />
-    <PackageReference Include="MGroup.MSolve.Geometry" Version="0.1.0-unstable.37" />
+    <PackageReference Include="MGroup.MSolve.Core" Version="0.2.0-unstable.33" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
-
 </Project>

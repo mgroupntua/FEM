@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using MGroup.Constitutive.Thermal;
-using MGroup.FEM.Embedding;
-using MGroup.FEM.Interfaces;
 using MGroup.MSolve.Discretization;
+using MGroup.MSolve.Discretization.Dofs;
+using MGroup.MSolve.Discretization.Embedding;
 
 namespace MGroup.FEM.Thermal.Embedding
 {
@@ -14,7 +14,7 @@ namespace MGroup.FEM.Thermal.Embedding
 
 		public IReadOnlyList<IReadOnlyList<IDofType>> GetDOFTypesOfHost(EmbeddedNode node)
 		{
-			return node.EmbeddedInElement.ElementType.GetElementDofTypes(node.EmbeddedInElement);
+			return node.EmbeddedInElement.GetElementDofTypes();
 		}
 
 		public double[][] GetTransformationVector(EmbeddedNode node)
@@ -24,7 +24,7 @@ namespace MGroup.FEM.Thermal.Embedding
 			const int commonDofsPerNode = 1;
 			const int hostDofsPerNode = 1;
 			const int hostShapeFunctionLength = 4; //TODO: Use the interpolation for this. Probably for the next line too.
-			double[] hostShapeFunctions = ((IEmbeddedHostElement)node.EmbeddedInElement.ElementType).GetShapeFunctionsForNode(node.EmbeddedInElement, node);
+			double[] hostShapeFunctions = ((IEmbeddedHostElement)node.EmbeddedInElement).GetShapeFunctionsForNode(node.EmbeddedInElement, node);
 
 			var transformation = new double[commonDofsPerNode][];
 			for (int j = 0; j < commonDofsPerNode; j++)

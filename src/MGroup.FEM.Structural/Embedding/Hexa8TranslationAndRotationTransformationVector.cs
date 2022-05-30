@@ -1,12 +1,9 @@
 using System;
 using System.Collections.Generic;
 using MGroup.Constitutive.Structural;
-using MGroup.FEM.Elements;
-using MGroup.FEM.Embedding;
-using MGroup.FEM.Interfaces;
-using MGroup.FEM.Structural.Elements;
 using MGroup.MSolve.Discretization;
-using MGroup.MSolve.Discretization.Mesh;
+using MGroup.MSolve.Discretization.Dofs;
+using MGroup.MSolve.Discretization.Embedding;
 
 namespace MGroup.FEM.Structural.Embedding
 {
@@ -23,7 +20,7 @@ namespace MGroup.FEM.Structural.Embedding
 
 		public IReadOnlyList<IReadOnlyList<IDofType>> GetDOFTypesOfHost(EmbeddedNode node)
 		{
-			return node.EmbeddedInElement.ElementType.GetElementDofTypes(node.EmbeddedInElement);
+			return node.EmbeddedInElement.GetElementDofTypes();
 		}
 
 		private Tuple<double[,], double[,]> GetJacobiansFromShapeFunctionsVector(double[] shapeFunctionsVector)
@@ -42,10 +39,10 @@ namespace MGroup.FEM.Structural.Embedding
 
 		private double[][] GetTransformationVectorForTranslationsOnly(EmbeddedNode node)
 		{
-			if (!(node.EmbeddedInElement.ElementType.CellType == CellType.Hexa8)
+			if (!(node.EmbeddedInElement.CellType == CellType.Hexa8)
 				)throw new ArgumentException("Host element is not Hexa8.");
 
-			double[] hostShapeFunctions = ((IEmbeddedHostElement)node.EmbeddedInElement.ElementType).GetShapeFunctionsForNode(node.EmbeddedInElement, node);
+			double[] hostShapeFunctions = ((IEmbeddedHostElement)node.EmbeddedInElement).GetShapeFunctionsForNode(node.EmbeddedInElement, node);
 			var transformation = new double[commonDofsPerNode + rotationalDofsPerNode][];
 			for (int j = 0; j < commonDofsPerNode; j++)
 			{

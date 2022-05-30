@@ -20,9 +20,16 @@
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" Label="Debug Settings">
 		<DebugSymbols>true</DebugSymbols>
 	</PropertyGroup>
+	
+	<PropertyGroup>
+		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+	</PropertyGroup>
 
 	<PropertyGroup Label="Package">
 		<PackageId></PackageId>
+		<PackageProjectUrl>http://github.com/mgroupntua/FEM</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/mgroupntua/FEM</RepositoryUrl>
+		<Authors>George Stavroulakis, Serafeim Bakalakos, Dimitris Tsapetis</Authors>
 		<Company>MGroup</Company>
 		<!-- Optional: Include PDB in the built .nupkg to enable debugging -->
 		<AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>

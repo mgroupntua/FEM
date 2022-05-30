@@ -17,13 +17,23 @@ pool:
 variables:
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
-  Version: '1.0.$(Build.BuildId)'
-  Major: '1'
-  Minor: '0'
-  Patch: '$(Build.BuildId)'
   testProject: 'tests/MGroup.FEM.Tests'
 
 steps:
+- task: PowerShell@2
+  displayName: Install gitversion.tool
+  inputs:
+    targetType: inline
+    script: dotnet tool install --tool-path .. gitversion.tool
+    pwsh: true
+
+- task: PowerShell@2
+  displayName: Set SemVer from git history and update AssemblyInfo
+  inputs:
+    targetType: inline
+    script: ../dotnet-gitversion /updateassemblyinfo AssemblyInfo.cs AssemblyVersionInfo.cs /output buildserver 
+    pwsh: true
+
 - task: DotNetCoreCLI@2
   name: dotnetRestore
   displayName: "Restore nugets"
@@ -31,34 +41,29 @@ steps:
     command: 'restore'
     verbosityRestore: 'Normal'
     feedsToUse: 'config'
-    nugetConfigPath: 'NuGet.Config'
+    nugetConfigPath: 'NuGet.config'
 
-
-# - task: SonarCloudPrepare@1
-#   displayName: "Prepares SonarCloud analysis"
-#   inputs:
-#     SonarCloud: 'SonarCloud'
-#     organization: 'mgroupntua'
-#     scannerMode: 'MSBuild'
-#     projectKey: 'MSolve.FEM'
-#     extraProperties: 'sonar.cs.opencover.reportsPaths=$(Build.SourcesDirectory)/coverage/coverage.opencover.xml'
-- task: UseGitVersion@5
-  inputs:
-    versionSpec: '5.x'
-    includePrerelease: true
-    useConfigFile: true
-    configFilePath: 'GitVersion.yml'
+ - task: SonarCloudPrepare@1
+   displayName: "Prepares SonarCloud analysis"
+   inputs:
+     SonarCloud: 'SonarCloud'
+     organization: 'mgroupntua'
+     scannerMode: 'MSBuild'
+     projectKey: 'MSolve.FEM'
+     extraProperties: 'sonar.cs.opencover.reportsPaths=$(Build.SourcesDirectory)/coverage/coverage.opencover.xml'
 
 - task: DotNetCoreCLI@2
   name: dotnetBuild
   displayName: "Build projects"
   inputs:
     command: 'build'
-    arguments: '-p:Version=$(GitVersion.SemVer)'
-    verbosityPack: 'Minimal'
-    configuration: '$(buildConfiguration)'
+    arguments: '--no-restore --nologo --configuration $(buildConfiguration) /p:AssemblyVersion=$(GitVersion.AssemblySemVer) /p:Version=$(GitVersion.SemVer) /p:SourceLinkCreate=true'
+    versioningScheme: 'byEnvVar'
+    versionEnvVar: 'GitVersion.AssemblySemVer'
+
 
 - task: DotNetCoreCLI@2
+  enabled: false
   displayName: Runs Tests (develop)
   condition: eq(variables['Build.SourceBranch'], 'refs/heads/develop')
   inputs:
@@ -67,35 +72,46 @@ steps:
     arguments: '--configuration $(BuildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
     publishTestResults: true
 
+- task: PublishSymbols@2
+  displayName: "Publish symbols to Azure Devops artifacts"
+  inputs:
+    DetailedLog: true
+    SearchPattern: '**/bin/**/*.pdb'
+    IndexSources: false
+    SymbolServerType: 'TeamServices'
 
-# - task: SonarCloudAnalyze@1
-#   displayName: "Performs SonarCloud Analysis"
+ - task: SonarCloudAnalyze@1
+   displayName: "Performs SonarCloud Analysis"
 
-# - task: SonarCloudPublish@1
-#   displayName: 'Publish Quality Gate Results'
-#   inputs:
-#     pollingTimeoutSec: '300'
+ - task: SonarCloudPublish@1
+   displayName: 'Publish Quality Gate Results'
+   inputs:
+     pollingTimeoutSec: '300'
 
-# - task: PublishTestResults@2
-#   inputs:
-#     testRunner: VSTest
-#     testResultsFiles: '**/*.trx'
-
-# - task: PublishCodeCoverageResults@1
-#   inputs:
-#     summaryFileLocation: $(Build.SourcesDirectory)/coverage/Cobertura/Cobertura.xml
-#     reportDirectory: $(Build.SourcesDirectory)/coverage/Cobertura
-#     codecoverageTool: cobertura
+ - task: PublishCodeCoverageResults@1
+   inputs:
+     summaryFileLocation: $(Build.SourcesDirectory)/coverage/Cobertura/Cobertura.xml
+     reportDirectory: $(Build.SourcesDirectory)/coverage/Cobertura
+     codecoverageTool: cobertura
 
 - task: DotNetCoreCLI@2
   name: dotnetPack
-  displayName: "Packages new nugets"
   condition: ne(variables['Build.Reason'], 'PullRequest')
+  displayName: "Packages new nugets"
   inputs:
     command: 'pack'
+    arguments: '--nologo --no-restore'
+    nobuild: true
     versioningScheme: 'byEnvVar'
     versionEnvVar: 'GitVersion.SemVer'
-    verbosityPack: 'Minimal'
+    verbosityPack: 'Normal'
+
+- task: CopyFiles@2
+  enabled: false
+  displayName: "Copy everything in artifacts staging directory"
+  inputs:
+    Contents: '**'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
 - task: PublishBuildArtifacts@1
   name: publishToFeed
@@ -111,7 +127,7 @@ steps:
   inputs:
     command: 'push'
     packagesToPush: '$(build.artifactStagingDirectory)/*.nupkg'
-    verbosityPack: 'Minimal'
+    verbosityPack: 'Normal'
     feedPublish: 'MSolve/MGroup'
 
 - task: DotNetCoreCLI@2

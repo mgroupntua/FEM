@@ -1,48 +1,48 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using MGroup.FEM.Embedding;
-using MGroup.FEM.Entities;
-using MGroup.FEM.Interfaces;
+using MGroup.MSolve.Discretization;
+using MGroup.MSolve.Discretization.Embedding;
+using MGroup.MSolve.Discretization.Entities;
 
 namespace MGroup.FEM.Thermal.Embedding
 {
 	public class ThermalEmbeddedGrouping
 	{
-		private readonly Model model;
+		private readonly IModel model;
 		private readonly IEmbeddedDOFInHostTransformationVector transformer;
 
-		public ThermalEmbeddedGrouping(Model model, IEnumerable<Element> hostGroup, IEnumerable<Element> embeddedGroup,
+		public ThermalEmbeddedGrouping(IModel model, IEnumerable<IElementType> hostGroup, IEnumerable<IElementType> embeddedGroup,
 			IEmbeddedDOFInHostTransformationVector transformer)
 		{
 			this.model = model;
 			this.HostGroup = hostGroup;
 			this.EmbeddedGroup = embeddedGroup;
 			this.transformer = transformer;
-			hostGroup.Select(e => e.ElementType).Distinct().ToList().ForEach(et =>
+			hostGroup.Select(e => e).Distinct().ToList().ForEach(et =>
 			{
 				if (!(et is IEmbeddedHostElement))
 					throw new ArgumentException("EmbeddedGrouping: One or more elements of host group does NOT implement IEmbeddedHostElement.");
 			});
-			embeddedGroup.Select(e => e.ElementType).Distinct().ToList().ForEach(et =>
+			embeddedGroup.Select(e => e).Distinct().ToList().ForEach(et =>
 			{
 				if (!(et is IEmbeddedElement))
 					throw new ArgumentException("EmbeddedGrouping: One or more elements of embedded group does NOT implement IEmbeddedElement.");
 			});
 		}
 
-		public IEnumerable<Element> HostGroup { get; }
-		public IEnumerable<Element> EmbeddedGroup { get; }
+		public IEnumerable<IElementType> HostGroup { get; }
+		public IEnumerable<IElementType> EmbeddedGroup { get; }
 
 		public void ApplyEmbedding()
 		{
 			foreach (var embeddedElement in EmbeddedGroup)
 			{
-				var elType = (IEmbeddedElement)embeddedElement.ElementType;
+				var elType = (IEmbeddedElement)embeddedElement;
 				foreach (var node in embeddedElement.Nodes)
 				{
 					var embeddedNodes = HostGroup
-						.Select(e => ((IEmbeddedHostElement)e.ElementType).BuildHostElementEmbeddedNode(e, node, transformer))
+						.Select(e => ((IEmbeddedHostElement)e).BuildHostElementEmbeddedNode(e, node, transformer))
 						.Where(e => e != null);
 					foreach (var embeddedNode in embeddedNodes)
 					{
@@ -50,20 +50,25 @@ namespace MGroup.FEM.Thermal.Embedding
 							elType.EmbeddedNodes.Add(embeddedNode);
 
 						// Update embedded node information for elements that are not inside the embedded group but contain an embedded node.
-						foreach (var element in model.Elements.Except(EmbeddedGroup))
-							if (element.ElementType is IEmbeddedElement && element.Nodes.Contains(embeddedNode.Node))
+						foreach (var subdomain in model.EnumerateSubdomains())
+						{
+							foreach (var element in model.EnumerateElements(subdomain.ID).Except(EmbeddedGroup))
 							{
-								var currentElementType = (IEmbeddedElement)element.ElementType;
-								if (!currentElementType.EmbeddedNodes.Contains(embeddedNode))
+								if (element is IEmbeddedElement && element.Nodes.Contains(embeddedNode.Node))
 								{
-									currentElementType.EmbeddedNodes.Add(embeddedNode);
-									element.ElementType.DofEnumerator = new ElementEmbedder(model, element, transformer);
+									var currentElementType = (IEmbeddedElement)element;
+									if (!currentElementType.EmbeddedNodes.Contains(embeddedNode))
+									{
+										currentElementType.EmbeddedNodes.Add(embeddedNode);
+										element.DofEnumerator = new ElementEmbedder(element, transformer);
+									}
 								}
 							}
+						}
 					}
 				}
 
-				embeddedElement.ElementType.DofEnumerator = new ElementEmbedder(model, embeddedElement, transformer);
+				embeddedElement.DofEnumerator = new ElementEmbedder(embeddedElement, transformer);
 			}
 		}
 	}

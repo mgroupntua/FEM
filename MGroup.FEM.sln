@@ -5,8 +5,6 @@ VisualStudioVersion = 16.0.29806.167
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B0C87C19-1B55-4255-ADC8-97FC240EB363}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{F7BB06C4-D249-41C7-832F-6E03F526800D}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGroup.FEM", "src\MGroup.FEM\MGroup.FEM.csproj", "{3632D9E5-3EB7-471E-BB61-CB8A2B588139}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGroup.FEM.Structural", "src\MGroup.FEM.Structural\MGroup.FEM.Structural.csproj", "{C6FAC11F-40ED-4CEB-A0EB-877703DA10AE}"
@@ -14,10 +12,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGroup.FEM.Thermal", "src\MGroup.FEM.Thermal\MGroup.FEM.Thermal.csproj", "{2042A3FE-94F9-4FD8-8AA6-558F15FA37E1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGroup.FEM.PorousMedia", "src\MGroup.FEM.PorousMedia\MGroup.FEM.PorousMedia.csproj", "{37714488-F640-4529-B888-D7A4ACA3431E}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGroup.FEM.Tests", "tests\MGroup.FEM.Tests\MGroup.FEM.Tests.csproj", "{AF94B94E-657E-471D-9782-25AE3FDA8C3A}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MGroup.FEM.Structural.Contact", "src\MGroup.FEM.Structural.Contact\MGroup.FEM.Structural.Contact.csproj", "{542F231A-C4AE-4072-97D0-70FBC64271D7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
