@@ -43,14 +43,14 @@ steps:
     feedsToUse: 'config'
     nugetConfigPath: 'NuGet.config'
 
- - task: SonarCloudPrepare@1
-   displayName: "Prepares SonarCloud analysis"
-   inputs:
-     SonarCloud: 'SonarCloud'
-     organization: 'mgroupntua'
-     scannerMode: 'MSBuild'
-     projectKey: 'MSolve.FEM'
-     extraProperties: 'sonar.cs.opencover.reportsPaths=$(Build.SourcesDirectory)/coverage/coverage.opencover.xml'
+- task: SonarCloudPrepare@1
+  displayName: "Prepares SonarCloud analysis"
+  inputs:
+    SonarCloud: 'SonarCloud'
+    organization: 'mgroupntua'
+    scannerMode: 'MSBuild'
+    projectKey: 'MSolve.FEM'
+    extraProperties: 'sonar.cs.opencover.reportsPaths=$(Build.SourcesDirectory)/coverage/coverage.opencover.xml'
 
 - task: DotNetCoreCLI@2
   name: dotnetBuild
@@ -80,16 +80,16 @@ steps:
     IndexSources: false
     SymbolServerType: 'TeamServices'
 
- - task: SonarCloudAnalyze@1
-   displayName: "Performs SonarCloud Analysis"
+- task: SonarCloudAnalyze@1
+  displayName: "Performs SonarCloud Analysis"
 
- - task: SonarCloudPublish@1
-   displayName: 'Publish Quality Gate Results'
-   inputs:
+- task: SonarCloudPublish@1
+  displayName: 'Publish Quality Gate Results'
+  inputs:
      pollingTimeoutSec: '300'
 
- - task: PublishCodeCoverageResults@1
-   inputs:
+- task: PublishCodeCoverageResults@1
+  inputs:
      summaryFileLocation: $(Build.SourcesDirectory)/coverage/Cobertura/Cobertura.xml
      reportDirectory: $(Build.SourcesDirectory)/coverage/Cobertura
      codecoverageTool: cobertura
