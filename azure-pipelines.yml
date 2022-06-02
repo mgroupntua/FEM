@@ -49,8 +49,9 @@ steps:
     SonarCloud: 'SonarCloud'
     organization: 'mgroupntua'
     scannerMode: 'MSBuild'
-    projectKey: 'MSolve.FEM'
+    projectKey: 'mgroupntua_FEM'
     extraProperties: 'sonar.cs.opencover.reportsPaths=$(Build.SourcesDirectory)/coverage/coverage.opencover.xml'
+    projectVersion: $(GitVersion.SemVer)
 
 - task: DotNetCoreCLI@2
   name: dotnetBuild
