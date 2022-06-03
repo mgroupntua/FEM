@@ -64,7 +64,7 @@ steps:
 
 
 - task: DotNetCoreCLI@2
-  enabled: false
+  enabled: true
   displayName: Runs Tests (develop)
   condition: eq(variables['Build.SourceBranch'], 'refs/heads/develop')
   inputs:
