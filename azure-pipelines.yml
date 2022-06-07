@@ -73,6 +73,30 @@ steps:
     arguments: '--configuration $(BuildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
     publishTestResults: true
 
+- task: PowerShell@2
+  displayName: Clone MSolve.Tests
+  inputs:
+    targetType: inline
+    script: mkdir integrationTests ; cd integrationTests ; git clone https://github.com/mgroupntua/MSolve.Tests.git
+    pwsh: true
+
+- task: DotNetCoreCLI@2
+  enabled: true
+  displayName: Runs MSolve.Tests (master)
+  condition: eq(variables['Build.SourceBranch'], 'refs/heads/develop')
+  inputs:
+    command: 'test'
+    projects: '**/*[Tt]ests/*.csproj'
+    arguments: '--configuration $(BuildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
+    publishTestResults: true
+
+- task: PowerShell@2
+  displayName: cd ..
+  inputs:
+    targetType: inline
+    script: cd ..
+    pwsh: true
+
 - task: PublishSymbols@2
   displayName: "Publish symbols to Azure Devops artifacts"
   inputs:
