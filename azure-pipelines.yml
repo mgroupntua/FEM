@@ -94,7 +94,7 @@ steps:
   displayName: Remove MSolve.Tests folder
   inputs:
     targetType: inline
-    script: cd ..; rm -R .\integrationTests
+    script: rm -R .\integrationTests
     pwsh: true
 
 - task: PublishSymbols@2
