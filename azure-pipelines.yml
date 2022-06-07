@@ -91,10 +91,10 @@ steps:
     publishTestResults: true
 
 - task: PowerShell@2
-  displayName: cd ..
+  displayName: Remove MSolve.Tests folder
   inputs:
     targetType: inline
-    script: cd ..
+    script: cd ..; rm -R .\integrationTests
     pwsh: true
 
 - task: PublishSymbols@2
