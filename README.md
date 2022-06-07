@@ -1,7 +1,7 @@
 ![alt text](http://mgroup.ntua.gr/wp-content/uploads/2018/05/MGroup52.png "MGroup")
 
 # FEM
-MSolve library that support the spatial discretization method of finite elements.
+MSolve library that support the spatial discretization method of Finite Elements.
 
 ## Features
 
