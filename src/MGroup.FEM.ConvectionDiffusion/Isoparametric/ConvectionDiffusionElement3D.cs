@@ -82,24 +82,110 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 			return DiffusionMatrix().Add(ConvectionMatrix()).Add(ProductionMatrix());
 		}
 
-		public Matrix BuildFirstTimeDerivativeMatrix() //TODO: Do it
+		public Matrix BuildFirstTimeDerivativeMatrix()
 		{
-			throw new NotImplementedException();
+			int numDofs = Nodes.Count;
+			var capacity = Matrix.CreateZero(numDofs, numDofs);
+			IReadOnlyList<double[]> shapeFunctions =
+				Interpolation.EvaluateFunctionsAtGaussPoints(QuadratureForConsistentMass);
+			IReadOnlyList<Matrix> shapeGradientsNatural =
+				Interpolation.EvaluateNaturalGradientsAtGaussPoints(QuadratureForConsistentMass);
+
+			for (int gp = 0; gp < QuadratureForConsistentMass.IntegrationPoints.Count; ++gp)
+			{
+				Matrix shapeFunctionMatrix = BuildShapeFunctionMatrix(shapeFunctions[gp]);
+				Matrix partial = shapeFunctionMatrix.Transpose() * shapeFunctionMatrix;
+				var jacobian = new IsoparametricJacobian3D(Nodes, shapeGradientsNatural[gp]);
+				double dA = jacobian.DirectDeterminant * QuadratureForConsistentMass.IntegrationPoints[gp].Weight;
+				capacity.AxpyIntoThis(partial, dA);
+			}
+			//TODO Ask Giannis : Should it be multiplies by surface
+			capacity.ScaleIntoThis(material.FirstTimeDerivativeCoeff * Thickness);
+			return capacity;
 		}
 
-		public Matrix BuildDiffusionMatrix() //TODO: Do it
+		public Matrix BuildDiffusionMatrix()
 		{
-			throw new NotImplementedException();
+			int numDofs = Nodes.Count;
+			var diffusion = Matrix.CreateZero(numDofs, numDofs);
+			IReadOnlyList<Matrix> shapeGradientsNatural =
+				Interpolation.EvaluateNaturalGradientsAtGaussPoints(QuadratureForStiffness);
+
+			for (int gp = 0; gp < QuadratureForStiffness.IntegrationPoints.Count; ++gp)
+			{
+				var jacobian = new IsoparametricJacobian3D(Nodes, shapeGradientsNatural[gp]);
+				Matrix shapeGradientsCartesian =
+					jacobian.TransformNaturalDerivativesToCartesian(shapeGradientsNatural[gp]);
+
+				var deformation = Matrix.CreateZero(3, Nodes.Count);
+				for (int nodeIdx = 0; nodeIdx < Nodes.Count; ++nodeIdx)
+				{
+					deformation[0, nodeIdx] = shapeGradientsCartesian[nodeIdx, 0];
+					deformation[1, nodeIdx] = shapeGradientsCartesian[nodeIdx, 1];
+					deformation[2, nodeIdx] = shapeGradientsCartesian[nodeIdx, 2];
+				}
+
+				Matrix partialK = deformation.Transpose() * deformation;
+
+				double dA = jacobian.DirectDeterminant * QuadratureForStiffness.IntegrationPoints[gp].Weight;
+				diffusion.AxpyIntoThis(partialK, dA * material.DiffusionCoeff * Thickness);
+			}
+
+			return diffusion;
 		}
 
-		public Matrix BuildConvectionMatrix() //TODO: Do it
+		public Matrix BuildConvectionMatrix() // TODO: Check this. Cannot be the same as Capacity and production
 		{
-			throw new NotImplementedException();
+			int numDofs = Nodes.Count;
+			var convection = Matrix.CreateZero(numDofs, numDofs);
+			IReadOnlyList<double[]> shapeFunctions =
+				Interpolation.EvaluateFunctionsAtGaussPoints(QuadratureForConsistentMass);
+			IReadOnlyList<Matrix> shapeGradientsNatural =
+				Interpolation.EvaluateNaturalGradientsAtGaussPoints(QuadratureForConsistentMass);
+
+			for (int gp = 0; gp < QuadratureForConsistentMass.IntegrationPoints.Count; ++gp)
+			{
+				Matrix shapeFunctionMatrix_line = BuildShapeFunctionMatrix(shapeFunctions[gp]);
+				double[,] shapeFunctionArray = new double[3, numDofs];
+
+				for (var col = 0; col < numDofs; col++)
+				{
+					shapeFunctionArray[0, col] = shapeFunctionMatrix_line[0, col];
+					shapeFunctionArray[1, col] = shapeFunctionMatrix_line[0, col];
+					shapeFunctionArray[3, col] = shapeFunctionMatrix_line[0, col];
+				}
+
+				Matrix partial = Matrix.CreateFromArray(shapeFunctionArray).Transpose() * shapeGradientsNatural[gp];
+
+				var jacobian = new IsoparametricJacobian3D(Nodes, shapeGradientsNatural[gp]);
+
+				double dA = jacobian.DirectDeterminant * QuadratureForConsistentMass.IntegrationPoints[gp].Weight;
+				convection.AxpyIntoThis(partial, dA * material.ConvectionCoeff * Thickness);
+			}
+
+			return convection;
 		}
 
-		public Matrix BuildProductionMatrix() //TODO: Do it
+		public Matrix BuildProductionMatrix()
 		{
-			throw new NotImplementedException();
+			int numDofs = Nodes.Count;
+			var production = Matrix.CreateZero(numDofs, numDofs);
+			IReadOnlyList<double[]> shapeFunctions =
+				Interpolation.EvaluateFunctionsAtGaussPoints(QuadratureForConsistentMass);
+			IReadOnlyList<Matrix> shapeGradientsNatural =
+				Interpolation.EvaluateNaturalGradientsAtGaussPoints(QuadratureForConsistentMass);
+
+			for (int gp = 0; gp < QuadratureForConsistentMass.IntegrationPoints.Count; ++gp)
+			{
+				Matrix shapeFunctionMatrix = BuildShapeFunctionMatrix(shapeFunctions[gp]);
+				Matrix partial = shapeFunctionMatrix.Transpose() * shapeFunctionMatrix;
+				var jacobian = new IsoparametricJacobian3D(Nodes, shapeGradientsNatural[gp]);
+				double dA = jacobian.DirectDeterminant * QuadratureForConsistentMass.IntegrationPoints[gp].Weight;
+				production.AxpyIntoThis(partial, dA);
+			}
+
+			production.ScaleIntoThis(material.IndependentSourceCoeff * Thickness);
+			return production;
 		}
 
 		private Matrix BuildDeformationMatrix(Matrix shapeGradientsCartesian)
