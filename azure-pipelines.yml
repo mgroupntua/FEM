@@ -44,6 +44,7 @@ steps:
     nugetConfigPath: 'NuGet.config'
 
 - task: SonarCloudPrepare@1
+  condition: ne(variables['Build.Reason'], 'PullRequest')
   displayName: "Prepares SonarCloud analysis"
   inputs:
     SonarCloud: 'SonarCloud'
@@ -106,9 +107,11 @@ steps:
     SymbolServerType: 'TeamServices'
 
 - task: SonarCloudAnalyze@1
+  condition: ne(variables['Build.Reason'], 'PullRequest')
   displayName: "Performs SonarCloud Analysis"
 
 - task: SonarCloudPublish@1
+  condition: ne(variables['Build.Reason'], 'PullRequest')
   displayName: 'Publish Quality Gate Results'
   inputs:
      pollingTimeoutSec: '300'
