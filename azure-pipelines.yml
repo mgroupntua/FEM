@@ -75,6 +75,7 @@ steps:
     publishTestResults: true
 
 - task: PowerShell@2
+  enabled: false
   displayName: Clone MSolve.Tests
   inputs:
     targetType: inline
@@ -82,7 +83,7 @@ steps:
     pwsh: true
 
 - task: DotNetCoreCLI@2
-  enabled: true
+  enabled: false
   displayName: Runs MSolve.Tests (master)
   condition: eq(variables['Build.SourceBranch'], 'refs/heads/develop')
   inputs:
@@ -92,6 +93,7 @@ steps:
     publishTestResults: true
 
 - task: PowerShell@2
+  enabled: false
   displayName: Remove MSolve.Tests folder
   inputs:
     targetType: inline
