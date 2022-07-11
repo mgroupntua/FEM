@@ -11,9 +11,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MGroup.MSolve.Core" Version="0.2.0-unstable.33" />
+    <PackageReference Include="MGroup.MSolve.Core" Version="0.2.0-unstable.40" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
-    <PackageReference Include="MGroup.Constitutive.Thermal" Version="0.2.0-unstable.5" />
+    <PackageReference Include="MGroup.Constitutive.Thermal" Version="0.2.0-unstable.13" />
   </ItemGroup>
 
   <ItemGroup>

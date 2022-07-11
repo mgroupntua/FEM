@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Commons\**" />
+    <EmbeddedResource Remove="Commons\**" />
+    <None Remove="Commons\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="coverlet.msbuild" Version="2.6.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -22,9 +28,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="Commons\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Commons\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\MGroup.FEM.Structural\MGroup.FEM.Structural.csproj" />
