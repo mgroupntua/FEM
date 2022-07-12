@@ -141,7 +141,7 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 			return diffusion;
 		}
 
-		public Matrix BuildConvectionMatrix() // TODO: Check this
+		public Matrix BuildConvectionMatrix() // TODO: Check this. Cannot be the same as Capacity and production
 		{
 			int numDofs = Nodes.Count;
 			var convection = Matrix.CreateZero(numDofs, numDofs);

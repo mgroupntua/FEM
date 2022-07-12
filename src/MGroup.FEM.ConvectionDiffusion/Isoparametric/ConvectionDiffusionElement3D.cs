@@ -100,7 +100,7 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 				capacity.AxpyIntoThis(partial, dA);
 			}
 			//TODO Ask Giannis : Should it be multiplies by surface
-			capacity.ScaleIntoThis(material.FirstTimeDerivativeCoeff * Thickness);
+			capacity.ScaleIntoThis(material.FirstTimeDerivativeCoeff);
 			return capacity;
 		}
 
@@ -128,7 +128,7 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 				Matrix partialK = deformation.Transpose() * deformation;
 
 				double dA = jacobian.DirectDeterminant * QuadratureForStiffness.IntegrationPoints[gp].Weight;
-				diffusion.AxpyIntoThis(partialK, dA * material.DiffusionCoeff * Thickness);
+				diffusion.AxpyIntoThis(partialK, dA * material.DiffusionCoeff);
 			}
 
 			return diffusion;
@@ -152,7 +152,7 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 				{
 					shapeFunctionArray[0, col] = shapeFunctionMatrix_line[0, col];
 					shapeFunctionArray[1, col] = shapeFunctionMatrix_line[0, col];
-					shapeFunctionArray[3, col] = shapeFunctionMatrix_line[0, col];
+					shapeFunctionArray[2, col] = shapeFunctionMatrix_line[0, col];
 				}
 
 				Matrix partial = Matrix.CreateFromArray(shapeFunctionArray).Transpose() * shapeGradientsNatural[gp];
@@ -160,12 +160,11 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 				var jacobian = new IsoparametricJacobian3D(Nodes, shapeGradientsNatural[gp]);
 
 				double dA = jacobian.DirectDeterminant * QuadratureForConsistentMass.IntegrationPoints[gp].Weight;
-				convection.AxpyIntoThis(partial, dA * material.ConvectionCoeff * Thickness);
+				convection.AxpyIntoThis(partial, dA * material.ConvectionCoeff);
 			}
 
 			return convection;
 		}
-
 		public Matrix BuildProductionMatrix()
 		{
 			int numDofs = Nodes.Count;
@@ -184,7 +183,7 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 				production.AxpyIntoThis(partial, dA);
 			}
 
-			production.ScaleIntoThis(material.IndependentSourceCoeff * Thickness);
+			production.ScaleIntoThis(material.IndependentSourceCoeff);
 			return production;
 		}
 
