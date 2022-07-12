@@ -57,9 +57,9 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 
 		public IElementDofEnumerator DofEnumerator { get; set; } = new GenericDofEnumerator();
 
-		public IMatrix FirstTimeDerivativeMatrix()
+		public IMatrix CapacityMatrix()
 		{
-			return BuildFirstTimeDerivativeMatrix();
+			return BuildCapacityMatrix();
 		}
 
 		public IMatrix DiffusionMatrix()
@@ -82,7 +82,7 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 			return DiffusionMatrix().Add(ConvectionMatrix()).Add(ProductionMatrix());
 		}
 
-		public Matrix BuildFirstTimeDerivativeMatrix()
+		public Matrix BuildCapacityMatrix()
 		{
 			int numDofs = Nodes.Count;
 			var capacity = Matrix.CreateZero(numDofs, numDofs);
@@ -100,7 +100,7 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 				capacity.AxpyIntoThis(partial, dA);
 			}
 			//TODO Ask Giannis : Should it be multiplies by surface
-			capacity.ScaleIntoThis(material.FirstTimeDerivativeCoeff);
+			capacity.ScaleIntoThis(material.CapacityCoeff);
 			return capacity;
 		}
 

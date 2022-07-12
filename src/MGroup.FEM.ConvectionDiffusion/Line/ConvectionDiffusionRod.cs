@@ -53,9 +53,9 @@ namespace MGroup.FEM.ConvectionDiffusion.Line
 
 		public IList<EmbeddedNode> EmbeddedNodes { get; } = new List<EmbeddedNode>();
 
-		public IMatrix FirstTimeDerivativeMatrix()
+		public IMatrix CapacityMatrix()
 		{
-			return BuildFirstTimeDerivativeMatrix();
+			return BuildCapacityMatrix();
 		}
 
 		public IMatrix DiffusionMatrix()
@@ -78,9 +78,9 @@ namespace MGroup.FEM.ConvectionDiffusion.Line
 			return DiffusionMatrix().Add(ConvectionMatrix()).Add(ProductionMatrix());
 		}
 
-		public Matrix BuildFirstTimeDerivativeMatrix()
+		public Matrix BuildCapacityMatrix()
 		{
-			double coeff = material.FirstTimeDerivativeCoeff * Length;// TODO: Check if we need CrossSectionArea
+			double coeff = material.CapacityCoeff * Length;// TODO: Check if we need CrossSectionArea
 			double[,] firstTimeDerMatrix = { { coeff / 3d, coeff / 6d }, { coeff / 6d, coeff / 3d } };
 			return Matrix.CreateFromArray(firstTimeDerMatrix);
 		}
