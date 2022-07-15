@@ -112,18 +112,19 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 			return capacity;
 		}
 
+
+
 		public Matrix BuildDiffusionMatrix()
 		{
 			int numDofs = Nodes.Count;
 			var diffusion = Matrix.CreateZero(numDofs, numDofs);
-			IReadOnlyList<Matrix> shapeGradientsNatural =
-				Interpolation.EvaluateNaturalGradientsAtGaussPoints(QuadratureForStiffness);
+			IReadOnlyList<Matrix> shapeGradientsNatural = Interpolation.EvaluateNaturalGradientsAtGaussPoints(QuadratureForStiffness);
 
 			for (int gp = 0; gp < QuadratureForStiffness.IntegrationPoints.Count; ++gp)
 			{
 				var jacobian = new IsoparametricJacobian2D(Nodes, shapeGradientsNatural[gp]);
-				Matrix shapeGradientsCartesian =
-					jacobian.TransformNaturalDerivativesToCartesian(shapeGradientsNatural[gp]);
+				
+				Matrix shapeGradientsCartesian = jacobian.TransformNaturalDerivativesToCartesian(shapeGradientsNatural[gp]);
 
 				var deformation = Matrix.CreateZero(2, Nodes.Count);
 				for (int nodeIdx = 0; nodeIdx < Nodes.Count; ++nodeIdx)
@@ -135,8 +136,9 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 				Matrix partialK = deformation.Transpose() * deformation;
 
 				double dA = jacobian.DirectDeterminant * QuadratureForStiffness.IntegrationPoints[gp].Weight;
-				diffusion.AxpyIntoThis(partialK, dA * material.DiffusionCoeff * Thickness);
+				diffusion.AxpyIntoThis(partialK, dA);
 			}
+			diffusion.ScaleIntoThis(material.DiffusionCoeff * Thickness);
 
 			return diffusion;
 		}
@@ -155,13 +157,13 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 				Matrix shapeFunctionMatrix_line = BuildShapeFunctionMatrix(shapeFunctions[gp]);
 				double[,] shapeFunctionArray = new double[2, numDofs];
 
-				for (var col = 0; col < numDofs; col++)
+				for (var dof = 0; dof < numDofs; dof++)
 				{
-					shapeFunctionArray[0, col] = shapeFunctionMatrix_line[0, col];
-					shapeFunctionArray[1, col] = shapeFunctionMatrix_line[0, col];
+					shapeFunctionArray[0, dof] = shapeFunctionMatrix_line[0, dof];
+					shapeFunctionArray[1, dof] = shapeFunctionMatrix_line[0, dof];
 				}
 
-				Matrix partial = Matrix.CreateFromArray(shapeFunctionArray).Transpose() * shapeGradientsNatural[gp];
+				Matrix partial = Matrix.CreateFromArray(shapeFunctionArray).Transpose() * shapeGradientsNatural[gp].Transpose();
 
 				var jacobian = new IsoparametricJacobian2D(Nodes, shapeGradientsNatural[gp]);
 
