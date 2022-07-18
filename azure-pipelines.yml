@@ -97,7 +97,7 @@ steps:
   displayName: Remove MSolve.Tests folder
   inputs:
     targetType: inline
-    script: Remove-Item -Recurse -Force integrationTests; rm -R .\integrationTests
+    script: cd; cd integrationTests; del * /S /Q; cd; rmdir /S /Q integrationTests
     pwsh: true
 
 - task: PublishSymbols@2
