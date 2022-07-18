@@ -97,7 +97,7 @@ steps:
   displayName: Remove MSolve.Tests folder
   inputs:
     targetType: inline
-    script: rd /s /q 'D:\a\1\s\integrationTests\' 2>nul ; rmdir /S /Q "D:\a\1\s\integrationTests\"
+    script: rd /s /q "D:\a\1\s\integrationTests\" 2>nul ; rmdir /S /Q "D:\a\1\s\integrationTests\"
     pwsh: true
 
 - task: PublishSymbols@2
