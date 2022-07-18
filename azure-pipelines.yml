@@ -92,13 +92,11 @@ steps:
     arguments: '--configuration $(BuildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
     publishTestResults: true
 
-- task: PowerShell@2
-  enabled: true
-  displayName: Remove MSolve.Tests folder
+- task: DeleteFiles@1
+  displayName: 'Remove integration tests dir'
   inputs:
-    targetType: inline
-    script: rd /s /q "D:\a\1\s\integrationTests\" 2>nul ; rmdir /S /Q "D:\a\1\s\integrationTests\"
-    pwsh: true
+    contents: |
+      **/integrationTests/*
 
 - task: PublishSymbols@2
   displayName: "Publish symbols to Azure Devops artifacts"
