@@ -89,7 +89,7 @@ steps:
   inputs:
     command: 'test'
     projects: '**/*[Tt]ests/*.csproj'
-    arguments: '--configuration $(BuildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
+    arguments: '--configuration $(BuildConfiguration) /p:CollectCoverage=false /p:CoverletOutputFormat=cobertura'
     publishTestResults: true
 
 - task: DeleteFiles@1
