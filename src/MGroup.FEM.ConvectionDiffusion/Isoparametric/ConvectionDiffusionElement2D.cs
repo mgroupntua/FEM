@@ -15,12 +15,12 @@ using MGroup.MSolve.Discretization.Dofs;
 using MGroup.MSolve.Discretization.Meshes;
 using MGroup.MSolve.Geometry.Coordinates;
 
-//TODO: Is there any point in having different material properties per Gauss point?
+
 namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 {
 	public class ConvectionDiffusionElement2D : IConvectionDiffusionElementType, IEmbeddedHostElement, ICell<INode>
 	{
-		private readonly IDofType[][] dofTypes; //TODO: this should not be stored for each element. Instead store it once for each Quad4, Tri3, etc. Otherwise create it on the fly.
+		private readonly IDofType[][] dofTypes;
 		private readonly IConvectionDiffusionProperties material;
 		//private readonly Dictionary<GaussPoint, ThermalMaterial> materialsAtGaussPoints;
 
@@ -145,6 +145,8 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 
 		public Matrix BuildConvectionMatrix() // TODO: Check this. Cannot be the same as Capacity and production
 		{
+
+			//throw new NotImplementedException();
 			int numDofs = Nodes.Count;
 			var convection = Matrix.CreateZero(numDofs, numDofs);
 			IReadOnlyList<double[]> shapeFunctions =
@@ -168,7 +170,7 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 				var jacobian = new IsoparametricJacobian2D(Nodes, shapeGradientsNatural[gp]);
 
 				double dA = jacobian.DirectDeterminant * QuadratureForConsistentMass.IntegrationPoints[gp].Weight;
-				convection.AxpyIntoThis(partial, dA * material.ConvectionCoeff * Thickness);
+				//convection.AxpyIntoThis(partial, dA * material.ConvectionCoeff * Thickness);
 			}
 
 			return convection;

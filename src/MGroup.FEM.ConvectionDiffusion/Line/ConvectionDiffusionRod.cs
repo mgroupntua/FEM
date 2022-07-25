@@ -87,15 +87,18 @@ namespace MGroup.FEM.ConvectionDiffusion.Line
 
 		public Matrix BuildDiffusionMatrix()
 		{
-			double coeff = material.DiffusionCoeff * CrossSectionArea * Length;
-			double[,] diffusionMatrix = { { coeff / 4d, -coeff / 4d }, { -coeff / 4d, coeff / 4d } };
+			double coeff = material.DiffusionCoeff * CrossSectionArea / Length;
+
+			//double coeff = material.DiffusionCoeff * CrossSectionArea * Length;         
+			//double[,] diffusionMatrix = { { coeff / 4d, -coeff / 4d }, { -coeff / 4d, coeff / 4d } };
+			double[,] diffusionMatrix = { { coeff, -coeff }, { -coeff, coeff } };
 			return Matrix.CreateFromArray(diffusionMatrix);
 		}
 
 		public Matrix BuildConvectionMatrix()
 		{
-			double coeff = material.ConvectionCoeff * CrossSectionArea * Length;
-			double[,] convectionMatrix = { { -coeff / 4d, -coeff / 4d }, { coeff / 4d, coeff / 4d } };
+			double coeff = material.ConvectionCoeff[0] * CrossSectionArea;
+			double[,] convectionMatrix = { { -coeff / 2d, coeff / 2d }, { -coeff / 2d, coeff / 2d } };
 			return Matrix.CreateFromArray(convectionMatrix);
 		}
 

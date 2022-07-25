@@ -17,7 +17,7 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 	public class ConvectionDiffusionElement3D : IConvectionDiffusionElementType, ICell<INode>
 	{
 		private readonly static IDofType[] nodalDOFTypes = new IDofType[] { ConvectionDiffusionDof.UnknownVariable};
-		private readonly IDofType[][] dofTypes; //TODO: this should not be stored for each element. Instead store it once for each Quad4, Tri3, etc. Otherwise create it on the fly.
+		private readonly IDofType[][] dofTypes;
 		private readonly IConvectionDiffusionProperties material;
 
 		public ConvectionDiffusionElement3D(IReadOnlyList<INode> nodes, IIsoparametricInterpolation3D interpolation,
@@ -136,6 +136,7 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 
 		public Matrix BuildConvectionMatrix() // TODO: Check this. Cannot be the same as Capacity and production
 		{
+			throw new NotImplementedException();
 			int numDofs = Nodes.Count;
 			var convection = Matrix.CreateZero(numDofs, numDofs);
 			IReadOnlyList<double[]> shapeFunctions =
@@ -160,7 +161,7 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 				var jacobian = new IsoparametricJacobian3D(Nodes, shapeGradientsNatural[gp]);
 
 				double dA = jacobian.DirectDeterminant * QuadratureForConsistentMass.IntegrationPoints[gp].Weight;
-				convection.AxpyIntoThis(partial, dA * material.ConvectionCoeff);
+				//convection.AxpyIntoThis(partial, dA * material.ConvectionCoeff);
 			}
 
 			return convection;
@@ -189,7 +190,6 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 
 		private Matrix BuildDeformationMatrix(Matrix shapeGradientsCartesian)
 		{
-			//TODO: isn't this just the transpose of [dNi/dxj]?
 			var deformation = Matrix.CreateZero(3, Nodes.Count);
 			for (int nodeIdx = 0; nodeIdx < Nodes.Count; ++nodeIdx)
 			{
