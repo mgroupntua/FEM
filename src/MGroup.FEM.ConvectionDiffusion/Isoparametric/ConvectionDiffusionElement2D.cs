@@ -145,8 +145,6 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 
 		public Matrix BuildConvectionMatrix() // TODO: Check this. Cannot be the same as Capacity and production
 		{
-
-			//throw new NotImplementedException();
 			int numDofs = Nodes.Count;
 			var convection = Matrix.CreateZero(numDofs, numDofs);
 			IReadOnlyList<double[]> shapeFunctions =
@@ -156,23 +154,27 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 
 			for (int gp = 0; gp < QuadratureForConsistentMass.IntegrationPoints.Count; ++gp)
 			{
-				Matrix shapeFunctionMatrix_line = BuildShapeFunctionMatrix(shapeFunctions[gp]);
-				double[,] shapeFunctionArray = new double[2, numDofs];
+				var jacobian = new IsoparametricJacobian2D(Nodes, shapeGradientsNatural[gp]);
+				
+				Matrix shapeGradientsCartesian = jacobian.TransformNaturalDerivativesToCartesian(shapeGradientsNatural[gp]);
 
-				for (var dof = 0; dof < numDofs; dof++)
+				var deformationX = Matrix.CreateZero(1, Nodes.Count);
+				var deformationY = Matrix.CreateZero(1, Nodes.Count);
+				for (int nodeIdx = 0; nodeIdx < Nodes.Count; ++nodeIdx)
 				{
-					shapeFunctionArray[0, dof] = shapeFunctionMatrix_line[0, dof];
-					shapeFunctionArray[1, dof] = shapeFunctionMatrix_line[0, dof];
+					deformationX[0, nodeIdx] = shapeGradientsCartesian[nodeIdx, 0];
+					deformationY[0, nodeIdx] = shapeGradientsCartesian[nodeIdx, 1];
 				}
 
-				Matrix partial = Matrix.CreateFromArray(shapeFunctionArray).Transpose() * shapeGradientsNatural[gp].Transpose();
+				Matrix shapeFunctionMatrix = BuildShapeFunctionMatrix(shapeFunctions[gp]);
 
-				var jacobian = new IsoparametricJacobian2D(Nodes, shapeGradientsNatural[gp]);
+				Matrix partialConvectionMatrix = shapeFunctionMatrix.Transpose() * deformationX * material.ConvectionCoeff[0]
+												+ shapeFunctionMatrix.Transpose() * deformationY * material.ConvectionCoeff[1];
 
 				double dA = jacobian.DirectDeterminant * QuadratureForConsistentMass.IntegrationPoints[gp].Weight;
-				//convection.AxpyIntoThis(partial, dA * material.ConvectionCoeff * Thickness);
-			}
 
+				convection.AxpyIntoThis(partialConvectionMatrix, dA * Thickness);
+			}
 			return convection;
 		}
 
