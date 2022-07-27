@@ -160,7 +160,6 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 				}
 
 				Matrix shapeFunctionMatrix = BuildShapeFunctionMatrix(shapeFunctions[gp]);
-
 				Matrix partialConvectionMatrix = shapeFunctionMatrix.Transpose() * deformationX * material.ConvectionCoeff[0]
 												+ shapeFunctionMatrix.Transpose() * deformationY * material.ConvectionCoeff[1]
 												+ shapeFunctionMatrix.Transpose() * deformationZ * material.ConvectionCoeff[2];
