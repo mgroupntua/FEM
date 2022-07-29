@@ -196,7 +196,7 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 				production.AxpyIntoThis(partial, dA);
 			}
 
-			production.ScaleIntoThis(material.IndependentSourceCoeff * Thickness);
+			production.ScaleIntoThis(material.DependentSourceCoeff * Thickness);
 			return production;
 		}
 
