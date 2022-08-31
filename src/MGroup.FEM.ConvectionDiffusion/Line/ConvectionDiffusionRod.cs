@@ -104,7 +104,7 @@ namespace MGroup.FEM.ConvectionDiffusion.Line
 
 		public Matrix BuildProductionMatrix()
 		{
-			double coeff = material.IndependentSourceCoeff * CrossSectionArea * Length;
+			double coeff = material.IndependentSourceCoeff * (-1d) * CrossSectionArea * Length;
 			double[,] productionMatrix = { { coeff / 3d, coeff / 6d }, { coeff / 6d, coeff / 3d } };
 			return Matrix.CreateFromArray(productionMatrix);
 		}
