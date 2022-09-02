@@ -185,7 +185,7 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 		public Matrix BuildProductionMatrix()
 		{
 			int numDofs = Nodes.Count;
-			var production = Matrix.CreateZero(numDofs, numDofs);
+			var production= Matrix.CreateZero(numDofs, numDofs);
 			IReadOnlyList<double[]> shapeFunctions =
 				Interpolation.EvaluateFunctionsAtGaussPoints(QuadratureForConsistentMass);
 			IReadOnlyList<Matrix> shapeGradientsNatural =
@@ -208,7 +208,6 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 		{
 			int numDofs = Nodes.Count;
 			var productionVector = Matrix.CreateZero(numDofs, 1);
-			var identity = Matrix.CreateIdentity(numDofs);
 			IReadOnlyList<double[]> shapeFunctions =
 				Interpolation.EvaluateFunctionsAtGaussPoints(QuadratureForConsistentMass);
 			IReadOnlyList<Matrix> shapeGradientsNatural =
