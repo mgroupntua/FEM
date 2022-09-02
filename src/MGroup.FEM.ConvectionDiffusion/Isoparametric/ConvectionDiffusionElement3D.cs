@@ -82,6 +82,11 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 			return DiffusionMatrix().Add(ConvectionMatrix()).Add(ProductionMatrix());
 		}
 
+		public double[] ProductionVector()
+		{
+			return BuildProductionVector();
+		}
+
 		public Matrix BuildCapacityMatrix()
 		{
 			int numDofs = Nodes.Count;
@@ -191,6 +196,36 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 
 			production.ScaleIntoThis(material.DependentSourceCoeff * (-1d));
 			return production;
+		}
+
+		public double[] BuildProductionVector()
+		{
+			int numDofs = Nodes.Count;
+			var productionVector = Matrix.CreateZero(numDofs, 1);
+			var identity = Matrix.CreateIdentity(numDofs);
+			IReadOnlyList<double[]> shapeFunctions =
+				Interpolation.EvaluateFunctionsAtGaussPoints(QuadratureForConsistentMass);
+			IReadOnlyList<Matrix> shapeGradientsNatural =
+				Interpolation.EvaluateNaturalGradientsAtGaussPoints(QuadratureForConsistentMass);
+
+			for (int gp = 0; gp < QuadratureForConsistentMass.IntegrationPoints.Count; ++gp)
+			{
+				Matrix shapeFunctionMatrix = BuildShapeFunctionMatrix(shapeFunctions[gp]).Transpose();
+				var jacobian = new IsoparametricJacobian3D(Nodes, shapeGradientsNatural[gp]);
+				double dA = jacobian.DirectDeterminant * QuadratureForConsistentMass.IntegrationPoints[gp].Weight;
+				productionVector.AxpyIntoThis(shapeFunctionMatrix, dA);
+			}
+
+			productionVector.ScaleIntoThis(material.IndependentSourceCoeff);
+
+			double[,] vectorDouble = productionVector.CopyToArray2D();
+			double[] result = new double[numDofs];
+
+			for (int i = 0; i < numDofs; i++)
+			{
+				result[i] = vectorDouble[i, 0];
+			}
+			return result;
 		}
 
 		private Matrix BuildDeformationMatrix(Matrix shapeGradientsCartesian)

@@ -73,6 +73,11 @@ namespace MGroup.FEM.ConvectionDiffusion.Line
 			return BuildProductionMatrix();
 		}
 
+		public double[] ProductionVector()
+		{
+			return BuildProductionVector();
+		}
+
 		public IMatrix PhysicsMatrix()
 		{
 			return DiffusionMatrix().Add(ConvectionMatrix()).Add(ProductionMatrix());
@@ -104,9 +109,16 @@ namespace MGroup.FEM.ConvectionDiffusion.Line
 
 		public Matrix BuildProductionMatrix()
 		{
-			double coeff = material.IndependentSourceCoeff * (-1d) * CrossSectionArea * Length;
+			double coeff = material.DependentSourceCoeff * (-1d) * CrossSectionArea * Length;
 			double[,] productionMatrix = { { coeff / 3d, coeff / 6d }, { coeff / 6d, coeff / 3d } };
 			return Matrix.CreateFromArray(productionMatrix);
+		}
+
+		public double[] BuildProductionVector()
+		{
+			double coeff = material.IndependentSourceCoeff * CrossSectionArea * Length;
+			double[] productionVector= {coeff / 2d, coeff / 2d };
+			return productionVector;
 		}
 
 		public IReadOnlyList<IReadOnlyList<IDofType>> GetElementDofTypes() => dofTypes;
