@@ -100,7 +100,7 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 			{
 				Matrix shapeFunctionMatrix = BuildShapeFunctionMatrix(shapeFunctions[gp]);
 				Matrix partial = shapeFunctionMatrix.Transpose() * shapeFunctionMatrix;
-				var jacobian = new IsoparametricJacobian3D(Nodes, shapeGradientsNatural[gp]);
+				var jacobian = new IsoparametricJacobian3D(Nodes, shapeGradientsNatural[gp], 1e-20);
 				double dA = jacobian.DirectDeterminant * QuadratureForConsistentMass.IntegrationPoints[gp].Weight;
 				capacity.AxpyIntoThis(partial, dA);
 			}
@@ -118,7 +118,7 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 
 			for (int gp = 0; gp < QuadratureForStiffness.IntegrationPoints.Count; ++gp)
 			{
-				var jacobian = new IsoparametricJacobian3D(Nodes, shapeGradientsNatural[gp]);
+				var jacobian = new IsoparametricJacobian3D(Nodes, shapeGradientsNatural[gp], 1e-20);
 				Matrix shapeGradientsCartesian =
 					jacobian.TransformNaturalDerivativesToCartesian(shapeGradientsNatural[gp]);
 
@@ -150,7 +150,7 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 
 			for (int gp = 0; gp < QuadratureForConsistentMass.IntegrationPoints.Count; ++gp)
 			{
-				var jacobian = new IsoparametricJacobian3D(Nodes, shapeGradientsNatural[gp]);
+				var jacobian = new IsoparametricJacobian3D(Nodes, shapeGradientsNatural[gp], 1e-20);
 				
 				Matrix shapeGradientsCartesian = jacobian.TransformNaturalDerivativesToCartesian(shapeGradientsNatural[gp]);
 
@@ -189,7 +189,7 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 			{
 				Matrix shapeFunctionMatrix = BuildShapeFunctionMatrix(shapeFunctions[gp]);
 				Matrix partial = shapeFunctionMatrix.Transpose() * shapeFunctionMatrix;
-				var jacobian = new IsoparametricJacobian3D(Nodes, shapeGradientsNatural[gp]);
+				var jacobian = new IsoparametricJacobian3D(Nodes, shapeGradientsNatural[gp], 1e-20);
 				double dA = jacobian.DirectDeterminant * QuadratureForConsistentMass.IntegrationPoints[gp].Weight;
 				production.AxpyIntoThis(partial, dA);
 			}
@@ -211,7 +211,7 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 			for (int gp = 0; gp < QuadratureForConsistentMass.IntegrationPoints.Count; ++gp)
 			{
 				Matrix shapeFunctionMatrix = BuildShapeFunctionMatrix(shapeFunctions[gp]).Transpose();
-				var jacobian = new IsoparametricJacobian3D(Nodes, shapeGradientsNatural[gp]);
+				var jacobian = new IsoparametricJacobian3D(Nodes, shapeGradientsNatural[gp], 1e-20);
 				double dA = jacobian.DirectDeterminant * QuadratureForConsistentMass.IntegrationPoints[gp].Weight;
 				productionVector.AxpyIntoThis(shapeFunctionMatrix, dA);
 			}
