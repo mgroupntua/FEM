@@ -44,6 +44,7 @@ steps:
     nugetConfigPath: 'NuGet.config'
 
 - task: SonarCloudPrepare@1
+  condition: ne(variables['Build.Reason'], 'PullRequest')
   displayName: "Prepares SonarCloud analysis"
   inputs:
     SonarCloud: 'SonarCloud'
@@ -74,6 +75,7 @@ steps:
     publishTestResults: true
 
 - task: PowerShell@2
+  enabled: true
   displayName: Clone MSolve.Tests
   inputs:
     targetType: inline
@@ -90,13 +92,6 @@ steps:
     arguments: '--configuration $(BuildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
     publishTestResults: true
 
-- task: PowerShell@2
-  displayName: Remove MSolve.Tests folder
-  inputs:
-    targetType: inline
-    script: Remove-Item -Recurse -Force integrationTests; rm -R .\integrationTests
-    pwsh: true
-
 - task: PublishSymbols@2
   displayName: "Publish symbols to Azure Devops artifacts"
   inputs:
@@ -106,9 +101,11 @@ steps:
     SymbolServerType: 'TeamServices'
 
 - task: SonarCloudAnalyze@1
+  condition: ne(variables['Build.Reason'], 'PullRequest')
   displayName: "Performs SonarCloud Analysis"
 
 - task: SonarCloudPublish@1
+  condition: ne(variables['Build.Reason'], 'PullRequest')
   displayName: 'Publish Quality Gate Results'
   inputs:
      pollingTimeoutSec: '300'
@@ -118,6 +115,12 @@ steps:
      summaryFileLocation: $(Build.SourcesDirectory)/coverage/Cobertura/Cobertura.xml
      reportDirectory: $(Build.SourcesDirectory)/coverage/Cobertura
      codecoverageTool: cobertura
+
+- task: DeleteFiles@1
+  displayName: 'Remove integration tests dir'
+  inputs:
+    contents: |
+      **/integrationTests/*
 
 - task: DotNetCoreCLI@2
   name: dotnetPack
