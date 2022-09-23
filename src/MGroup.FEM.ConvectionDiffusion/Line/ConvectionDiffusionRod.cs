@@ -85,7 +85,7 @@ namespace MGroup.FEM.ConvectionDiffusion.Line
 
 		public Matrix BuildCapacityMatrix()
 		{
-			double coeff = material.CapacityCoeff * Length;// TODO: Check if we need CrossSectionArea
+			double coeff = material.CapacityCoeff * Length;
 			double[,] firstTimeDerMatrix = { { coeff / 3d, coeff / 6d }, { coeff / 6d, coeff / 3d } };
 			return Matrix.CreateFromArray(firstTimeDerMatrix);
 		}
@@ -94,8 +94,6 @@ namespace MGroup.FEM.ConvectionDiffusion.Line
 		{
 			double coeff = material.DiffusionCoeff * CrossSectionArea / Length;
 
-			//double coeff = material.DiffusionCoeff * CrossSectionArea * Length;         
-			//double[,] diffusionMatrix = { { coeff / 4d, -coeff / 4d }, { -coeff / 4d, coeff / 4d } };
 			double[,] diffusionMatrix = { { coeff, -coeff }, { -coeff, coeff } };
 			return Matrix.CreateFromArray(diffusionMatrix);
 		}

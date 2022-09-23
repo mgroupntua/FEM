@@ -104,7 +104,7 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 				double dA = jacobian.DirectDeterminant * QuadratureForConsistentMass.IntegrationPoints[gp].Weight;
 				capacity.AxpyIntoThis(partial, dA);
 			}
-			//TODO Ask Giannis : Should it be multiplies by surface
+			
 			capacity.ScaleIntoThis(material.CapacityCoeff);
 			return capacity;
 		}
@@ -139,7 +139,7 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 			return diffusion;
 		}
 
-		public Matrix BuildConvectionMatrix() // TODO: Check this. Cannot be the same as Capacity and production
+		public Matrix BuildConvectionMatrix()
 		{
 			int numDofs = Nodes.Count;
 			var convection = Matrix.CreateZero(numDofs, numDofs);

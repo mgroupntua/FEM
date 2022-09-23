@@ -22,7 +22,6 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 	{
 		private readonly IDofType[][] dofTypes;
 		private readonly IConvectionDiffusionProperties material;
-		//private readonly Dictionary<GaussPoint, ThermalMaterial> materialsAtGaussPoints;
 
 		public ConvectionDiffusionElement2D(double thickness, IReadOnlyList<Node> nodes, IIsoparametricInterpolation2D interpolation,
 			IQuadrature2D quadratureForStiffness, IQuadrature2D quadratureForConsistentMass,
@@ -147,7 +146,7 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 			return diffusion;
 		}
 
-		public Matrix BuildConvectionMatrix() // TODO: Check this. Cannot be the same as Capacity and production
+		public Matrix BuildConvectionMatrix()
 		{
 			int numDofs = Nodes.Count;
 			var convection = Matrix.CreateZero(numDofs, numDofs);
