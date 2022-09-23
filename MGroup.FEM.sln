@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29806.167
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32825.248
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B0C87C19-1B55-4255-ADC8-97FC240EB363}"
 EndProject
@@ -15,13 +15,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGroup.FEM.PorousMedia", "s
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{B6EF0323-3F6B-42DA-A3AE-D4F3696C3442}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MGroup.FEM.Structural.Tests", "tests\MGroup.FEM.Structural.Tests\MGroup.FEM.Structural.Tests.csproj", "{E8582FAE-E452-45AB-9294-EE654D780343}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGroup.FEM.Structural.Tests", "tests\MGroup.FEM.Structural.Tests\MGroup.FEM.Structural.Tests.csproj", "{E8582FAE-E452-45AB-9294-EE654D780343}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MGroup.FEM.Thermal.Tests", "tests\MGroup.FEM.Thermal.Tests\MGroup.FEM.Thermal.Tests.csproj", "{05AD0523-A290-42DC-B963-E80E8990FB51}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGroup.FEM.Thermal.Tests", "tests\MGroup.FEM.Thermal.Tests\MGroup.FEM.Thermal.Tests.csproj", "{05AD0523-A290-42DC-B963-E80E8990FB51}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MGroup.FEM.ConvectionDiffusion", "src\MGroup.FEM.ConvectionDiffusion\MGroup.FEM.ConvectionDiffusion.csproj", "{8E9CE3EE-E737-4391-B67C-DD1E78765F44}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MGroup.Constitutive.ConvectionDiffusion", "..\Constitutive\src\MGroup.Constitutive.ConvectionDiffusion\MGroup.Constitutive.ConvectionDiffusion.csproj", "{C0F95FB7-0F7C-4EF9-BF36-9CDFEFB487D1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGroup.FEM.ConvectionDiffusion", "src\MGroup.FEM.ConvectionDiffusion\MGroup.FEM.ConvectionDiffusion.csproj", "{8E9CE3EE-E737-4391-B67C-DD1E78765F44}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,10 +55,6 @@ Global
 		{8E9CE3EE-E737-4391-B67C-DD1E78765F44}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8E9CE3EE-E737-4391-B67C-DD1E78765F44}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8E9CE3EE-E737-4391-B67C-DD1E78765F44}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C0F95FB7-0F7C-4EF9-BF36-9CDFEFB487D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C0F95FB7-0F7C-4EF9-BF36-9CDFEFB487D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C0F95FB7-0F7C-4EF9-BF36-9CDFEFB487D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C0F95FB7-0F7C-4EF9-BF36-9CDFEFB487D1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
