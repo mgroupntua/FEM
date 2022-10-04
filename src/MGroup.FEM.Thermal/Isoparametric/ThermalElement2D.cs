@@ -89,8 +89,6 @@ namespace MGroup.FEM.Thermal.Isoparametric
 
 		public Matrix BuildConductivityMatrix()
 		{
-	
-		    throw new NotImplementedException();
 			int numDofs = Nodes.Count;
 			var conductivity = Matrix.CreateZero(numDofs, numDofs);
 			IReadOnlyList<Matrix> shapeGradientsNatural =
