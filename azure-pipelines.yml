@@ -89,7 +89,7 @@ steps:
     Contents: |
       **/*
       !integrationTests/**/*
-    targetFolder: '**/integrationTests/src/FEM'
+    targetFolder: 'D:\a\1\s\integrationTests\src\FEM'
     cleanTargetFolder: true # Optional
 
 - task: DotNetCoreCLI@2
