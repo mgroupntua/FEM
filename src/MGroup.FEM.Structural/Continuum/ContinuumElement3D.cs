@@ -15,6 +15,8 @@ using MGroup.MSolve.Discretization.Entities;
 using MGroup.MSolve.Discretization.Meshes;
 using MGroup.MSolve.Geometry.Coordinates;
 using MGroup.LinearAlgebra.Vectors;
+using MGroup.MSolve.Discretization.Embedding;
+using System.Linq;
 
 namespace MGroup.FEM.Structural.Continuum
 {
@@ -23,7 +25,7 @@ namespace MGroup.FEM.Structural.Continuum
 	/// the appropriate <see cref="IIsoparametricInterpolation3D_OLD"/>, <see cref="IQuadrature3D"/> etc. strategies. 
 	/// Authors: Dimitris Tsapetis
 	/// </summary>
-	public class ContinuumElement3D : IStructuralElementType, ICell<INode>
+	public class ContinuumElement3D : IStructuralElementType, ICell<INode>, IEmbeddedHostElement
 	{
 		private readonly static IDofType[] nodalDOFTypes = new IDofType[]
 		{
@@ -396,5 +398,143 @@ namespace MGroup.FEM.Structural.Continuum
 			return shapeFunctionMatrix;
 		}
 
+		public EmbeddedNode BuildHostElementEmbeddedNode(IElementType element, INode node,
+			IEmbeddedDOFInHostTransformationVector transformation)
+		{
+			var points = GetNaturalCoordinates(element, (Node)node);
+			if (points.Length == 0) return null;
+
+			//element.EmbeddedNodes.Add(node);
+			var embeddedNode = new EmbeddedNode(node, element, transformation.GetDependentDOFTypes);
+			for (int i = 0; i < points.Length; i++) embeddedNode.Coordinates.Add(points[i]);
+			return embeddedNode;
+		}
+
+		private double[] GetNaturalCoordinates(IElementType element, Node node)
+		{
+			double[] mins = new double[] { element.Nodes[0].X, element.Nodes[0].Y, element.Nodes[0].Z };
+			double[] maxes = new double[] { element.Nodes[0].X, element.Nodes[0].Y, element.Nodes[0].Z };
+			for (int i = 0; i < element.Nodes.Count; i++)
+			{
+				mins[0] = mins[0] > element.Nodes[i].X ? element.Nodes[i].X : mins[0];
+				mins[1] = mins[1] > element.Nodes[i].Y ? element.Nodes[i].Y : mins[1];
+				mins[2] = mins[2] > element.Nodes[i].Z ? element.Nodes[i].Z : mins[2];
+				maxes[0] = maxes[0] < element.Nodes[i].X ? element.Nodes[i].X : maxes[0];
+				maxes[1] = maxes[1] < element.Nodes[i].Y ? element.Nodes[i].Y : maxes[1];
+				maxes[2] = maxes[2] < element.Nodes[i].Z ? element.Nodes[i].Z : maxes[2];
+			}
+			//return new double[] { (node.X - mins[0]) / ((maxes[0] - mins[0]) / 2) - 1,
+			//    (node.Y - mins[1]) / ((maxes[1] - mins[1]) / 2) - 1,
+			//    (node.Z - mins[2]) / ((maxes[2] - mins[2]) / 2) - 1 };
+
+			bool maybeInsideElement = node.X <= maxes[0] && node.X >= mins[0] &&
+				node.Y <= maxes[1] && node.Y >= mins[1] &&
+				node.Z <= maxes[2] && node.Z >= mins[2];
+			if (maybeInsideElement == false) return new double[0];
+
+			const int jacobianSize = 3;
+			const int maxIterations = 1000;
+			const double tolerance = 1e-10;
+			int iterations = 0;
+			double deltaNaturalCoordinatesNormSquare = 100;
+			double[] naturalCoordinates = new double[] { 0, 0, 0 };
+			const double toleranceSquare = tolerance * tolerance;
+
+			while (deltaNaturalCoordinatesNormSquare > toleranceSquare && iterations < maxIterations)
+			{
+				iterations++;
+				var shapeFunctions = Interpolation.EvaluateFunctionsAt(new NaturalPoint(naturalCoordinates));
+				double[] coordinateDifferences = new double[] { 0, 0, 0 };
+				for (int i = 0; i < shapeFunctions.Length; i++)
+				{
+					coordinateDifferences[0] += shapeFunctions[i] * element.Nodes[i].X;
+					coordinateDifferences[1] += shapeFunctions[i] * element.Nodes[i].Y;
+					coordinateDifferences[2] += shapeFunctions[i] * element.Nodes[i].Z;
+				}
+				coordinateDifferences[0] = node.X - coordinateDifferences[0];
+				coordinateDifferences[1] = node.Y - coordinateDifferences[1];
+				coordinateDifferences[2] = node.Z - coordinateDifferences[2];
+
+				double[,] faXYZ = GetCoordinatesTranspose(element);
+				var nablaShapeFunctions = Interpolation.EvaluateNaturalGradientsAt(new NaturalPoint(naturalCoordinates));
+				var inverseJacobian = new IsoparametricJacobian3D(element.Nodes.ToArray(), nablaShapeFunctions).InverseMatrix;
+
+				double[] deltaNaturalCoordinates = new double[] { 0, 0, 0 };
+				for (int i = 0; i < jacobianSize; i++)
+					for (int j = 0; j < jacobianSize; j++)
+						deltaNaturalCoordinates[i] += inverseJacobian[j, i] * coordinateDifferences[j];
+				for (int i = 0; i < 3; i++)
+					naturalCoordinates[i] += deltaNaturalCoordinates[i];
+
+				deltaNaturalCoordinatesNormSquare = 0;
+				for (int i = 0; i < 3; i++)
+					deltaNaturalCoordinatesNormSquare += deltaNaturalCoordinates[i] * deltaNaturalCoordinates[i];
+				//deltaNaturalCoordinatesNormSquare = Math.Sqrt(deltaNaturalCoordinatesNormSquare);
+			}
+
+			return naturalCoordinates.Count(x => Math.Abs(x) - 1.0 > tolerance) > 0 ? new double[0] : naturalCoordinates;
+		}
+
+		protected double[,] GetCoordinatesTranspose(IElementType element)
+		{
+			double[,] nodeCoordinatesXYZ = new double[3, dofTypes.Length];
+			for (int i = 0; i < dofTypes.Length; i++)
+			{
+				nodeCoordinatesXYZ[0, i] = element.Nodes[i].X;
+				nodeCoordinatesXYZ[1, i] = element.Nodes[i].Y;
+				nodeCoordinatesXYZ[2, i] = element.Nodes[i].Z;
+			}
+			return nodeCoordinatesXYZ;
+		}
+
+		double[] IEmbeddedHostElement.GetShapeFunctionsForNode(IElementType element, EmbeddedNode node)
+		{
+			var naturalPoint = new NaturalPoint(node.Coordinates.ToArray());
+			var shapeFunctions = Interpolation.EvaluateFunctionsAt(naturalPoint);
+			var shapeFunctionGradients = Interpolation.EvaluateNaturalGradientsAt(naturalPoint);
+			var jacobian = new IsoparametricJacobian3D(element.Nodes.ToArray(), shapeFunctionGradients);
+
+			var shapeFunctionGradients2DArray = shapeFunctionGradients.CopyToArray2D();
+			var shapeFunctionGradients1DArray = new double[shapeFunctionGradients2DArray.GetLength(0) * shapeFunctionGradients2DArray.GetLength(1)];
+			for (int j = 0; j < shapeFunctionGradients2DArray.GetLength(1); j++)
+			{
+				for (int i = 0; i < shapeFunctionGradients2DArray.GetLength(0); i++)
+				{
+					shapeFunctionGradients1DArray[(shapeFunctionGradients2DArray.GetLength(0) * j) + i] = shapeFunctionGradients2DArray[i, j];
+				}
+			}
+
+			var jacobianDirect2DArray = jacobian.DirectMatrix.CopyToArray2D();
+			var jacobianInverse2DArray = jacobian.InverseMatrix.CopyToArray2D();
+			var jacobianDirect1DArray = new double[jacobianDirect2DArray.GetLength(0) * jacobianDirect2DArray.GetLength(1)];
+			var jacobianInverse1DArray = new double[jacobianInverse2DArray.GetLength(0) * jacobianInverse2DArray.GetLength(1)];
+			for (int i = 0; i < jacobianDirect2DArray.GetLength(0); i++)
+			{
+				for (int j = 0; j < jacobianDirect2DArray.GetLength(1); j++)
+				{
+					jacobianDirect1DArray[(jacobianDirect2DArray.GetLength(1) * i) + j] = jacobianDirect2DArray[i, j];
+					jacobianInverse1DArray[(jacobianInverse2DArray.GetLength(1) * i) + j] = jacobianInverse2DArray[i, j];
+				}
+			}
+			var returnValueList = new List<double>();
+			foreach (double shapeFunction in shapeFunctions)
+			{
+				returnValueList.Add(shapeFunction);
+			}
+			foreach (double shapeFunctionGradient in shapeFunctionGradients1DArray)
+			{
+				returnValueList.Add(shapeFunctionGradient);
+			}
+			foreach (double value in jacobianDirect1DArray)
+			{
+				returnValueList.Add(value);
+			}
+			foreach (double value in jacobianInverse1DArray)
+			{
+				returnValueList.Add(value);
+			}
+
+			return returnValueList.ToArray();
+		}
 	}
 }
