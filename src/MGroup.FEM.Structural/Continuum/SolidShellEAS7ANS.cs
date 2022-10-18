@@ -15,6 +15,7 @@ using MGroup.MSolve.Discretization.Entities;
 using MGroup.MSolve.Discretization.Meshes;
 using MGroup.MSolve.Geometry.Coordinates;
 using MGroup.LinearAlgebra.Vectors;
+using MGroup.MSolve.DataStructures;
 
 namespace MGroup.FEM.Structural.Continuum
 {
@@ -944,5 +945,7 @@ namespace MGroup.FEM.Structural.Continuum
 
 			return shapeFunctionMatrix;
 		}
+
+		public void SaveConstitutiveLawState(IHaveState externalState) => throw new NotImplementedException();
 	}
 }
