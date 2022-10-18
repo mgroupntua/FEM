@@ -6,6 +6,7 @@ using MGroup.MSolve.Discretization;
 using MGroup.MSolve.Discretization.Dofs;
 using MGroup.MSolve.Discretization.Entities;
 using MGroup.MSolve.Discretization.BoundaryConditions;
+using MGroup.MSolve.DataStructures;
 
 namespace MGroup.FEM.Structural.Special
 {
@@ -153,7 +154,7 @@ namespace MGroup.FEM.Structural.Special
 		//public double[] CalculateAccelerationResponseIntegral(IElementType element, IList<MassAccelerationLoad> loads) => new double[6];
 
 		public void ClearConstitutiveLawState() { }
-		public void SaveConstitutiveLawState() { }
+		public void SaveConstitutiveLawState(IHaveState externalState) { }
 		public void ClearConstitutiveLawStresses() { }
 	}
 }

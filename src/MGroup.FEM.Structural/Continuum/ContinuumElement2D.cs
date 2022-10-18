@@ -14,6 +14,9 @@ using MGroup.MSolve.Discretization.Entities;
 using MGroup.MSolve.Numerics.Integration.Quadratures;
 using MGroup.MSolve.Discretization.Meshes;
 using MGroup.MSolve.Geometry.Coordinates;
+using MGroup.MSolve.DataStructures;
+using System.Linq;
+using MGroup.MSolve.Constitutive;
 
 //TODO: Damping matrix calculation needs redesign for all of MSolve. For this class, see DampingMatrix().
 //TODO: Materials also need redesign. Some properties are the same for all instances of a material class, some are the same for
@@ -275,9 +278,23 @@ namespace MGroup.FEM.Structural.Continuum
 		//	foreach (var material in materialsAtGaussPoints) material.ResetModified();
 		//}
 
-		public void SaveConstitutiveLawState()
+		public void SaveConstitutiveLawState(IHaveState externalState)
 		{
 			foreach (var m in materialsAtGaussPoints) m.CreateState();
+
+			if (externalState != null && (externalState is IHaveStateWithValues))
+			{
+				var s = (IHaveStateWithValues)externalState;
+				if (s.StateValues.ContainsKey(TransientLiterals.TIME))
+				{
+					var time = s.StateValues[TransientLiterals.TIME];
+					foreach(var m in materialsAtGaussPoints.Where(x => x is ITransientConstitutiveLaw).Select(x => (ITransientConstitutiveLaw)x))
+					{
+						m.SetCurrentTime(time);
+					}
+				}
+
+			}
 		}
 
 		public IMatrix StiffnessMatrix() => DofEnumerator.GetTransformedMatrix(BuildStiffnessMatrix());

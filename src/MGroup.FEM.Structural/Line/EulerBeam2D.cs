@@ -6,6 +6,7 @@ using MGroup.MSolve.Discretization;
 using MGroup.MSolve.Discretization.Dofs;
 using MGroup.MSolve.Discretization.Entities;
 using MGroup.MSolve.Discretization.BoundaryConditions;
+using MGroup.MSolve.DataStructures;
 
 namespace MGroup.FEM.Structural.Line
 {
@@ -188,7 +189,7 @@ namespace MGroup.FEM.Structural.Line
 		//	return massMatrix.Multiply(accelerations);
 		//}
 
-		public void SaveConstitutiveLawState() => throw new NotImplementedException();
+		public void SaveConstitutiveLawState(IHaveState externalState) => throw new NotImplementedException();
 
 		#endregion
 
