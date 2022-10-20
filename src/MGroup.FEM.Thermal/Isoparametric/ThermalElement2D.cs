@@ -14,6 +14,7 @@ using MGroup.MSolve.Discretization.BoundaryConditions;
 using MGroup.MSolve.Discretization.Dofs;
 using MGroup.MSolve.Discretization.Meshes;
 using MGroup.MSolve.Geometry.Coordinates;
+using MGroup.MSolve.DataStructures;
 
 //TODO: Is there any point in having different material properties per Gauss point?
 namespace MGroup.FEM.Thermal.Isoparametric
@@ -183,7 +184,7 @@ namespace MGroup.FEM.Thermal.Isoparametric
 		//	throw new NotImplementedException();
 		//}
 
-		public void SaveConstitutiveLawState()
+		public void SaveConstitutiveLawState(IHaveState externalState)
 		{
 			throw new NotImplementedException();
 		}

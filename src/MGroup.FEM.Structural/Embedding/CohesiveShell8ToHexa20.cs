@@ -11,6 +11,9 @@ using MGroup.MSolve.Numerics.Interpolation;
 using MGroup.MSolve.Numerics.Integration.Quadratures;
 using MGroup.Constitutive.Structural.Cohesive;
 using MGroup.FEM.Structural.Helpers;
+using MGroup.MSolve.DataStructures;
+using MGroup.MSolve.Constitutive;
+using System.Linq;
 
 //TODO: current nodal coordinates should be managed by the analyzer, instead of each element calculting and storing them independently. The same applies for direction vectors of shells. 
 //TODO: direction vectors creation and update could be handled by a dedicated class that will be composed into this element. Which element would update them then?
@@ -721,9 +724,23 @@ namespace MGroup.FEM.Structural.Embedding
 		//	foreach (ICohesiveZoneMaterial3D m in materialsAtGaussPoints) m.ClearState();
 		//}
 
-		public void SaveConstitutiveLawState()
+		public void SaveConstitutiveLawState(IHaveState externalState)
 		{
 			foreach (ICohesiveZoneMaterial m in materialsAtGaussPoints) m.CreateState();
+			
+			if (externalState != null && (externalState is IHaveStateWithValues))
+			{
+				var s = (IHaveStateWithValues)externalState;
+				if (s.StateValues.ContainsKey(TransientLiterals.TIME))
+				{
+					var time = s.StateValues[TransientLiterals.TIME];
+					foreach (var m in materialsAtGaussPoints.Where(x => x is ITransientConstitutiveLaw).Select(x => (ITransientConstitutiveLaw)x))
+					{
+						m.SetCurrentTime(time);
+					}
+				}
+
+			}
 		}
 
 		public bool ConstitutiveLawModified

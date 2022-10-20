@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using MGroup.Constitutive.Thermal;
 using MGroup.LinearAlgebra.Matrices;
+using MGroup.MSolve.DataStructures;
 using MGroup.MSolve.Discretization;
 using MGroup.MSolve.Discretization.Dofs;
 using MGroup.MSolve.Discretization.Embedding;
@@ -96,7 +97,7 @@ namespace MGroup.FEM.Thermal.Line
 		//	throw new NotImplementedException();
 		//}
 
-		public void SaveConstitutiveLawState()
+		public void SaveConstitutiveLawState(IHaveState externalState)
 		{
 			throw new NotImplementedException();
 		}
