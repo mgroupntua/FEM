@@ -16,7 +16,7 @@ pool:
 
 variables:
   buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
+  buildConfiguration: 'Debug'
   testProject: 'tests/MGroup.FEM.Tests'
 
 steps:
