@@ -11,9 +11,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MGroup.Constitutive.PorousMedia" Version="0.2.0-unstable.46" />
+    <PackageReference Include="MGroup.Constitutive.PorousMedia" Version="0.2.0-unstable.48" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
-    <PackageReference Include="MGroup.Constitutive.Structural" Version="0.2.0-unstable.46" />
+    <PackageReference Include="MGroup.Constitutive.Structural" Version="0.2.0-unstable.48" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MGroup.FEM\MGroup.FEM.csproj" />
