@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Authors>Orestis Papas, Christodoulou Theofilos</Authors>
+    <Product>MSolve</Product>
+    <Description>A series of classes of finite elements for the solution of problems adhering to Constitutive.ConvectionDiffusion laws</Description>
+    <PackageProjectUrl>http://mgroup.ntua.gr</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/mgroupntua/FEM</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MGroup.Constitutive.ConvectionDiffusion" Version="0.2.0-unstable.33" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MGroup.FEM\MGroup.FEM.csproj" />
+  </ItemGroup>
+
+</Project>

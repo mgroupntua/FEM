@@ -1,4 +1,3 @@
-﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32825.248
@@ -12,6 +11,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGroup.FEM.Thermal", "src\MGroup.FEM.Thermal\MGroup.FEM.Thermal.csproj", "{2042A3FE-94F9-4FD8-8AA6-558F15FA37E1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGroup.FEM.PorousMedia", "src\MGroup.FEM.PorousMedia\MGroup.FEM.PorousMedia.csproj", "{37714488-F640-4529-B888-D7A4ACA3431E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGroup.FEM.ConvectionDiffusion", "src\MGroup.FEM.ConvectionDiffusion\MGroup.FEM.ConvectionDiffusion.csproj", "{8E9CE3EE-E737-4391-B67C-DD1E78765F44}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{B6EF0323-3F6B-42DA-A3AE-D4F3696C3442}"
 EndProject
@@ -49,6 +50,10 @@ Global
 		{05AD0523-A290-42DC-B963-E80E8990FB51}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{05AD0523-A290-42DC-B963-E80E8990FB51}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{05AD0523-A290-42DC-B963-E80E8990FB51}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E9CE3EE-E737-4391-B67C-DD1E78765F44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E9CE3EE-E737-4391-B67C-DD1E78765F44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E9CE3EE-E737-4391-B67C-DD1E78765F44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E9CE3EE-E737-4391-B67C-DD1E78765F44}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -60,6 +65,7 @@ Global
 		{37714488-F640-4529-B888-D7A4ACA3431E} = {B0C87C19-1B55-4255-ADC8-97FC240EB363}
 		{E8582FAE-E452-45AB-9294-EE654D780343} = {B6EF0323-3F6B-42DA-A3AE-D4F3696C3442}
 		{05AD0523-A290-42DC-B963-E80E8990FB51} = {B6EF0323-3F6B-42DA-A3AE-D4F3696C3442}
+		{8E9CE3EE-E737-4391-B67C-DD1E78765F44} = {B0C87C19-1B55-4255-ADC8-97FC240EB363}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D4E306A5-E12C-49DD-92A6-1D6687B9C4B9}
