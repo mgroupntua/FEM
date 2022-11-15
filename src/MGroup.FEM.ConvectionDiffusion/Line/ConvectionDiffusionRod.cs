@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using MGroup.MSolve.DataStructures;
 using MGroup.Constitutive.ConvectionDiffusion;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.MSolve.Discretization;
