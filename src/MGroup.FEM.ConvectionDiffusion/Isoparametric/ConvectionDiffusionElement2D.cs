@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using MGroup.Constitutive.ConvectionDiffusion;
+using MGroup.MSolve.DataStructures;
 using MGroup.MSolve.Numerics.Interpolation;
 using MGroup.MSolve.Numerics.Interpolation.GaussPointExtrapolation;
 using MGroup.MSolve.Numerics.Interpolation.Inverse;
