@@ -129,7 +129,7 @@ namespace MGroup.FEM.ConvectionDiffusion.Line
 
 		public double[] CalculateResponseIntegralForLogging(double[] localDisplacements) => throw new NotImplementedException();
 
-		public void SaveConstitutiveLawState() => throw new NotImplementedException();
+		public void SaveConstitutiveLawState(IHaveState externalState) => throw new NotImplementedException();
 
 		public void ClearConstitutiveLawState() => throw new NotImplementedException();
 
