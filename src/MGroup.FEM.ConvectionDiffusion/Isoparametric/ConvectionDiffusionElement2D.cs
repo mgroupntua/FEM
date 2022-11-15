@@ -262,7 +262,7 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 			throw new NotImplementedException();
 		}
 
-		public void SaveConstitutiveLawState()
+		public void SaveConstitutiveLawState(IHaveState externalState)
 		{
 			throw new NotImplementedException();
 		}
