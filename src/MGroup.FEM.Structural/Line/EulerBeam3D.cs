@@ -8,6 +8,7 @@ using MGroup.MSolve.Discretization.Dofs;
 using MGroup.MSolve.Discretization.Entities;
 using MGroup.MSolve.Discretization.Embedding;
 using MGroup.MSolve.Discretization.BoundaryConditions;
+using MGroup.MSolve.DataStructures;
 
 namespace MGroup.FEM.Structural.Line
 {
@@ -695,7 +696,7 @@ namespace MGroup.FEM.Structural.Line
 
 		public void ClearConstitutiveLawState() { }
 
-		public void SaveConstitutiveLawState()
+		public void SaveConstitutiveLawState(IHaveState externalState)
 		{
 			//throw new NotImplementedException();
 		}

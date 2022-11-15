@@ -9,6 +9,7 @@ using MGroup.MSolve.Discretization.Entities;
 using MGroup.MSolve.Discretization.BoundaryConditions;
 using MGroup.MSolve.Discretization.Meshes;
 using MGroup.Constitutive.Structural.Line;
+using MGroup.MSolve.DataStructures;
 
 namespace MGroup.FEM.Structural.Line
 {
@@ -299,7 +300,7 @@ namespace MGroup.FEM.Structural.Line
 		//	return massMatrix.Multiply(accelerations);
 		//}
 
-		public void SaveConstitutiveLawState()
+		public void SaveConstitutiveLawState(IHaveState externalState)
 		{
 			SaveGeometryState();
 			//material.SaveState();

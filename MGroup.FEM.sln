@@ -1,4 +1,3 @@
-﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32825.248
@@ -13,13 +12,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGroup.FEM.Thermal", "src\M
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGroup.FEM.PorousMedia", "src\MGroup.FEM.PorousMedia\MGroup.FEM.PorousMedia.csproj", "{37714488-F640-4529-B888-D7A4ACA3431E}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGroup.FEM.ConvectionDiffusion", "src\MGroup.FEM.ConvectionDiffusion\MGroup.FEM.ConvectionDiffusion.csproj", "{8E9CE3EE-E737-4391-B67C-DD1E78765F44}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{B6EF0323-3F6B-42DA-A3AE-D4F3696C3442}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGroup.FEM.Structural.Tests", "tests\MGroup.FEM.Structural.Tests\MGroup.FEM.Structural.Tests.csproj", "{E8582FAE-E452-45AB-9294-EE654D780343}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGroup.FEM.Thermal.Tests", "tests\MGroup.FEM.Thermal.Tests\MGroup.FEM.Thermal.Tests.csproj", "{05AD0523-A290-42DC-B963-E80E8990FB51}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGroup.FEM.ConvectionDiffusion", "src\MGroup.FEM.ConvectionDiffusion\MGroup.FEM.ConvectionDiffusion.csproj", "{8E9CE3EE-E737-4391-B67C-DD1E78765F44}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

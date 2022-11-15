@@ -12,6 +12,8 @@ using MGroup.MSolve.Numerics.Integration.Quadratures;
 using MGroup.Constitutive.Structural.Continuum;
 using MGroup.LinearAlgebra.Vectors;
 using System.Linq;
+using MGroup.MSolve.DataStructures;
+using MGroup.MSolve.Constitutive;
 
 namespace MGroup.FEM.Structural.Continuum
 {
@@ -676,7 +678,7 @@ namespace MGroup.FEM.Structural.Continuum
             //foreach (IContinuumMaterial3D m in materialsAtGaussPoints) m.ClearState();
         }
 
-        public void SaveConstitutiveLawState()
+        public void SaveConstitutiveLawState(IHaveState externalState)
         {
             for (int npoint = 0; npoint < materialsAtGaussPoints.Length; npoint++)
             {
@@ -685,7 +687,21 @@ namespace MGroup.FEM.Structural.Continuum
             }
 
             foreach (IContinuumMaterial3D m in materialsAtGaussPoints) m.CreateState();
-        }
+
+			if (externalState != null && (externalState is IHaveStateWithValues))
+			{
+				var s = (IHaveStateWithValues)externalState;
+				if (s.StateValues.ContainsKey(TransientLiterals.TIME))
+				{
+					var time = s.StateValues[TransientLiterals.TIME];
+					foreach (var m in materialsAtGaussPoints.Where(x => x is ITransientConstitutiveLaw).Select(x => (ITransientConstitutiveLaw)x))
+					{
+						m.SetCurrentTime(time);
+					}
+				}
+
+			}
+		}
 
         //public void ClearMaterialStresses()
         //{

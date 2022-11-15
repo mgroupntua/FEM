@@ -146,6 +146,12 @@ namespace MGroup.FEM.Structural.Continuum
 			return new ContinuumElement3DNonLinear(nodes, commonMaterial, integrationsForStiffness[cellType], interpolations[cellType]);
 		}
 
+		public ContinuumElement3DGrowth CreateNonLinearElementGrowt(CellType cellType, IReadOnlyList<INode> nodes,
+			IContinuumMaterial3DDefGrad commonMaterial, TransientAnalysisProperties commonDynamicProperties,double lambda = 1)
+		{
+			return new ContinuumElement3DGrowth(nodes, commonMaterial, integrationsForStiffness[cellType], interpolations[cellType], lambda);
+		}
+
 		private ContinuumElement3D CreateElement(CellType cellType, IReadOnlyList<INode> nodes,
 			IReadOnlyList<IContinuumMaterial3D> materialsAtGaussPoints, ITransientAnalysisProperties commonDynamicProperties)
 		{

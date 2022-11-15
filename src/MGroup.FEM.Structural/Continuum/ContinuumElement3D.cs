@@ -15,6 +15,9 @@ using MGroup.MSolve.Discretization.Entities;
 using MGroup.MSolve.Discretization.Meshes;
 using MGroup.MSolve.Geometry.Coordinates;
 using MGroup.LinearAlgebra.Vectors;
+using MGroup.MSolve.DataStructures;
+using MGroup.MSolve.Constitutive;
+using System.Linq;
 
 namespace MGroup.FEM.Structural.Continuum
 {
@@ -308,14 +311,29 @@ namespace MGroup.FEM.Structural.Continuum
 		//	foreach (var material in materialsAtGaussPoints) material.ResetModified();
 		//}
 
-		public void SaveConstitutiveLawState()
+		public void SaveConstitutiveLawState(IHaveState externalState)
 		{
 			for (int npoint = 0; npoint < materialsAtGaussPoints.Count; npoint++)
 			{
 				for (int i1 = 0; i1 < 6; i1++)
 				{ strainsVecLastConverged[npoint][i1] = strainsVec[npoint][i1]; }
 			}
+
 			foreach (var m in materialsAtGaussPoints) m.CreateState();
+
+			if (externalState != null && (externalState is IHaveStateWithValues))
+			{
+				var s = (IHaveStateWithValues)externalState;
+				if (s.StateValues.ContainsKey(TransientLiterals.TIME))
+				{
+					var time = s.StateValues[TransientLiterals.TIME];
+					foreach (var m in materialsAtGaussPoints.Where(x => x is ITransientConstitutiveLaw).Select(x => (ITransientConstitutiveLaw)x))
+					{
+						m.SetCurrentTime(time);
+					}
+				}
+
+			}
 		}
 
 		public IMatrix StiffnessMatrix() => DofEnumerator.GetTransformedMatrix(BuildStiffnessMatrix());
