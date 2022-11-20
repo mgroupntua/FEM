@@ -99,7 +99,7 @@ steps:
 
 - task: CopyFiles@2
   enabled: true
-  displayName: Updates FEM project on MSolve.Tests (locally)
+  displayName: Update FEM project on MSolve.Tests (locally)
   inputs:
     sourceFolder: 'D:\a\1\s'
     Contents: |
@@ -112,27 +112,21 @@ steps:
 
 - task: CopyFiles@2
   enabled: true
-  displayName: Updates NumericalAnalyzers project on MSolve.Tests (locally)
+  displayName: Update NumericalAnalyzers project on MSolve.Tests (locally)
   inputs:
-    sourceFolder: 'D:\a\1\s'
+    sourceFolder: 'D:\a\1\s\na'
     Contents: |
       **/*
-      !integrationTests/**/*
-      !fem/**/*
-      !sol/**/*
     targetFolder: 'D:\a\1\s\integrationTests\src\NumericalAnalyzers'
     cleanTargetFolder: true # Optional
 
 - task: CopyFiles@2
   enabled: true
-  displayName: Updates Solvers project on MSolve.Tests (locally)
+  displayName: Update Solvers project on MSolve.Tests (locally)
   inputs:
-    sourceFolder: 'D:\a\1\s'
+    sourceFolder: 'D:\a\1\s\sol'
     Contents: |
       **/*
-      !integrationTests/**/*
-      !fem/**/*
-      !na/**/*
     targetFolder: 'D:\a\1\s\integrationTests\src\Solvers'
     cleanTargetFolder: true # Optional
 
