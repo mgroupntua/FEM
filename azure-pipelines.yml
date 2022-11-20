@@ -114,7 +114,7 @@ steps:
   enabled: true
   displayName: Update NumericalAnalyzers project on MSolve.Tests (locally)
   inputs:
-    sourceFolder: 'D:\a\1\s\na'
+    sourceFolder: 'D:\a\1\s\na\NumericalAnalyzers'
     Contents: |
       **/*
     targetFolder: 'D:\a\1\s\integrationTests\src\NumericalAnalyzers'
@@ -124,7 +124,7 @@ steps:
   enabled: true
   displayName: Update Solvers project on MSolve.Tests (locally)
   inputs:
-    sourceFolder: 'D:\a\1\s\sol'
+    sourceFolder: 'D:\a\1\s\sol\Solvers'
     Contents: |
       **/*
     targetFolder: 'D:\a\1\s\integrationTests\src\Solvers'
