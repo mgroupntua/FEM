@@ -75,6 +75,22 @@ steps:
 
 - task: PowerShell@2
   enabled: true
+  displayName: Clone NumericalAnalyzers
+  inputs:
+    targetType: inline
+    script: mkdir na ; cd na ; git clone https://github.com/mgroupntua/NumericalAnalyzers.git
+    pwsh: true
+
+- task: PowerShell@2
+  enabled: true
+  displayName: Clone Solvers
+  inputs:
+    targetType: inline
+    script: mkdir sol ; cd sol ; git clone https://github.com/mgroupntua/Solvers.git
+    pwsh: true
+
+- task: PowerShell@2
+  enabled: true
   displayName: Clone MSolve.Tests
   inputs:
     targetType: inline
@@ -89,7 +105,35 @@ steps:
     Contents: |
       **/*
       !integrationTests/**/*
+      !sol/**/*
+      !na/**/*
     targetFolder: 'D:\a\1\s\integrationTests\src\FEM'
+    cleanTargetFolder: true # Optional
+
+- task: CopyFiles@2
+  enabled: true
+  displayName: Updates NumericalAnalyzers project on MSolve.Tests (locally)
+  inputs:
+    sourceFolder: 'D:\a\1\s'
+    Contents: |
+      **/*
+      !integrationTests/**/*
+      !fem/**/*
+      !sol/**/*
+    targetFolder: 'D:\a\1\s\integrationTests\src\NumericalAnalyzers'
+    cleanTargetFolder: true # Optional
+
+- task: CopyFiles@2
+  enabled: true
+  displayName: Updates Solvers project on MSolve.Tests (locally)
+  inputs:
+    sourceFolder: 'D:\a\1\s'
+    Contents: |
+      **/*
+      !integrationTests/**/*
+      !fem/**/*
+      !na/**/*
+    targetFolder: 'D:\a\1\s\integrationTests\src\Solvers'
     cleanTargetFolder: true # Optional
 
 - task: DotNetCoreCLI@2
