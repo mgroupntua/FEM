@@ -165,10 +165,12 @@ steps:
      codecoverageTool: cobertura
 
 - task: DeleteFiles@1
-  displayName: 'Remove integration tests dir'
+  displayName: 'Remove numerical analyzers, solvers and integration tests dirs'
   inputs:
     contents: |
       **/integrationTests/*
+      **/sol/*
+      **/na/*
 
 - task: DotNetCoreCLI@2
   name: dotnetPack
