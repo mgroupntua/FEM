@@ -31,7 +31,7 @@ steps:
   displayName: Set SemVer from git history and update AssemblyInfo
   inputs:
     targetType: inline
-    script: ../dotnet-gitversion /updateassemblyinfo AssemblyInfo.cs AssemblyVersionInfo.cs /output buildserver 
+    script: ../dotnet-gitversion /updateassemblyinfo AssemblyInfo.cs AssemblyVersionInfo.cs /output buildserver
     pwsh: true
 
 - task: DotNetCoreCLI@2
@@ -97,18 +97,36 @@ steps:
     script: mkdir integrationTests ; cd integrationTests ; git clone https://github.com/mgroupntua/MSolve.Tests.git
     pwsh: true
 
+- task: PowerShell@2
+  enabled: true
+  displayName: TEST Clone FEM
+  inputs:
+    targetType: inline
+    script: mkdir fe ; cd fe ; git clone https://github.com/mgroupntua/FEM.git
+    pwsh: true
+
 - task: CopyFiles@2
   enabled: true
-  displayName: Update FEM project on MSolve.Tests (locally)
+  displayName: TEST Update FEM project on MSolve.Tests (locally)
   inputs:
-    sourceFolder: 'D:\a\1\s'
+    sourceFolder: 'D:\a\1\s\fe\FEM'
     Contents: |
       **/*
-      !integrationTests/**/*
-      !sol/**/*
-      !na/**/*
     targetFolder: 'D:\a\1\s\integrationTests\src\FEM'
     cleanTargetFolder: true # Optional
+
+# - task: CopyFiles@2
+#   enabled: true
+#   displayName: Update FEM project on MSolve.Tests (locally)
+#   inputs:
+#     sourceFolder: 'D:\a\1\s'
+#     Contents: |
+#       **/*
+#       !integrationTests/**/*
+#       !sol/**/*
+#       !na/**/*
+#     targetFolder: 'D:\a\1\s\integrationTests\src\FEM'
+#     cleanTargetFolder: true # Optional
 
 - task: CopyFiles@2
   enabled: true
@@ -188,6 +206,7 @@ steps:
       **/integrationTests/*
       **/sol/*
       **/na/*
+      **/fe/*
 
 - task: DotNetCoreCLI@2
   name: dotnetPack
