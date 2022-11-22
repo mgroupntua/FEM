@@ -102,7 +102,7 @@ steps:
   displayName: Exploring file structure
   inputs:
     targetType: inline
-    script: dir ; cd integrationTests; dir; cd ..
+    script: dir ; cd integrationTests; dir; cd MSolve.Tests; dir
     pwsh: true
 
 - task: CopyFiles@2
@@ -115,7 +115,7 @@ steps:
       !integrationTests/**/*
       !sol/**/*
       !na/**/*
-    targetFolder: 'D:\a\1\s\integrationTests\src\FEM'
+    targetFolder: 'D:\a\1\s\integrationTests\MSolve.Tests\src\FEM'
     cleanTargetFolder: true # Optional
 
 - task: CopyFiles@2
@@ -125,7 +125,7 @@ steps:
     sourceFolder: 'D:\a\1\s\na\NumericalAnalyzers'
     Contents: |
       **/*
-    targetFolder: 'D:\a\1\s\integrationTests\src\NumericalAnalyzers'
+    targetFolder: 'D:\a\1\s\integrationTests\MSolve.Tests\src\NumericalAnalyzers'
     cleanTargetFolder: true # Optional
 
 - task: CopyFiles@2
@@ -135,7 +135,7 @@ steps:
     sourceFolder: 'D:\a\1\s\sol\Solvers'
     Contents: |
       **/*
-    targetFolder: 'D:\a\1\s\integrationTests\src\Solvers'
+    targetFolder: 'D:\a\1\s\integrationTests\MSolve.Tests\src\Solvers'
     cleanTargetFolder: true # Optional
 
 - task: DotNetCoreCLI@2
