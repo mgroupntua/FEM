@@ -102,7 +102,7 @@ steps:
   displayName: Exploring file structure
   inputs:
     targetType: inline
-    script: dir ; cd integrationTests; cd src; dir
+    script: dir ; cd integrationTests; dir; cd ..
     pwsh: true
 
 - task: CopyFiles@2
