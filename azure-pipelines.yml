@@ -145,7 +145,7 @@ steps:
   inputs:
     command: 'build'
     projects: '**/*[Tt]ests/*.csproj'
-    arguments: '--configuration $(BuildConfiguration)'
+    # arguments: '--configuration $(BuildConfiguration)'
 
 - task: DotNetCoreCLI@2
   enabled: true
