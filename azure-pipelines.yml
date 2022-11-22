@@ -97,38 +97,38 @@ steps:
     script: mkdir integrationTests ; cd integrationTests ; git clone https://github.com/mgroupntua/MSolve.Tests.git
     pwsh: true
 
-- task: CopyFiles@2
-  enabled: true
-  displayName: Update FEM project on MSolve.Tests (locally)
-  inputs:
-    sourceFolder: 'D:\a\1\s'
-    Contents: |
-      **/*
-      !integrationTests/**/*
-      !sol/**/*
-      !na/**/*
-    targetFolder: 'D:\a\1\s\integrationTests\src\FEM'
-    cleanTargetFolder: true # Optional
+# - task: CopyFiles@2
+#   enabled: true
+#   displayName: Update FEM project on MSolve.Tests (locally)
+#   inputs:
+#     sourceFolder: 'D:\a\1\s'
+#     Contents: |
+#       **/*
+#       !integrationTests/**/*
+#       !sol/**/*
+#       !na/**/*
+#     targetFolder: 'D:\a\1\s\integrationTests\src\FEM'
+#     cleanTargetFolder: true # Optional
 
-- task: CopyFiles@2
-  enabled: true
-  displayName: Update NumericalAnalyzers project on MSolve.Tests (locally)
-  inputs:
-    sourceFolder: 'D:\a\1\s\na\NumericalAnalyzers'
-    Contents: |
-      **/*
-    targetFolder: 'D:\a\1\s\integrationTests\src\NumericalAnalyzers'
-    cleanTargetFolder: true # Optional
+# - task: CopyFiles@2
+#   enabled: true
+#   displayName: Update NumericalAnalyzers project on MSolve.Tests (locally)
+#   inputs:
+#     sourceFolder: 'D:\a\1\s\na\NumericalAnalyzers'
+#     Contents: |
+#       **/*
+#     targetFolder: 'D:\a\1\s\integrationTests\src\NumericalAnalyzers'
+#     cleanTargetFolder: true # Optional
 
-- task: CopyFiles@2
-  enabled: true
-  displayName: Update Solvers project on MSolve.Tests (locally)
-  inputs:
-    sourceFolder: 'D:\a\1\s\sol\Solvers'
-    Contents: |
-      **/*
-    targetFolder: 'D:\a\1\s\integrationTests\src\Solvers'
-    cleanTargetFolder: true # Optional
+# - task: CopyFiles@2
+#   enabled: true
+#   displayName: Update Solvers project on MSolve.Tests (locally)
+#   inputs:
+#     sourceFolder: 'D:\a\1\s\sol\Solvers'
+#     Contents: |
+#       **/*
+#     targetFolder: 'D:\a\1\s\integrationTests\src\Solvers'
+#     cleanTargetFolder: true # Optional
 
 - task: DotNetCoreCLI@2
   enabled: true
