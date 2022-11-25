@@ -75,68 +75,34 @@ steps:
 
 - task: PowerShell@2
   enabled: true
-  displayName: Clone NumericalAnalyzers
-  inputs:
-    targetType: inline
-    script: mkdir na ; cd na ; git clone https://github.com/mgroupntua/NumericalAnalyzers.git
-    pwsh: true
-
-- task: PowerShell@2
-  enabled: true
-  displayName: Clone Solvers
-  inputs:
-    targetType: inline
-    script: mkdir sol ; cd sol ; git clone https://github.com/mgroupntua/Solvers.git
-    pwsh: true
-
-- task: PowerShell@2
-  enabled: true
   displayName: Clone MSolve.Tests
   inputs:
     targetType: inline
     script: mkdir integrationTests ; cd integrationTests ; git clone https://github.com/mgroupntua/MSolve.Tests.git
     pwsh: true
 
-- task: PowerShell@2
-  enabled: true
-  displayName: Exploring file structure
-  inputs:
-    targetType: inline
-    script: dir ; cd integrationTests; dir; cd MSolve.Tests; dir; cd ..\..
-    pwsh: true
-
 - task: CopyFiles@2
   enabled: true
-  displayName: Update FEM project on MSolve.Tests (locally)
+  displayName: Copy FEM project on MSolve.Tests
   inputs:
     sourceFolder: 'D:\a\1\s'
     Contents: |
       **/*
       !integrationTests/**/*
-      !sol/**/*
-      !na/**/*
-    targetFolder: 'D:\a\1\s\integrationTests\MSolve.Tests\src\FEM'
+    targetFolder: 'D:\a\1\s\integrationTests\FEM'
     cleanTargetFolder: true # Optional
 
-- task: CopyFiles@2
-  enabled: true
-  displayName: Update NumericalAnalyzers project on MSolve.Tests (locally)
-  inputs:
-    sourceFolder: 'D:\a\1\s\na\NumericalAnalyzers'
-    Contents: |
-      **/*
-    targetFolder: 'D:\a\1\s\integrationTests\MSolve.Tests\src\NumericalAnalyzers'
-    cleanTargetFolder: true # Optional
+- script: dotnet remove D:\a\1\s\integrationTests\MSolve.Tests\tests\MGroup.FEM.Structural.Tests\MGroup.FEM.Structural.Tests.csproj package MGroup.FEM.Structural
+  displayName: Remove Package FEM.Structural
 
-- task: CopyFiles@2
-  enabled: true
-  displayName: Update Solvers project on MSolve.Tests (locally)
-  inputs:
-    sourceFolder: 'D:\a\1\s\sol\Solvers'
-    Contents: |
-      **/*
-    targetFolder: 'D:\a\1\s\integrationTests\MSolve.Tests\src\Solvers'
-    cleanTargetFolder: true # Optional
+- script: dotnet add D:\a\1\s\integrationTests\MSolve.Tests\tests\MGroup.FEM.Structural.Tests\MGroup.FEM.Structural.Tests.csproj reference D:\a\1\s\integrationTests\FEM\src\MGroup.FEM.Structural\MGroup.FEM.Structural.csproj
+  displayName: Add project ref FEM.Structural
+
+- script: dotnet remove D:\a\1\s\integrationTests\MSolve.Tests\tests\MGroup.FEM.Thermal.Tests\MGroup.FEM.Thermal.Tests.csproj package MGroup.FEM.Thermal
+  displayName: Remove Package FEM.Thermal
+
+- script: dotnet add D:\a\1\s\integrationTests\MSolve.Tests\tests\MGroup.FEM.Thermal.Tests\MGroup.FEM.Thermal.Tests.csproj reference D:\a\1\s\integrationTests\FEM\src\MGroup.FEM.Thermal\MGroup.FEM.Thermal.csproj
+  displayName: Add project ref FEM.Thermal
 
 - task: DotNetCoreCLI@2
   enabled: true
@@ -173,12 +139,10 @@ steps:
      codecoverageTool: cobertura
 
 - task: DeleteFiles@1
-  displayName: 'Remove numerical analyzers, solvers and integration tests dirs'
+  displayName: 'Remove integration tests dir'
   inputs:
     contents: |
       **/integrationTests/*
-      **/sol/*
-      **/na/*
 
 - task: DotNetCoreCLI@2
   name: dotnetPack
