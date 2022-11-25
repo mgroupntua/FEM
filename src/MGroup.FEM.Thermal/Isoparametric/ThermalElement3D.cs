@@ -60,22 +60,22 @@ namespace MGroup.FEM.Thermal.Isoparametric
 		{
 			int numDofs = Nodes.Count;
 			var capacity = Matrix.CreateZero(numDofs, numDofs);
-			// IReadOnlyList<double[]> shapeFunctions =
-			// 	Interpolation.EvaluateFunctionsAtGaussPoints(QuadratureForConsistentMass);
-			// IReadOnlyList<Matrix> shapeGradientsNatural =
-			// 	Interpolation.EvaluateNaturalGradientsAtGaussPoints(QuadratureForConsistentMass);
+			IReadOnlyList<double[]> shapeFunctions =
+				Interpolation.EvaluateFunctionsAtGaussPoints(QuadratureForConsistentMass);
+			IReadOnlyList<Matrix> shapeGradientsNatural =
+				Interpolation.EvaluateNaturalGradientsAtGaussPoints(QuadratureForConsistentMass);
 
-			// for (int gp = 0; gp < QuadratureForConsistentMass.IntegrationPoints.Count; ++gp)
-			// {
-			// 	Matrix shapeFunctionMatrix = BuildShapeFunctionMatrix(shapeFunctions[gp]);
-			// 	Matrix partial = shapeFunctionMatrix.Transpose() * shapeFunctionMatrix;
-			// 	var jacobian = new IsoparametricJacobian3D(Nodes, shapeGradientsNatural[gp]);
-			// 	double dA = jacobian.DirectDeterminant * QuadratureForConsistentMass.IntegrationPoints[gp].Weight;
-			// 	capacity.AxpyIntoThis(partial, dA);
-			// }
+			for (int gp = 0; gp < QuadratureForConsistentMass.IntegrationPoints.Count; ++gp)
+			{
+				Matrix shapeFunctionMatrix = BuildShapeFunctionMatrix(shapeFunctions[gp]);
+				Matrix partial = shapeFunctionMatrix.Transpose() * shapeFunctionMatrix;
+				var jacobian = new IsoparametricJacobian3D(Nodes, shapeGradientsNatural[gp]);
+				double dA = jacobian.DirectDeterminant * QuadratureForConsistentMass.IntegrationPoints[gp].Weight;
+				capacity.AxpyIntoThis(partial, dA);
+			}
 
-			// //WARNING: the following needs to change for non uniform density. Perhaps the integration order too.
-			// capacity.Scale(material.Density * material.SpecialHeatCoeff);
+			//WARNING: the following needs to change for non uniform density. Perhaps the integration order too.
+			capacity.Scale(material.Density * material.SpecialHeatCoeff);
 			return capacity;
 		}
 
@@ -91,29 +91,29 @@ namespace MGroup.FEM.Thermal.Isoparametric
 		{
 			int numDofs = Nodes.Count;
 			var conductivity = Matrix.CreateZero(numDofs, numDofs);
-			// IReadOnlyList<Matrix> shapeGradientsNatural =
-			// 	Interpolation.EvaluateNaturalGradientsAtGaussPoints(QuadratureForStiffness);
+			IReadOnlyList<Matrix> shapeGradientsNatural =
+				Interpolation.EvaluateNaturalGradientsAtGaussPoints(QuadratureForStiffness);
 
-			// for (int gp = 0; gp < QuadratureForStiffness.IntegrationPoints.Count; ++gp)
-			// {
-			// 	// Calculate the necessary quantities for the integration
-			// 	//Matrix constitutive = (Matrix)(materialsAtGaussPoints[gp].ConstitutiveMatrix); // ugly cast will be removed along with the legacy Matrix classes
-			// 	var jacobian = new IsoparametricJacobian3D(Nodes, shapeGradientsNatural[gp]);
-			// 	Matrix shapeGradientsCartesian =
-			// 		jacobian.TransformNaturalDerivativesToCartesian(shapeGradientsNatural[gp]);
-			// 	Matrix deformation = BuildDeformationMatrix(shapeGradientsCartesian);
+			for (int gp = 0; gp < QuadratureForStiffness.IntegrationPoints.Count; ++gp)
+			{
+				// Calculate the necessary quantities for the integration
+				//Matrix constitutive = (Matrix)(materialsAtGaussPoints[gp].ConstitutiveMatrix); // ugly cast will be removed along with the legacy Matrix classes
+				var jacobian = new IsoparametricJacobian3D(Nodes, shapeGradientsNatural[gp]);
+				Matrix shapeGradientsCartesian =
+					jacobian.TransformNaturalDerivativesToCartesian(shapeGradientsNatural[gp]);
+				Matrix deformation = BuildDeformationMatrix(shapeGradientsCartesian);
 
-			// 	// Contribution of this gauss point to the element stiffness matrix
-			// 	Matrix partialK = deformation.Transpose() * deformation;
-			// 	//Matrix partialΚ = deformation.Transpose() * (constitutive * deformation);
-			// 	//partialK.Scale(materialsAtGaussPoints[gaussPoint].ThermalConductivity);
+				// Contribution of this gauss point to the element stiffness matrix
+				Matrix partialK = deformation.Transpose() * deformation;
+				//Matrix partialΚ = deformation.Transpose() * (constitutive * deformation);
+				//partialK.Scale(materialsAtGaussPoints[gaussPoint].ThermalConductivity);
 
-			// 	double dA = jacobian.DirectDeterminant * QuadratureForStiffness.IntegrationPoints[gp].Weight; //TODO: this is used by all methods that integrate. I should cache it.
-			// 	conductivity.AxpyIntoThis(partialK, dA * material.ThermalConductivity);
-			// 	//conductivity.AxpyIntoThis(partialK, dA * 1);
-			// }
+				double dA = jacobian.DirectDeterminant * QuadratureForStiffness.IntegrationPoints[gp].Weight; //TODO: this is used by all methods that integrate. I should cache it.
+				conductivity.AxpyIntoThis(partialK, dA * material.ThermalConductivity);
+				//conductivity.AxpyIntoThis(partialK, dA * 1);
+			}
 
-			// conductivity.Scale(1);
+			conductivity.Scale(1);
 			return conductivity;
 		}
 
@@ -121,12 +121,12 @@ namespace MGroup.FEM.Thermal.Isoparametric
 		{
 			//TODO: isn't this just the transpose of [dNi/dxj]?
 			var deformation = Matrix.CreateZero(3, Nodes.Count);
-			// for (int nodeIdx = 0; nodeIdx < Nodes.Count; ++nodeIdx)
-			// {
-			// 	deformation[0, nodeIdx] = shapeGradientsCartesian[nodeIdx, 0];
-			// 	deformation[1, nodeIdx] = shapeGradientsCartesian[nodeIdx, 1];
-			// 	deformation[2, nodeIdx] = shapeGradientsCartesian[nodeIdx, 2];
-			// }
+			for (int nodeIdx = 0; nodeIdx < Nodes.Count; ++nodeIdx)
+			{
+				deformation[0, nodeIdx] = shapeGradientsCartesian[nodeIdx, 0];
+				deformation[1, nodeIdx] = shapeGradientsCartesian[nodeIdx, 1];
+				deformation[2, nodeIdx] = shapeGradientsCartesian[nodeIdx, 2];
+			}
 			return deformation;
 		}
 
