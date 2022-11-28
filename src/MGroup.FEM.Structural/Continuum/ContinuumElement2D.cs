@@ -17,6 +17,7 @@ using MGroup.MSolve.Geometry.Coordinates;
 using MGroup.MSolve.DataStructures;
 using System.Linq;
 using MGroup.MSolve.Constitutive;
+using MGroup.LinearAlgebra.Providers;
 
 //TODO: Damping matrix calculation needs redesign for all of MSolve. For this class, see DampingMatrix().
 //TODO: Materials also need redesign. Some properties are the same for all instances of a material class, some are the same for
@@ -109,6 +110,7 @@ namespace MGroup.FEM.Structural.Continuum
 
 			//WARNING: the following needs to change for non uniform density. Perhaps the integration order too.
 			mass.ScaleIntoThis(Thickness * dynamicProperties.Density);
+			mass.MatrixSymmetry = MatrixSymmetry.Symmetric;
 			return mass;
 		}
 
@@ -133,6 +135,7 @@ namespace MGroup.FEM.Structural.Continuum
 			// Divide the total mass uniformly for each node
 			double nodalMass = Thickness * area * dynamicProperties.Density / Nodes.Count;
 			for (int i = 0; i < numDofs; ++i) lumpedMass[i, i] = nodalMass;
+			lumpedMass.MatrixSymmetry = MatrixSymmetry.Symmetric;
 
 			return lumpedMass;
 		}
@@ -144,10 +147,12 @@ namespace MGroup.FEM.Structural.Continuum
 			IReadOnlyList<Matrix> shapeGradientsNatural =
 				Interpolation.EvaluateNaturalGradientsAtGaussPoints(QuadratureForStiffness);
 
+			var s = MatrixSymmetry.Symmetric;
 			for (int gp = 0; gp < QuadratureForStiffness.IntegrationPoints.Count; ++gp)
 			{
 				// Calculate the necessary quantities for the integration
 				IMatrixView constitutive = materialsAtGaussPoints[gp].ConstitutiveMatrix;
+				s = s == MatrixSymmetry.Symmetric ? constitutive.MatrixSymmetry : s;
 				var jacobian = new IsoparametricJacobian2D(Nodes, shapeGradientsNatural[gp]);
 				Matrix shapeGradientsCartesian =
 					jacobian.TransformNaturalDerivativesToCartesian(shapeGradientsNatural[gp]);
@@ -158,7 +163,9 @@ namespace MGroup.FEM.Structural.Continuum
 				double dA = jacobian.DirectDeterminant * QuadratureForStiffness.IntegrationPoints[gp].Weight; //TODO: this is used by all methods that integrate. I should cache it.
 				stiffness.AxpyIntoThis(partial, dA);
 			}
+
 			stiffness.ScaleIntoThis(Thickness);
+			stiffness.MatrixSymmetry = s;
 			return stiffness;
 		}
 
@@ -236,8 +243,10 @@ namespace MGroup.FEM.Structural.Continuum
 			//TODO: Stiffness and mass matrices have already been computed probably. Reuse them.
 			//TODO: Perhaps with Rayleigh damping, the global damping matrix should be created directly from global mass and stiffness matrices.
 			Matrix damping = BuildStiffnessMatrix();
+			var m = MassMatrix();
 			damping.ScaleIntoThis(dynamicProperties.RayleighCoeffStiffness);
-			damping.AxpyIntoThis(MassMatrix(), dynamicProperties.RayleighCoeffMass);
+			damping.AxpyIntoThis(m, dynamicProperties.RayleighCoeffMass);
+			damping.MatrixSymmetry = m.MatrixSymmetry == MatrixSymmetry.Symmetric && damping.MatrixSymmetry == MatrixSymmetry.Symmetric ? MatrixSymmetry.Symmetric : MatrixSymmetry.NonSymmetric;
 			return damping;
 		}
 

@@ -15,6 +15,7 @@ using MGroup.MSolve.Discretization.Entities;
 using MGroup.FEM.Structural.Helpers;
 using MGroup.MSolve.DataStructures;
 using MGroup.MSolve.Constitutive;
+using MGroup.LinearAlgebra.Providers;
 
 namespace MGroup.FEM.Structural.Continuum
 {
@@ -514,6 +515,8 @@ namespace MGroup.FEM.Structural.Continuum
 
 			var secPiolaMat = new double[nGaussPoints][,];
 			var secPiolaElasMat = new double[nGaussPoints][,];
+			var s = MatrixSymmetry.Symmetric;
+
 			for (int npoint = 0; npoint < nGaussPoints; npoint++)
 			{
 				var stressesElastic = lastStresses[npoint];
@@ -667,6 +670,7 @@ namespace MGroup.FEM.Structural.Continuum
 
 				//
 				IMatrixView consDisp = materialsAtGaussPoints[npoint].ConstitutiveMatrix;
+				s = s == MatrixSymmetry.Symmetric ? consDisp.MatrixSymmetry : s;
 
 				var DG = new double[3, 3] { { DefGradVec[npoint][0], DefGradVec[npoint][3], DefGradVec[npoint][6] }, { DefGradVec[npoint][7], DefGradVec[npoint][1], DefGradVec[npoint][4] }, { DefGradVec[npoint][5], DefGradVec[npoint][8], DefGradVec[npoint][2] } };
 				var DG_el = new double[3, 3] { { DefGradVec[npoint][0] / lambdag, DefGradVec[npoint][3] / lambdag, DefGradVec[npoint][6] / lambdag }, { DefGradVec[npoint][7] / lambdag, DefGradVec[npoint][1] / lambdag, DefGradVec[npoint][4] / lambdag }, { DefGradVec[npoint][5] / lambdag, DefGradVec[npoint][8] / lambdag, DefGradVec[npoint][2] / lambdag } };
@@ -723,6 +727,7 @@ namespace MGroup.FEM.Structural.Continuum
 				}
 			}
 
+			elementStiffnessMatrix.MatrixSymmetry = s;
 			return elementStiffnessMatrix;
 		}
 
