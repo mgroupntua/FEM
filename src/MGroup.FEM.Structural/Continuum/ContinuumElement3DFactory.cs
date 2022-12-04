@@ -143,7 +143,7 @@ namespace MGroup.FEM.Structural.Continuum
 		public ContinuumElement3DNonLinear CreateNonLinearElement(CellType cellType, IReadOnlyList<INode> nodes,
 			IContinuumMaterial3D commonMaterial, TransientAnalysisProperties commonDynamicProperties)
 		{
-			return new ContinuumElement3DNonLinear(nodes, commonMaterial, integrationsForStiffness[cellType], interpolations[cellType]);
+			return new ContinuumElement3DNonLinear(nodes, commonMaterial, integrationsForStiffness[cellType], interpolations[cellType], commonDynamicProperties, integrationsForMass[cellType]);
 		}
 
 		public ContinuumElement3DGrowth CreateNonLinearElementGrowt(CellType cellType, IReadOnlyList<INode> nodes,
