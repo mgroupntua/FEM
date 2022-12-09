@@ -78,7 +78,7 @@ steps:
   displayName: Clone MSolve.Tests
   inputs:
     targetType: inline
-    script: mkdir integrationTests ; cd integrationTests ; git clone https://github.com/mgroupntua/MSolve.Tests.git
+    script: mkdir integrationTests ; cd integrationTests ; git clone https://github.com/mgroupntua/MSolve.Tests.git ; cd MSolve.Tests
     pwsh: true
 
 - task: CopyFiles@2
