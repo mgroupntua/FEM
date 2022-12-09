@@ -113,6 +113,7 @@ steps:
     projects: '**/*[Tt]ests/*.csproj'
     arguments: '--configuration $(BuildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
     publishTestResults: true
+    workingDirectory: 'D:\a\1\s\integrationTests\MSolve.Tests'
 
 - task: PublishSymbols@2
   displayName: "Publish symbols to Azure Devops artifacts"
