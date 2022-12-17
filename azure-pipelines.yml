@@ -16,7 +16,7 @@ pool:
 
 variables:
   buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
+  buildConfiguration: 'Debug'
   testProject: 'tests/MGroup.FEM.Tests'
 
 steps:
@@ -31,7 +31,7 @@ steps:
   displayName: Set SemVer from git history and update AssemblyInfo
   inputs:
     targetType: inline
-    script: ../dotnet-gitversion /updateassemblyinfo AssemblyInfo.cs AssemblyVersionInfo.cs /output buildserver 
+    script: ../dotnet-gitversion /updateassemblyinfo AssemblyInfo.cs AssemblyVersionInfo.cs /output buildserver
     pwsh: true
 
 - task: DotNetCoreCLI@2
@@ -78,19 +78,31 @@ steps:
   displayName: Clone MSolve.Tests
   inputs:
     targetType: inline
-    script: mkdir integrationTests ; cd integrationTests ; git clone https://github.com/mgroupntua/MSolve.Tests.git
+    script: mkdir integrationTests ; cd integrationTests ; git clone https://github.com/mgroupntua/MSolve.Tests.git ; cd MSolve.Tests
     pwsh: true
 
 - task: CopyFiles@2
   enabled: true
-  displayName: Updates FEM project on MSolve.Tests (locally)
+  displayName: Copy FEM project on MSolve.Tests
   inputs:
     sourceFolder: 'D:\a\1\s'
     Contents: |
       **/*
       !integrationTests/**/*
-    targetFolder: 'D:\a\1\s\integrationTests\src\FEM'
+    targetFolder: 'D:\a\1\s\integrationTests\FEM'
     cleanTargetFolder: true # Optional
+
+- script: dotnet remove D:\a\1\s\integrationTests\MSolve.Tests\tests\MGroup.FEM.Structural.Tests\MGroup.FEM.Structural.Tests.csproj package MGroup.FEM.Structural
+  displayName: Remove Package FEM.Structural
+
+- script: dotnet add D:\a\1\s\integrationTests\MSolve.Tests\tests\MGroup.FEM.Structural.Tests\MGroup.FEM.Structural.Tests.csproj reference D:\a\1\s\integrationTests\FEM\src\MGroup.FEM.Structural\MGroup.FEM.Structural.csproj
+  displayName: Add project ref FEM.Structural
+
+- script: dotnet remove D:\a\1\s\integrationTests\MSolve.Tests\tests\MGroup.FEM.Thermal.Tests\MGroup.FEM.Thermal.Tests.csproj package MGroup.FEM.Thermal
+  displayName: Remove Package FEM.Thermal
+
+- script: dotnet add D:\a\1\s\integrationTests\MSolve.Tests\tests\MGroup.FEM.Thermal.Tests\MGroup.FEM.Thermal.Tests.csproj reference D:\a\1\s\integrationTests\FEM\src\MGroup.FEM.Thermal\MGroup.FEM.Thermal.csproj
+  displayName: Add project ref FEM.Thermal
 
 - task: DotNetCoreCLI@2
   enabled: true
@@ -98,7 +110,10 @@ steps:
   condition: eq(variables['Build.SourceBranch'], 'refs/heads/develop')
   inputs:
     command: 'test'
-    projects: '**/*[Tt]ests/*.csproj'
+    projects: |
+      D:\a\1\s\integrationTests\MSolve.Tests\tests\MGroup.FEM.Structural.Tests\MGroup.FEM.Structural.Tests.csproj
+      D:\a\1\s\integrationTests\MSolve.Tests\tests\MGroup.FEM.Thermal.Tests\MGroup.FEM.Thermal.Tests.csproj
+      D:\a\1\s\integrationTests\MSolve.Tests\tests\MGroup.FEM.ConvectionDiffusion.Tests\MGroup.FEM.ConvectionDiffusion.Tests.csproj
     arguments: '--configuration $(BuildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
     publishTestResults: true
 
