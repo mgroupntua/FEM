@@ -76,6 +76,7 @@ namespace MGroup.FEM.Thermal.Isoparametric
 
 			//WARNING: the following needs to change for non uniform density. Perhaps the integration order too.
 			capacity.Scale(material.Density * material.SpecialHeatCoeff);
+			capacity.MatrixSymmetry = LinearAlgebra.Providers.MatrixSymmetry.Symmetric;
 			return capacity;
 		}
 
@@ -114,6 +115,7 @@ namespace MGroup.FEM.Thermal.Isoparametric
 			}
 
 			conductivity.Scale(1);
+			conductivity.MatrixSymmetry = LinearAlgebra.Providers.MatrixSymmetry.Symmetric;
 			return conductivity;
 		}
 
