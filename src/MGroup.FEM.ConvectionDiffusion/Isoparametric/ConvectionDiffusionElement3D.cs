@@ -107,6 +107,7 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 			}
 			
 			capacity.ScaleIntoThis(material.CapacityCoeff);
+			capacity.MatrixSymmetry = LinearAlgebra.Providers.MatrixSymmetry.Symmetric;
 			return capacity;
 		}
 
@@ -136,6 +137,7 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 				double dA = jacobian.DirectDeterminant * QuadratureForStiffness.IntegrationPoints[gp].Weight;
 				diffusion.AxpyIntoThis(partialK, dA * material.DiffusionCoeff);
 			}
+			diffusion.MatrixSymmetry = LinearAlgebra.Providers.MatrixSymmetry.Symmetric;
 
 			return diffusion;
 		}
@@ -174,6 +176,8 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 
 				convection.AxpyIntoThis(partialConvectionMatrix, dA);
 			}
+			convection.MatrixSymmetry = material.ConvectionCoeff[0] == 0 && material.ConvectionCoeff[1] == 0 && material.ConvectionCoeff[2] == 0 ? LinearAlgebra.Providers.MatrixSymmetry.Symmetric : LinearAlgebra.Providers.MatrixSymmetry.NonSymmetric;
+
 
 			return convection;
 		}
@@ -196,6 +200,7 @@ namespace MGroup.FEM.ConvectionDiffusion.Isoparametric
 			}
 
 			production.ScaleIntoThis(material.DependentSourceCoeff * (-1d));
+			production.MatrixSymmetry = LinearAlgebra.Providers.MatrixSymmetry.Symmetric;
 			return production;
 		}
 
