@@ -104,6 +104,12 @@ steps:
 - script: dotnet add D:\a\1\s\integrationTests\MSolve.Tests\tests\MGroup.FEM.Thermal.Tests\MGroup.FEM.Thermal.Tests.csproj reference D:\a\1\s\integrationTests\FEM\src\MGroup.FEM.Thermal\MGroup.FEM.Thermal.csproj
   displayName: Add project ref FEM.Thermal
 
+- script: dotnet remove D:\a\1\s\integrationTests\MSolve.Tests\tests\MGroup.FEM.ConvectionDiffusion.Tests\MGroup.FEM.ConvectionDiffusion.Tests.csproj package MGroup.FEM.ConvectionDiffusion
+  displayName: Remove Package FEM.ConvectionDiffusion
+
+- script: dotnet add D:\a\1\s\integrationTests\MSolve.Tests\tests\MGroup.FEM.ConvectionDiffusion.Tests\MGroup.FEM.ConvectionDiffusion.Tests.csproj reference D:\a\1\s\integrationTests\FEM\src\MGroup.FEM.ConvectionDiffusion\MGroup.FEM.ConvectionDiffusion.csproj
+  displayName: Add project ref FEM.ConvectionDiffusion
+
 - task: DotNetCoreCLI@2
   enabled: true
   displayName: Runs MSolve.Tests (master)
