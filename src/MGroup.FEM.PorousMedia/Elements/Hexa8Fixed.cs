@@ -10,6 +10,7 @@ using MGroup.MSolve.Discretization;
 using MGroup.MSolve.Discretization.Dofs;
 using MGroup.MSolve.Discretization.Embedding;
 using MGroup.MSolve.Discretization.Entities;
+using MGroup.MSolve.DataStructures;
 
 //TODO: get rid of Hexa8.cs
 
@@ -517,7 +518,7 @@ namespace MGroup.FEM.PorousMedia.Elements
 		//	foreach (IContinuumMaterial3D m in materialsAtGaussPoints) m.ClearState();
 		//}
 
-		public void SaveConstitutiveLawState()
+		public void SaveConstitutiveLawState(IHaveState externalState)
 		{
 			foreach (IContinuumMaterial3D m in materialsAtGaussPoints) m.CreateState();
 		}

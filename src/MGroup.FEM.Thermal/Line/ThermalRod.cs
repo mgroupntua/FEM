@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using MGroup.Constitutive.Thermal;
 using MGroup.LinearAlgebra.Matrices;
+using MGroup.MSolve.DataStructures;
 using MGroup.MSolve.Discretization;
 using MGroup.MSolve.Discretization.Dofs;
 using MGroup.MSolve.Discretization.Embedding;
@@ -58,7 +59,9 @@ namespace MGroup.FEM.Thermal.Line
 		{
 			double kdAL = material.SpecialHeatCoeff * material.Density * CrossSectionArea * Length;
 			double[,] capacity = { { kdAL / 3.0, kdAL / 6.0 }, { kdAL / 6.0, kdAL / 3.0 } };
-			return Matrix.CreateFromArray(capacity);
+			var matrix = Matrix.CreateFromArray(capacity);
+			matrix.MatrixSymmetry = LinearAlgebra.Providers.MatrixSymmetry.Symmetric;
+			return matrix;
 		}
 
 		public Matrix BuildConductivityMatrix()
@@ -66,7 +69,9 @@ namespace MGroup.FEM.Thermal.Line
 
 			double cAoverL = material.ThermalConductivity * CrossSectionArea / Length;
 			double[,] conductivity = { { cAoverL, -cAoverL }, { -cAoverL, cAoverL } };
-			return Matrix.CreateFromArray(conductivity);
+			var matrix = Matrix.CreateFromArray(conductivity);
+			matrix.MatrixSymmetry = LinearAlgebra.Providers.MatrixSymmetry.Symmetric;
+			return matrix;
 		}
 
 		public IReadOnlyList<IReadOnlyList<IDofType>> GetElementDofTypes() => dofTypes;
@@ -96,7 +101,7 @@ namespace MGroup.FEM.Thermal.Line
 		//	throw new NotImplementedException();
 		//}
 
-		public void SaveConstitutiveLawState()
+		public void SaveConstitutiveLawState(IHaveState externalState)
 		{
 			throw new NotImplementedException();
 		}

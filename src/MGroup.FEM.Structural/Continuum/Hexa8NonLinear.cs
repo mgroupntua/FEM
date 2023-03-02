@@ -12,6 +12,9 @@ using MGroup.MSolve.Discretization.Entities;
 using MGroup.MSolve.Discretization.BoundaryConditions;
 using MGroup.MSolve.Numerics.Integration.Quadratures;
 using MGroup.MSolve.Numerics.Interpolation;
+using MGroup.MSolve.DataStructures;
+using MGroup.MSolve.Constitutive;
+using MGroup.LinearAlgebra.Providers;
 
 namespace MGroup.FEM.Structural.Continuum
 {
@@ -408,7 +411,6 @@ namespace MGroup.FEM.Structural.Continuum
 		{
 			Matrix elementStiffnessMatrix = Matrix.CreateZero(24, 24);
 
-
 			// initialization of matrices that are not cached currently
 			double[][] integrCoeffsTimesStresses = new double[nGaussPoints][];
 			Matrix[] BL = new Matrix[nGaussPoints];
@@ -418,6 +420,7 @@ namespace MGroup.FEM.Structural.Continuum
 				BL[gpoint] = Matrix.CreateZero(6, 24);
 
 			}
+
 			Matrix ll2 = Matrix.CreateZero(8, 3);
 			for (int m = 0; m < 8; m++)
 			{
@@ -426,6 +429,7 @@ namespace MGroup.FEM.Structural.Continuum
 					ll2[m, n] = totalDisplacements[m][n];
 				}
 			}
+
 			IReadOnlyList<Matrix> shapeFunctionNaturalDerivatives;
 			shapeFunctionNaturalDerivatives = Interpolation.EvaluateNaturalGradientsAtGaussPoints(QuadratureForStiffness);
 			(Matrix[] jacobianInverse, double[] jacobianDeterminants) = JacobianHexa8Reverse.GetJ_0invHexaAndjacobianDeterminants(
@@ -447,8 +451,7 @@ namespace MGroup.FEM.Structural.Continuum
 				bL1112Plus01Matrices[npoint] = Matrix.CreateZero(6, 9); //TODO this may be unnescessary
 			}
 
-
-
+			var s = MatrixSymmetry.Symmetric;
 			for (int npoint = 0; npoint < nGaussPoints; npoint++)
 			{
 
@@ -489,11 +492,8 @@ namespace MGroup.FEM.Structural.Continuum
 			for (int gpoint = 0; gpoint < nGaussPoints; gpoint++)
 			{
 				bnlMatrices[gpoint] = Matrix.CreateZero(9, 24); //todo this may be unnescessary
-
 				bnlMatrices[gpoint] = bnl1Matrices[gpoint] * bl13Matrices[gpoint];
-
 			}
-
 
 			Matrix[] integrCoeff_Spk = new Matrix[nGaussPoints];
 			for (int npoint = 0; npoint < nGaussPoints; npoint++)
@@ -508,8 +508,6 @@ namespace MGroup.FEM.Structural.Continuum
 				kl_[npoint] = Matrix.CreateZero(24, 24);
 				knl_[npoint] = Matrix.CreateZero(24, 24);
 			}
-
-
 
 			for (int npoint = 0; npoint < nGaussPoints; npoint++)
 			{
@@ -530,6 +528,7 @@ namespace MGroup.FEM.Structural.Continuum
 
 				//
 				IMatrixView consDisp = materialsAtGaussPoints[npoint].ConstitutiveMatrix;
+				s = s == MatrixSymmetry.Symmetric ? consDisp.MatrixSymmetry : s;
 
 				for (int m = 0; m < 6; m++)
 				{
@@ -583,6 +582,7 @@ namespace MGroup.FEM.Structural.Continuum
 				}
 			}
 
+			elementStiffnessMatrix.MatrixSymmetry = s;
 			return elementStiffnessMatrix;
 		}
 
@@ -645,7 +645,7 @@ namespace MGroup.FEM.Structural.Continuum
 			//foreach (IContinuumMaterial3D m in materialsAtGaussPoints) m.ClearState();
 		}
 
-		public void SaveConstitutiveLawState()
+		public void SaveConstitutiveLawState(IHaveState externalState)
 		{
 			for (int npoint = 0; npoint < materialsAtGaussPoints.Length; npoint++)
 			{
@@ -654,6 +654,20 @@ namespace MGroup.FEM.Structural.Continuum
 			}
 
 			foreach (IContinuumMaterial3D m in materialsAtGaussPoints) m.CreateState();
+			
+			if (externalState != null && (externalState is IHaveStateWithValues))
+			{
+				var s = (IHaveStateWithValues)externalState;
+				if (s.StateValues.ContainsKey(TransientLiterals.TIME))
+				{
+					var time = s.StateValues[TransientLiterals.TIME];
+					foreach (var m in materialsAtGaussPoints.Where(x => x is ITransientConstitutiveLaw).Select(x => (ITransientConstitutiveLaw)x))
+					{
+						m.SetCurrentTime(time);
+					}
+				}
+
+			}
 		}
 
 		//public void ClearMaterialStresses()

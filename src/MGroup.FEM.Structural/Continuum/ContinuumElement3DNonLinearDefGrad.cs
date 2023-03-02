@@ -12,6 +12,9 @@ using MGroup.MSolve.Discretization.BoundaryConditions;
 using MGroup.LinearAlgebra.Vectors;
 using System.Linq;
 using MGroup.MSolve.Discretization.Entities;
+using MGroup.MSolve.DataStructures;
+using MGroup.MSolve.Constitutive;
+using MGroup.LinearAlgebra.Providers;
 
 namespace MGroup.FEM.Structural.Continuum
 {
@@ -467,8 +470,6 @@ namespace MGroup.FEM.Structural.Continuum
                 bL1112Plus01Matrices[npoint] = Matrix.CreateZero(6, 9); //TODO this may be unnescessary
             }
 
-
-
             for (int npoint = 0; npoint < nGaussPoints; npoint++)
             {
 
@@ -529,9 +530,8 @@ namespace MGroup.FEM.Structural.Continuum
                 knlStiffnessMatrixContributions[npoint] = Matrix.CreateZero(3 * numNodes, 3 * numNodes);
             }
 
-
-
-            for (int npoint = 0; npoint < nGaussPoints; npoint++)
+			var s = MatrixSymmetry.Symmetric;
+			for (int npoint = 0; npoint < nGaussPoints; npoint++)
             {
                 Matrix integrCoeffsTimesStressesTimesbnlMatrices = Matrix.CreateZero(9, 3*numNodes); //TODO
                 Matrix integrCoeffsTimesConsMatrix = Matrix.CreateZero(6, 6); //TODO
@@ -550,8 +550,9 @@ namespace MGroup.FEM.Structural.Continuum
 
                 //
                 IMatrixView consDisp = materialsAtGaussPoints[npoint].ConstitutiveMatrix;
+				s = s == MatrixSymmetry.Symmetric ? consDisp.MatrixSymmetry : s;
 
-                for (int m = 0; m < 6; m++)
+				for (int m = 0; m < 6; m++)
                 {
                     for (int n = 0; n < 6; n++)
                     {
@@ -603,7 +604,8 @@ namespace MGroup.FEM.Structural.Continuum
                 }
             }
 
-            return elementStiffnessMatrix;
+			elementStiffnessMatrix.MatrixSymmetry = s;
+			return elementStiffnessMatrix;
         }
         
         public Tuple<double[], double[]> CalculateResponse(double[] localTotalDisplacements)
@@ -671,7 +673,7 @@ namespace MGroup.FEM.Structural.Continuum
 			//foreach (IContinuumMaterial3DDefGrad m in materialsAtGaussPoints) m.ClearState();
 		}
 
-		public void SaveConstitutiveLawState()
+		public void SaveConstitutiveLawState(IHaveState externalState)
         {
             //for (int npoint = 0; npoint < materialsAtGaussPoints.Length; npoint++)
             //{
@@ -680,7 +682,21 @@ namespace MGroup.FEM.Structural.Continuum
             //}
 
             foreach (IContinuumMaterial3DDefGrad m in materialsAtGaussPoints) m.CreateState();
-        }
+			
+			if (externalState != null && (externalState is IHaveStateWithValues))
+			{
+				var s = (IHaveStateWithValues)externalState;
+				if (s.StateValues.ContainsKey(TransientLiterals.TIME))
+				{
+					var time = s.StateValues[TransientLiterals.TIME];
+					foreach (var m in materialsAtGaussPoints.Where(x => x is ITransientConstitutiveLaw).Select(x => (ITransientConstitutiveLaw)x))
+					{
+						m.SetCurrentTime(time);
+					}
+				}
+
+			}
+		}
 
         //public void ClearMaterialStresses()
         //{

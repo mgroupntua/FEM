@@ -11,6 +11,7 @@ using MGroup.MSolve.Discretization.Dofs;
 using MGroup.MSolve.Discretization.Embedding;
 using MGroup.MSolve.Discretization.Entities;
 using MGroup.MSolve.Discretization.BoundaryConditions;
+using MGroup.MSolve.DataStructures;
 
 namespace MGroup.FEM.PorousMedia.Elements
 {
@@ -528,7 +529,7 @@ namespace MGroup.FEM.PorousMedia.Elements
 		//	foreach (IContinuumMaterial3D m in materialsAtGaussPoints) m.ClearState();
 		//}
 
-		public void SaveConstitutiveLawState()
+		public void SaveConstitutiveLawState(IHaveState externalState)
 		{
 			foreach (IContinuumMaterial3D m in materialsAtGaussPoints) m.CreateState();
 		}

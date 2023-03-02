@@ -15,6 +15,10 @@ using MGroup.MSolve.Discretization.Entities;
 using MGroup.MSolve.Discretization.Meshes;
 using MGroup.MSolve.Geometry.Coordinates;
 using MGroup.LinearAlgebra.Vectors;
+using MGroup.MSolve.DataStructures;
+using MGroup.MSolve.Constitutive;
+using System.Linq;
+using MGroup.LinearAlgebra.Providers;
 
 namespace MGroup.FEM.Structural.Continuum
 {
@@ -114,7 +118,9 @@ namespace MGroup.FEM.Structural.Continuum
 				double dA = jacobian.DirectDeterminant * QuadratureForConsistentMass.IntegrationPoints[gp].Weight;
 				mass.AxpyIntoThis(partial, dA);
 			}
+
 			mass.ScaleIntoThis(dynamicProperties.Density);
+			mass.MatrixSymmetry = MatrixSymmetry.Symmetric;
 			return mass;
 		}
 
@@ -134,6 +140,7 @@ namespace MGroup.FEM.Structural.Continuum
 
 			double nodalMass = area * dynamicProperties.Density / Nodes.Count;
 			for (int i = 0; i < numberOfDofs; i++) lumpedMass[i, i] = nodalMass;
+			lumpedMass.MatrixSymmetry = MatrixSymmetry.Symmetric;
 
 			return lumpedMass;
 		}
@@ -145,9 +152,11 @@ namespace MGroup.FEM.Structural.Continuum
 			IReadOnlyList<Matrix> shapeGradientsNatural =
 				Interpolation.EvaluateNaturalGradientsAtGaussPoints(QuadratureForStiffness);
 
+			var s = MatrixSymmetry.Symmetric;
 			for (int gp = 0; gp < QuadratureForStiffness.IntegrationPoints.Count; ++gp)
 			{
 				IMatrixView constitutive = materialsAtGaussPoints[gp].ConstitutiveMatrix;
+				s = s == MatrixSymmetry.Symmetric ? constitutive.MatrixSymmetry : s;
 				var jacobian = new IsoparametricJacobian3D(Nodes, shapeGradientsNatural[gp]);
 				Matrix shapeGradientsCartesian =
 					jacobian.TransformNaturalDerivativesToCartesian(shapeGradientsNatural[gp]);
@@ -158,6 +167,7 @@ namespace MGroup.FEM.Structural.Continuum
 				stiffness.AxpyIntoThis(partial, dA);
 			}
 
+			stiffness.MatrixSymmetry = s;
 			return DofEnumerator.GetTransformedMatrix(stiffness);
 		}
 
@@ -285,9 +295,11 @@ namespace MGroup.FEM.Structural.Continuum
 
 		public IMatrix DampingMatrix()
 		{
-			IMatrix damping = BuildStiffnessMatrix();
+			var damping = BuildStiffnessMatrix().CopyToFullMatrix();
+			var m = MassMatrix();
 			damping.ScaleIntoThis(dynamicProperties.RayleighCoeffStiffness);
-			damping.AxpyIntoThis(MassMatrix(), dynamicProperties.RayleighCoeffMass);
+			damping.AxpyIntoThis(m, dynamicProperties.RayleighCoeffMass);
+			damping.MatrixSymmetry = m.MatrixSymmetry == MatrixSymmetry.Symmetric && damping.MatrixSymmetry == MatrixSymmetry.Symmetric ? MatrixSymmetry.Symmetric : MatrixSymmetry.NonSymmetric;
 			return damping;
 		}
 
@@ -308,14 +320,29 @@ namespace MGroup.FEM.Structural.Continuum
 		//	foreach (var material in materialsAtGaussPoints) material.ResetModified();
 		//}
 
-		public void SaveConstitutiveLawState()
+		public void SaveConstitutiveLawState(IHaveState externalState)
 		{
 			for (int npoint = 0; npoint < materialsAtGaussPoints.Count; npoint++)
 			{
 				for (int i1 = 0; i1 < 6; i1++)
 				{ strainsVecLastConverged[npoint][i1] = strainsVec[npoint][i1]; }
 			}
+
 			foreach (var m in materialsAtGaussPoints) m.CreateState();
+
+			if (externalState != null && (externalState is IHaveStateWithValues))
+			{
+				var s = (IHaveStateWithValues)externalState;
+				if (s.StateValues.ContainsKey(TransientLiterals.TIME))
+				{
+					var time = s.StateValues[TransientLiterals.TIME];
+					foreach (var m in materialsAtGaussPoints.Where(x => x is ITransientConstitutiveLaw).Select(x => (ITransientConstitutiveLaw)x))
+					{
+						m.SetCurrentTime(time);
+					}
+				}
+
+			}
 		}
 
 		public IMatrix StiffnessMatrix() => DofEnumerator.GetTransformedMatrix(BuildStiffnessMatrix());
