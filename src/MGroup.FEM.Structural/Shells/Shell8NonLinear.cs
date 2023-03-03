@@ -803,5 +803,6 @@ namespace MGroup.FEM.Structural.Shells
 		}
 		public double[] CalculateResponseIntegralForLogging(double[] localDisplacements)
 			=> CalculateResponseIntegral();
+		public double[] VolumeLoads() => throw new NotImplementedException();
 	}
 }

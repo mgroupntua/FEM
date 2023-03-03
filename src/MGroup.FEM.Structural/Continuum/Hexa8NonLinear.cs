@@ -914,6 +914,8 @@ namespace MGroup.FEM.Structural.Continuum
 			};
 		}
 
+		public double[] VolumeLoads() => throw new NotImplementedException();
+
 		#endregion
 
 	}

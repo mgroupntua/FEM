@@ -817,6 +817,8 @@ namespace MGroup.FEM.Structural.Embedding
 
 			return dofEnumerator.GetTransformedDisplacementsVector(hostDOFValues);
 		}
+
+		public double[] VolumeLoads() => throw new NotImplementedException();
 		#endregion
 	}
 }

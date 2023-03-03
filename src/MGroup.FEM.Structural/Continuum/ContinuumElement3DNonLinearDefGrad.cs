@@ -720,12 +720,14 @@ namespace MGroup.FEM.Structural.Continuum
         {
             throw new NotImplementedException();
         }
-        #endregion
+
+		public double[] VolumeLoads() => throw new NotImplementedException();
+		#endregion
 
 
-       
 
-    }
+
+	}
 
 
 }

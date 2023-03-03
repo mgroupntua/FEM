@@ -784,6 +784,8 @@ namespace MGroup.FEM.Structural.Continuum
 			damping.AxpyIntoThis(MassMatrix(), dynamicProperties.RayleighCoeffMass);
 			return damping;
 		}
+
+		public double[] VolumeLoads() => throw new NotImplementedException();
 		#endregion
 
 

@@ -372,5 +372,7 @@ namespace MGroup.FEM.Structural.Continuum
 			}
 			return shapeFunctionMatrix;
 		}
+
+		public double[] VolumeLoads() => throw new NotImplementedException();
 	}
 }
