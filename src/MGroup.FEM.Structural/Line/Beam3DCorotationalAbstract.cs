@@ -643,5 +643,7 @@ namespace MGroup.FEM.Structural.Line
 		{
 			throw new NotImplementedException();
 		}
+
+		public double[] VolumeLoads() => throw new NotImplementedException();
 	}
 }

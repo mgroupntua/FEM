@@ -313,5 +313,7 @@ namespace MGroup.FEM.Structural.Line
 		public void ClearConstitutiveLawStresses()
 		{
 		}
+
+		public double[] VolumeLoads() => throw new NotImplementedException();
 	}
 }

@@ -209,6 +209,7 @@ namespace MGroup.FEM.Structural.Line
 		}
 
 		public void ClearConstitutiveLawStresses() => throw new NotImplementedException();
+		public double[] VolumeLoads() => throw new NotImplementedException();
 		#endregion
 	}
 }

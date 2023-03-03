@@ -107,5 +107,7 @@ namespace MGroup.FEM.Structural.Special
 		public void ClearConstitutiveLawState() { }
 		public void SaveConstitutiveLawState(IHaveState externalState) { }
 		public void ClearConstitutiveLawStresses() { }
+
+		public double[] VolumeLoads() => throw new NotSupportedException();
 	}
 }

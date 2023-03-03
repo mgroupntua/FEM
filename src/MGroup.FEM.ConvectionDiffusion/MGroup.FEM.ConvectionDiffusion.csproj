@@ -11,11 +11,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MGroup.Constitutive.ConvectionDiffusion" Version="0.2.0-unstable.61" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\MSolve.Constitutive\src\MGroup.Constitutive.ConvectionDiffusion\MGroup.Constitutive.ConvectionDiffusion.csproj" />
     <ProjectReference Include="..\MGroup.FEM\MGroup.FEM.csproj" />
   </ItemGroup>
 

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
@@ -8,14 +8,15 @@
     <PackageProjectUrl>http://mgroup.ntua.gr</PackageProjectUrl>
     <RepositoryUrl>https://github.com/mgroupntua/FEM</RepositoryUrl>
     <PackageIconUrl>https://github.com/mgroupntua/FEM/raw/develop/MGroupFEMStructural.png</PackageIconUrl>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MGroup.Constitutive.Structural" Version="0.2.0-unstable.61" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\MSolve.Constitutive\src\MGroup.Constitutive.Structural\MGroup.Constitutive.Structural.csproj" />
     <ProjectReference Include="..\MGroup.FEM\MGroup.FEM.csproj" />
   </ItemGroup>
 

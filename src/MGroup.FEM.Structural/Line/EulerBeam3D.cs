@@ -751,6 +751,8 @@ namespace MGroup.FEM.Structural.Line
 			return dofEnumerator.GetTransformedDisplacementsVector(hostDOFValues);
 		}
 
+		public double[] VolumeLoads() => throw new NotImplementedException();
+
 		#endregion
 
 	}
