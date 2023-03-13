@@ -156,5 +156,10 @@ namespace MGroup.FEM.Structural.Special
 		public void ClearConstitutiveLawState() { }
 		public void SaveConstitutiveLawState(IHaveState externalState) { }
 		public void ClearConstitutiveLawStresses() { }
+
+		IEnumerable<double[]> InterpolateElementModelQuantities(IEnumerable<IElementModelQuantity<IStructuralDofType>> quantities) =>
+			throw new NotImplementedException();
+		IEnumerable<double[]> IntegrateElementModelQuantities(IEnumerable<IElementModelQuantity<IStructuralDofType>> quantities) =>
+			throw new NotImplementedException();
 	}
 }

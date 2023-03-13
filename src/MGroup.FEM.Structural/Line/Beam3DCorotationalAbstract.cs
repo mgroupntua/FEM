@@ -643,5 +643,10 @@ namespace MGroup.FEM.Structural.Line
 		{
 			throw new NotImplementedException();
 		}
+
+		IEnumerable<double[]> InterpolateElementModelQuantities(IEnumerable<IElementModelQuantity<IStructuralDofType>> quantities) =>
+			throw new NotImplementedException();
+		IEnumerable<double[]> IntegrateElementModelQuantities(IEnumerable<IElementModelQuantity<IStructuralDofType>> quantities) =>
+			throw new NotImplementedException();
 	}
 }

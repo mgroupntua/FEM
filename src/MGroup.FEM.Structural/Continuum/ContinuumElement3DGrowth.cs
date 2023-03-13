@@ -834,5 +834,10 @@ namespace MGroup.FEM.Structural.Continuum
 			throw new NotImplementedException();
 		}
 		#endregion
+
+		IEnumerable<double[]> InterpolateElementModelQuantities(IEnumerable<IElementModelQuantity<IStructuralDofType>> quantities) =>
+			throw new NotImplementedException();
+		IEnumerable<double[]> IntegrateElementModelQuantities(IEnumerable<IElementModelQuantity<IStructuralDofType>> quantities) =>
+			throw new NotImplementedException();
 	}
 }

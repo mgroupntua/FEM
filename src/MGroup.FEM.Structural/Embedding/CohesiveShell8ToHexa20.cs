@@ -818,5 +818,10 @@ namespace MGroup.FEM.Structural.Embedding
 			return dofEnumerator.GetTransformedDisplacementsVector(hostDOFValues);
 		}
 		#endregion
+
+		IEnumerable<double[]> InterpolateElementModelQuantities(IEnumerable<IElementModelQuantity<IStructuralDofType>> quantities) =>
+			throw new NotImplementedException();
+		IEnumerable<double[]> IntegrateElementModelQuantities(IEnumerable<IElementModelQuantity<IStructuralDofType>> quantities) =>
+			throw new NotImplementedException();
 	}
 }

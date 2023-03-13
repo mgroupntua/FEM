@@ -753,5 +753,9 @@ namespace MGroup.FEM.Structural.Line
 
 		#endregion
 
+		IEnumerable<double[]> InterpolateElementModelQuantities(IEnumerable<IElementModelQuantity<IStructuralDofType>> quantities) =>
+			throw new NotImplementedException();
+		IEnumerable<double[]> IntegrateElementModelQuantities(IEnumerable<IElementModelQuantity<IStructuralDofType>> quantities) =>
+			throw new NotImplementedException();
 	}
 }
