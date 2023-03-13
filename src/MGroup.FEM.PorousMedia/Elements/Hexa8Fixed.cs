@@ -668,9 +668,10 @@ namespace MGroup.FEM.PorousMedia.Elements
 		}
 
 		#endregion
-		IEnumerable<double[]> InterpolateElementModelQuantities(IEnumerable<IElementModelQuantity<IStructuralDofType>> quantities) =>
+		
+		public IEnumerable<double[]> InterpolateElementModelQuantities(IEnumerable<IElementModelQuantity<IStructuralDofType>> quantities) =>
 			throw new NotImplementedException();
-		IEnumerable<double[]> IntegrateElementModelQuantities(IEnumerable<IElementModelQuantity<IStructuralDofType>> quantities) =>
+		public IEnumerable<double[]> IntegrateElementModelQuantities(IEnumerable<IElementModelQuantity<IStructuralDofType>> quantities) =>
 			throw new NotImplementedException();
 	}
 }

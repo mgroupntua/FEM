@@ -804,9 +804,9 @@ namespace MGroup.FEM.Structural.Shells
 		public double[] CalculateResponseIntegralForLogging(double[] localDisplacements)
 			=> CalculateResponseIntegral();
 
-		IEnumerable<double[]> InterpolateElementModelQuantities(IEnumerable<IElementModelQuantity<IStructuralDofType>> quantities) =>
+		public IEnumerable<double[]> InterpolateElementModelQuantities(IEnumerable<IElementModelQuantity<IStructuralDofType>> quantities) =>
 			throw new NotImplementedException();
-		IEnumerable<double[]> IntegrateElementModelQuantities(IEnumerable<IElementModelQuantity<IStructuralDofType>> quantities) =>
+		public IEnumerable<double[]> IntegrateElementModelQuantities(IEnumerable<IElementModelQuantity<IStructuralDofType>> quantities) =>
 			throw new NotImplementedException();
 	}
 }
