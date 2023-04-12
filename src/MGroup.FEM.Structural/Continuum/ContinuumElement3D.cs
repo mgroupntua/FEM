@@ -424,8 +424,8 @@ namespace MGroup.FEM.Structural.Continuum
 			return shapeFunctionMatrix;
 		}
 
-		public IEnumerable<double[]> InterpolateElementModelQuantities(IEnumerable<IElementModelQuantity<IStructuralDofType>> quantities)
-			=> throw new NotImplementedException();
+		public IEnumerable<IEnumerable<double>> InterpolateElementModelQuantities(IEnumerable<IElementModelQuantity<IStructuralDofType>> quantities, IEnumerable<double[]> coordinates)
+			=> throw new NotImplementedException("Inverse interpolation mapping needs to be implemented in MSolve.Core");
 
 		private double[] GetGaussPointsCoordinates(int gpNo)
 		{
