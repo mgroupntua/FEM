@@ -585,21 +585,22 @@ namespace MGroup.FEM.Structural.Line
 			//    halfMass, 0,
 			//    halfMass
 			//});
-			double halfMass = Density * SectionArea / L / 6d;
+			double halfMass = 0.5 * Density * SectionArea * L;
+			double rotHalfMass = Density * SectionArea * L * L / 24d;
 			int order = 12;
 			Matrix massMatrix = SymmetricMatrix.CreateFromPackedRowMajorArray(
 				new double[] { halfMass, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 				halfMass, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 				halfMass, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0,
+				rotHalfMass, 0, 0, 0, 0, 0, 0, 0, 0,
+				rotHalfMass, 0, 0, 0, 0, 0, 0, 0,
+				rotHalfMass, 0, 0, 0, 0, 0, 0,
 				halfMass, 0, 0, 0, 0, 0,
 				halfMass, 0, 0, 0, 0,
 				halfMass, 0, 0, 0,
-				0, 0, 0,
-				0, 0,
-				0
+				rotHalfMass, 0, 0,
+				rotHalfMass, 0,
+				rotHalfMass,
 			}, order).CopyToFullMatrix();
 
 			var refx = new double[] { 1, 1, 1 };
