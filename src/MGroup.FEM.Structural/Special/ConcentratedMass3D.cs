@@ -45,13 +45,14 @@ namespace MGroup.FEM.Structural.Special
 
 		public bool ConstitutiveLawModified => false;
 
-		public ConcentratedMass3D(double massCoefficient)
+		public ConcentratedMass3D(INode node, double massCoefficient)
 		{
 			this.massCoefficient = massCoefficient;
+			this.Nodes = new List<INode> { node };
 		}
 
-		public ConcentratedMass3D(double massCoefficient, IElementDofEnumerator dofEnumerator)
-			: this(massCoefficient)
+		public ConcentratedMass3D(INode node, double massCoefficient, IElementDofEnumerator dofEnumerator)
+			: this(node, massCoefficient)
 		{
 			this.dofEnumerator = dofEnumerator;
 		}
