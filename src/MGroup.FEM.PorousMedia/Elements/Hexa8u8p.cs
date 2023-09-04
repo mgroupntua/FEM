@@ -24,8 +24,8 @@ namespace MGroup.FEM.PorousMedia.Elements
 		protected IIsotropicContinuumMaterial3D[] materialsAtGaussPoints;
 		protected IElementDofEnumerator dofEnumerator = new GenericDofEnumerator();
 		private double[] fluidDisplacements;
-		private double[][] lastStresses;
-		private double youngModulus, poissonRatio;
+		private readonly double[][] lastStresses;
+		private readonly double youngModulus, poissonRatio;
 
 		#region Fortran imports
 		//[DllImport("femelements.dll",

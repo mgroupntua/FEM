@@ -11,8 +11,8 @@ namespace MGroup.FEM
 		private readonly int NumberOfProcessors;
 		private int numberOfElementsPerSubdomain;
 		Dictionary<IElementType, List<IElementType>> ElementAdjacency;
-		List<IElementType> ElementsRenumbered = new List<IElementType>();
-		Dictionary<int, List<INode>> SubdomainInterfaceNodes = new Dictionary<int, List<INode>>();
+		readonly List<IElementType> ElementsRenumbered = new List<IElementType>();
+		readonly Dictionary<int, List<INode>> SubdomainInterfaceNodes = new Dictionary<int, List<INode>>();
 
 		public AutomaticDomainDecomposer(Model model, int numberOfProcessors)
 		{

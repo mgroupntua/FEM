@@ -9,10 +9,10 @@ namespace MGroup.FEM.Helpers
 {
 	public class AdinaElementLocalNodeOrdering : IElementLocalNodeOrdering
 	{
-		static int[] hexa8AdinaNodeForMsolveNodeTade = new int[] { 6, 7, 4, 5, 2, 3, 0, 1 };
-		static int[] tet10AdinaNodeForMsolveNodeTade = new int[] { 2, 1, 3, 0, 5, 7, 8, 6, 9, 4 };
+		static readonly int[] hexa8AdinaNodeForMsolveNodeTade = new int[] { 6, 7, 4, 5, 2, 3, 0, 1 };
+		static readonly int[] tet10AdinaNodeForMsolveNodeTade = new int[] { 2, 1, 3, 0, 5, 7, 8, 6, 9, 4 };
 
-		private Dictionary<CellType, int[]> orderings = new Dictionary<CellType, int[]>() 
+		private readonly Dictionary<CellType, int[]> orderings = new Dictionary<CellType, int[]>() 
 		{
 			{ CellType.Hexa8, hexa8AdinaNodeForMsolveNodeTade },
 			{ CellType.Tet10,  tet10AdinaNodeForMsolveNodeTade}

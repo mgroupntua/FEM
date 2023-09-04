@@ -25,7 +25,7 @@ namespace MGroup.FEM.Structural.Tests.Elements
 	/// </summary>
 	public class Tri3
 	{
-		private static double thickness = 1.0;
+		private static readonly double thickness = 1.0;
 
 		private static readonly ElasticMaterial2D material0 = new ElasticMaterial2D(2.1e5, 0.3, StressState2D.PlaneStress);
 

@@ -37,10 +37,10 @@ namespace MGroup.FEM.Structural.Continuum
 		private double[][] totalDisplacements;
 		private double[] integrationCoeffs;
 
-		private double[][] strainsVec;
-		private double[][] lastStresses;
+		private readonly double[][] strainsVec;
+		private readonly double[][] lastStresses;
 		private double[][] DefGradVec;
-		private double lambdag = 1;
+		private readonly double lambdag = 1;
 
 		public ContinuumElement3DGrowth(IReadOnlyList<INode> nodes, IContinuumMaterial3DDefGrad material, IQuadrature3D quadratureForStiffness,
 			 IIsoparametricInterpolation3D interpolation, double lambdag = 1)

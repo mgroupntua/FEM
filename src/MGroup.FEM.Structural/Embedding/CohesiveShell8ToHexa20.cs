@@ -35,9 +35,9 @@ namespace MGroup.FEM.Structural.Embedding
 		private readonly InterpolationShell8Cohesive interpolation = InterpolationShell8Cohesive.UniqueInstance;
 		private readonly List<EmbeddedNode> embeddedNodes = new List<EmbeddedNode>();
 		protected IElementDofEnumerator dofEnumerator = new GenericDofEnumerator();
-		private double[][] lastTractions;
+		private readonly double[][] lastTractions;
 
-		private int nGaussPoints;
+		private readonly int nGaussPoints;
 		public double[][] oVn_i { get; set; }
 		public double[] tk { get; set; }
 
@@ -67,8 +67,8 @@ namespace MGroup.FEM.Structural.Embedding
 		/// <summary>
 		/// Auxiliary variables for calculating rotations and updating the element's direction vectors.
 		/// </summary>      
-		private double[] ak_total = new double[8];
-		private double[] bk_total = new double[8];
+		private readonly double[] ak_total = new double[8];
+		private readonly double[] bk_total = new double[8];
 		public bool MatrixIsNotInitialized = true;
 
 		public CohesiveShell8ToHexa20(IReadOnlyList<INode> nodes, ICohesiveZoneMaterial material, IQuadrature2D quadratureForStiffness)

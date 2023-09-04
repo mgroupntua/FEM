@@ -36,8 +36,8 @@ namespace MGroup.FEM.Structural.Continuum
         private double[][] totalDisplacements;
         private double[] integrationCoeffs;
 
-		private double[][] strainsVec;
-		private double[][] lastStresses;
+		private readonly double[][] strainsVec;
+		private readonly double[][] lastStresses;
 		private double[][] DefGradVec;
 
 		protected ContinuumElement3DNonLinearDefGrad()

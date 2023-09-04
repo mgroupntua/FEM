@@ -39,7 +39,7 @@ namespace MGroup.FEM.Structural.Continuum
 
 		private double[][] strainsVec;
 		private double[][] strainsVec_last_converged;
-		private double[][] lastStresses;
+		private readonly double[][] lastStresses;
 
 		protected Hexa8NonLinear()
 		{

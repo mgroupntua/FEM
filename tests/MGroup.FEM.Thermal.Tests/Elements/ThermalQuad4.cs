@@ -10,10 +10,10 @@ namespace MGroup.FEM.Thermal.Tests.Elements
 {
 	public static class ThermalQuad4
 	{
-		private static double thickness = 1.0;
-		private static double thermalConductivity = 1.0;
-		private static double density = 1.0;
-		private static double specialHeatCoeff = 1.0;
+		private static readonly double thickness = 1.0;
+		private static readonly double thermalConductivity = 1.0;
+		private static readonly double density = 1.0;
+		private static readonly double specialHeatCoeff = 1.0;
 
 		/// <summary>
 		/// Random shape, not too distorted.
