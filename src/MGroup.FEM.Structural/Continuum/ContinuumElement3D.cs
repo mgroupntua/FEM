@@ -36,12 +36,12 @@ namespace MGroup.FEM.Structural.Continuum
 		};
 
 		private readonly IDofType[][] dofTypes;
-		private ITransientAnalysisProperties dynamicProperties;
+		private readonly ITransientAnalysisProperties dynamicProperties;
 		private readonly IReadOnlyList<IContinuumMaterial3D> materialsAtGaussPoints;
 
-		private double[][] strainsVec;
-		private double[][] strainsVecLastConverged;
-		private double[][] lastStresses;
+		private readonly double[][] strainsVec;
+		private readonly double[][] strainsVecLastConverged;
+		private readonly double[][] lastStresses;
 
 		public ContinuumElement3D(IReadOnlyList<INode> nodes, IIsoparametricInterpolation3D interpolation,
 			IQuadrature3D quadratureForStiffness, IQuadrature3D quadratureForMass,

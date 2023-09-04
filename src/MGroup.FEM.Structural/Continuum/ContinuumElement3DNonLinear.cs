@@ -28,7 +28,7 @@ namespace MGroup.FEM.Structural.Continuum
 	{
 		protected readonly IDofType[] nodalDOFTypes = new IDofType[] { StructuralDof.TranslationX, StructuralDof.TranslationY, StructuralDof.TranslationZ };
 		protected readonly IDofType[][] dofTypes;
-		private ITransientAnalysisProperties dynamicProperties;
+		private readonly ITransientAnalysisProperties dynamicProperties;
 
 		protected readonly IContinuumMaterial3D[] materialsAtGaussPoints;
 		protected IElementDofEnumerator dofEnumerator = new GenericDofEnumerator();
@@ -44,7 +44,7 @@ namespace MGroup.FEM.Structural.Continuum
 
 		private double[][] strainsVec;
 		private double[][] strainsVecLastConverged;
-		private double[][] lastStresses;
+		private readonly double[][] lastStresses;
 
 		protected ContinuumElement3DNonLinear()
 		{

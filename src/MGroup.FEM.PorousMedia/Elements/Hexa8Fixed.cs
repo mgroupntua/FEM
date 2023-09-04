@@ -27,7 +27,7 @@ namespace MGroup.FEM.PorousMedia.Elements
 			nodalDOFTypes, nodalDOFTypes, nodalDOFTypes, nodalDOFTypes, nodalDOFTypes };
 		protected readonly IContinuumMaterial3D[] materialsAtGaussPoints;
 		protected IElementDofEnumerator dofEnumerator = new GenericDofEnumerator();
-		private double[][] lastStresses;
+		private readonly double[][] lastStresses;
 
 		#region Fortran imports
 		//[DllImport("femelements.dll",

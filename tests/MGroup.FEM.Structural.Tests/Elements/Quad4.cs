@@ -26,7 +26,7 @@ namespace MGroup.FEM.Structural.Tests.Elements
 	public class Quad4
 	{
 		#region reproducible tests
-		private static double thickness = 1.0;
+		private static readonly double thickness = 1.0;
 
 		private static readonly ElasticMaterial2D material0 = new ElasticMaterial2D(2.1e5, 0.3, StressState2D.PlaneStress);
 

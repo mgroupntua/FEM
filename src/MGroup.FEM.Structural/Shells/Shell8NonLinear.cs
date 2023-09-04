@@ -32,7 +32,7 @@ namespace MGroup.FEM.Structural.Shells
 
 		public double[][] oVn_i { get; set; }
 		public double[] tk { get; set; }
-		private int nGaussPoints;
+		private readonly int nGaussPoints;
 
 		private double[] integrationCoefficient;
 		private double[][] tU;   //dimensions 8 arrays of six elements
@@ -40,11 +40,11 @@ namespace MGroup.FEM.Structural.Shells
 
 		// updating element configurations (NESSESARY for UpdateCoordinateData method)
 		// auxiliary fields for calculating element iterative rotations
-		private double[] ak_total = new double[8];
-		private double[] bk_total = new double[8];
+		private readonly double[] ak_total = new double[8];
+		private readonly double[] bk_total = new double[8];
 
 		private double[][] GLvec; // TODO possibly gl_vec_last_converged can be saved too if strains aren't handled in tthe current way by shell material classes
-		private double[][] lastStresses;
+		private readonly double[][] lastStresses;
 		private int stiffnessCase = 1;
 
 		public Shell8NonLinear(IReadOnlyList<INode> nodes, IShellMaterial material, IQuadrature3D quadratureForStiffness)

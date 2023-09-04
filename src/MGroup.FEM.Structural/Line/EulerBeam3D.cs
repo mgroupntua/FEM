@@ -26,8 +26,8 @@ namespace MGroup.FEM.Structural.Line
 		private int noOfDOFs = 12;
 		private double[] currentDisplacements;
 		private IDofType[][] dofsWhenNoRotations = null;
-		private List<IElementType> hostElementList;
-		private bool[] isNodeEmbedded;
+		private readonly List<IElementType> hostElementList;
+		private readonly bool[] isNodeEmbedded;
 		private readonly Node[][] rotNodes = new Node[2][];
 		private Matrix rotTransformation;
 		private IElementDofEnumerator dofEnumerator = new GenericDofEnumerator();

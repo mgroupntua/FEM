@@ -41,7 +41,7 @@ namespace MGroup.FEM.Structural.Continuum
 	{
 		private readonly static IDofType[] nodalDOFTypes = new IDofType[] { StructuralDof.TranslationX, StructuralDof.TranslationY };
 		private readonly IDofType[][] dofTypes; //TODO: this should not be stored for each element. Instead store it once for each Quad4, Tri3, etc. Otherwise create it on the fly.
-		private ITransientAnalysisProperties dynamicProperties;
+		private readonly ITransientAnalysisProperties dynamicProperties;
 		private readonly IReadOnlyList<IContinuumMaterial2D> materialsAtGaussPoints;
 
 		public ContinuumElement2D(double thickness, IReadOnlyList<INode> nodes, IIsoparametricInterpolation2D interpolation,
