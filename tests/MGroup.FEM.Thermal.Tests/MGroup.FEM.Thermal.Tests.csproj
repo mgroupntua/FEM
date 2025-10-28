@@ -20,9 +20,11 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
+  
   <ItemGroup>
     <None Remove="MGroup.LinearAlgebra" />
   </ItemGroup>
+  
   <ItemGroup>
     <ProjectReference Include="..\..\src\MGroup.FEM.Thermal\MGroup.FEM.Thermal.csproj" />
   </ItemGroup>
