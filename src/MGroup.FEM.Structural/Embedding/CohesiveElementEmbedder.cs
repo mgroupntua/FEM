@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
+
+using MGroup.LinearAlgebra.Extensions;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Matrices.Builders;
 using MGroup.MSolve.DataStructures;

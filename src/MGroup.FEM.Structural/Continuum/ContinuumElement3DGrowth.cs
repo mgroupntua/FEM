@@ -16,6 +16,7 @@ using MGroup.FEM.Structural.Helpers;
 using MGroup.MSolve.DataStructures;
 using MGroup.MSolve.Constitutive;
 using MGroup.LinearAlgebra.Implementations;
+using MGroup.LinearAlgebra.Extensions;
 
 namespace MGroup.FEM.Structural.Continuum
 {

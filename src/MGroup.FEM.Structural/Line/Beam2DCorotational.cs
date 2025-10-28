@@ -6,6 +6,7 @@ using MGroup.MSolve.Geometry;
 using MGroup.MSolve.Discretization;
 using MGroup.MSolve.Discretization.Entities;
 using MGroup.Constitutive.Structural.Line;
+using MGroup.LinearAlgebra.Extensions;
 
 namespace MGroup.FEM.Structural.Line
 {

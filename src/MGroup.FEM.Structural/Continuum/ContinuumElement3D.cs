@@ -7,6 +7,7 @@ namespace MGroup.FEM.Structural.Continuum
 	using MGroup.Constitutive.Structural;
 	using MGroup.Constitutive.Structural.Continuum;
 	using MGroup.Constitutive.Structural.Transient;
+	using MGroup.LinearAlgebra.Extensions;
 	using MGroup.LinearAlgebra.Implementations;
 	using MGroup.LinearAlgebra.Matrices;
 	using MGroup.LinearAlgebra.Vectors;

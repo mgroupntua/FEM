@@ -17,6 +17,7 @@ using MGroup.MSolve.Constitutive;
 using MGroup.LinearAlgebra.Implementations;
 using MGroup.Constitutive.Structural.Transient;
 using MGroup.MSolve.Numerics.Interpolation.GaussPointExtrapolation;
+using MGroup.LinearAlgebra.Extensions;
 
 namespace MGroup.FEM.Structural.Continuum
 {
