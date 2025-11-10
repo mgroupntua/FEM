@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(UseLocalMSolveProjects)' == 'false'">
-    <PackageReference Include="MGroup.Constitutive.ConvectionDiffusion" Version="0.2.0-unstable.77" />
+    <PackageReference Include="MGroup.Constitutive.ConvectionDiffusion" Version="0.2.0-unstable.82" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(UseLocalMSolveProjects)' == 'true'">

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(UseLocalMSolveProjects)' == 'false'">
-    <PackageReference Include="MGroup.Constitutive.Structural" Version="0.2.0-unstable.77" />
+    <PackageReference Include="MGroup.Constitutive.Structural" Version="0.2.0-unstable.82" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(UseLocalMSolveProjects)' == 'true'">
