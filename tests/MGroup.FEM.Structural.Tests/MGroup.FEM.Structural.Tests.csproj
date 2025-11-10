@@ -26,9 +26,11 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
+  
   <ItemGroup>
     <None Remove="Commons\" />
   </ItemGroup>
+  
   <ItemGroup>
     <ProjectReference Include="..\..\src\MGroup.FEM.Structural\MGroup.FEM.Structural.csproj" />
   </ItemGroup>

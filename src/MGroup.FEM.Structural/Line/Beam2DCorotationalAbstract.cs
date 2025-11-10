@@ -10,6 +10,7 @@ using MGroup.MSolve.Discretization.BoundaryConditions;
 using MGroup.MSolve.Discretization.Meshes;
 using MGroup.Constitutive.Structural.Line;
 using MGroup.MSolve.DataStructures;
+using MGroup.LinearAlgebra.Extensions;
 
 namespace MGroup.FEM.Structural.Line
 {

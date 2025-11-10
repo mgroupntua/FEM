@@ -9,6 +9,7 @@ using MGroup.MSolve.Discretization.Entities;
 using MGroup.MSolve.Discretization.Embedding;
 using MGroup.MSolve.Discretization.BoundaryConditions;
 using MGroup.MSolve.DataStructures;
+using MGroup.LinearAlgebra.Extensions;
 
 namespace MGroup.FEM.Structural.Line
 {
