@@ -1180,7 +1180,7 @@ namespace MGroup.FEM.Structural.Continuum
 				//-----------------------------------------------------------------
 			}
 			var BmatrixGlobal = Matrix.CreateFromArray(transformationMatrix) * Matrix.CreateFromArray(BmatrixLocal);
-			return BmatrixGlobal.CopytoArray2D();
+			return BmatrixGlobal.CopyToArray2D();
 		}
 
 		private Matrix CalculateDeformationMatrix(Dictionary<string, double[]> dNlocal, Matrix jacobianMatrix,

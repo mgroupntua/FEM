@@ -677,7 +677,7 @@ namespace MGroup.FEM.Structural.Continuum
 				var DG_el = new double[3, 3] { { DefGradVec[npoint][0] / lambdag, DefGradVec[npoint][3] / lambdag, DefGradVec[npoint][6] / lambdag }, { DefGradVec[npoint][7] / lambdag, DefGradVec[npoint][1] / lambdag, DefGradVec[npoint][4] / lambdag }, { DefGradVec[npoint][5] / lambdag, DefGradVec[npoint][8] / lambdag, DefGradVec[npoint][2] / lambdag } };
 				var Fg_inv = new double[3, 3] { { (double)1 / lambdag, 0, 0 }, { 0, (double)1 / lambdag, 0 }, { 0, 0, (double)1 / lambdag } };
 				var detFg = Math.Pow(lambdag, 3);
-				var consDisp2 = TransformationMethods.Calculate_dSdE_from_dSdEe(consDisp.CopytoArray2D(), DG, lambdag, secPiolaMat[npoint], DG_el, secPiolaElasMat[npoint], Fg_inv, detFg);
+				var consDisp2 = TransformationMethods.Calculate_dSdE_from_dSdEe(consDisp.CopyToArray2D(), DG, lambdag, secPiolaMat[npoint], DG_el, secPiolaElasMat[npoint], Fg_inv, detFg);
 				consDisp = Matrix.CreateFromArray(consDisp2);
 
 				for (int m = 0; m < 6; m++)
