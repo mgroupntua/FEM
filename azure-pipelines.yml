@@ -18,6 +18,7 @@ variables:
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Debug'
   testProject: 'tests/MGroup.FEM.Tests'
+  enableSonarCloud: false
 
 steps:
 - task: PowerShell@2
@@ -38,13 +39,14 @@ steps:
   name: dotnetRestore
   displayName: "Restore nugets"
   inputs:
+    projects: 'MGroup.FEM.sln'
     command: 'restore'
     verbosityRestore: 'Normal'
     feedsToUse: 'config'
     nugetConfigPath: 'NuGet.config'
 
 - task: SonarCloudPrepare@1
-  condition: ne(variables['Build.Reason'], 'PullRequest')
+  condition: and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['enableSonarCloud'], 'true'))
   displayName: "Prepares SonarCloud analysis"
   inputs:
     SonarCloud: 'SonarCloud'
@@ -59,6 +61,7 @@ steps:
   displayName: "Build projects"
   inputs:
     command: 'build'
+    projects: 'MGroup.FEM.sln'
     arguments: '--no-restore --nologo --configuration $(buildConfiguration) /p:AssemblyVersion=$(GitVersion.AssemblySemVer) /p:Version=$(GitVersion.SemVer) /p:SourceLinkCreate=true'
     versioningScheme: 'byEnvVar'
     versionEnvVar: 'GitVersion.AssemblySemVer'
@@ -132,11 +135,11 @@ steps:
     SymbolServerType: 'TeamServices'
 
 - task: SonarCloudAnalyze@1
-  condition: ne(variables['Build.Reason'], 'PullRequest')
+  condition: and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['enableSonarCloud'], 'true'))
   displayName: "Performs SonarCloud Analysis"
 
 - task: SonarCloudPublish@1
-  condition: ne(variables['Build.Reason'], 'PullRequest')
+  condition: and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['enableSonarCloud'], 'true'))
   displayName: 'Publish Quality Gate Results'
   inputs:
      pollingTimeoutSec: '300'
