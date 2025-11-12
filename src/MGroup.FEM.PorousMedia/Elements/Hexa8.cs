@@ -372,7 +372,7 @@ namespace MGroup.FEM.PorousMedia.Elements
 			foreach (GaussLegendrePoint3D intPoint in integrationPoints)
 			{
 				pointId++;
-				IMatrixView constitutiveMatrix = materialsAtGaussPoints[pointId].ConstitutiveMatrix;
+				IReadOnlyMatrix constitutiveMatrix = materialsAtGaussPoints[pointId].ConstitutiveMatrix;
 				double[,] b = intPoint.DeformationMatrix;
 				for (int i = 0; i < 24; i++)
 				{

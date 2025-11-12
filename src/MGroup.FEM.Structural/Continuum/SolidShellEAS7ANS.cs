@@ -501,7 +501,7 @@ namespace MGroup.FEM.Structural.Continuum
 			var transformationMat0 = CalculateTransformationMatrix(invJacobian0);
 			for (int gp = 0; gp < QuadratureForStiffness.IntegrationPoints.Count; ++gp)
 			{
-				IMatrixView constitutive = materialsAtGaussPoints[gp].ConstitutiveMatrix;
+				IReadOnlyMatrix constitutive = materialsAtGaussPoints[gp].ConstitutiveMatrix;
 				double[] gP = QuadratureForStiffness.IntegrationPoints[gp].Coordinates;
 				var gW = QuadratureForStiffness.IntegrationPoints[gp].Weight;
 				Dictionary<string, double[]> localdN = CalculateShapeFunctionsLocalDerivatives(gP);
@@ -549,7 +549,7 @@ namespace MGroup.FEM.Structural.Continuum
 			for (int gp = 0; gp < QuadratureForStiffness.IntegrationPoints.Count; ++gp)
 			{
 				Vector Stresses = Vector.CreateFromArray(lastStresses[gp]);
-				IMatrixView constitutive = materialsAtGaussPoints[gp].ConstitutiveMatrix;
+				IReadOnlyMatrix constitutive = materialsAtGaussPoints[gp].ConstitutiveMatrix;
 				double[] gP = QuadratureForStiffness.IntegrationPoints[gp].Coordinates;
 				var gW = QuadratureForStiffness.IntegrationPoints[gp].Weight;
 				Dictionary<string, double[]> localdN = CalculateShapeFunctionsLocalDerivatives(gP);
@@ -747,7 +747,7 @@ namespace MGroup.FEM.Structural.Continuum
 			var alphaVector = Vector.CreateFromArray(internalParamVectorEAS);
 			for (int gp = 0; gp < numberOfGPs; gp++)
 			{
-				IMatrixView constitutive = materialsAtGaussPoints[gp].ConstitutiveMatrix;
+				IReadOnlyMatrix constitutive = materialsAtGaussPoints[gp].ConstitutiveMatrix;
 				double[] gP = QuadratureForStiffness.IntegrationPoints[gp].Coordinates;
 				var gW = QuadratureForStiffness.IntegrationPoints[gp].Weight;
 				Dictionary<string, double[]> localdN = CalculateShapeFunctionsLocalDerivatives(gP);

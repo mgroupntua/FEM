@@ -151,7 +151,7 @@ namespace MGroup.FEM.Structural.Continuum
 			for (int gp = 0; gp < QuadratureForStiffness.IntegrationPoints.Count; ++gp)
 			{
 				// Calculate the necessary quantities for the integration
-				IMatrixView constitutive = materialsAtGaussPoints[gp].ConstitutiveMatrix;
+				IReadOnlyMatrix constitutive = materialsAtGaussPoints[gp].ConstitutiveMatrix;
 				s = s == MatrixSymmetry.Symmetric ? constitutive.MatrixSymmetry : s;
 				var jacobian = new IsoparametricJacobian2D(Nodes, shapeGradientsNatural[gp]);
 				Matrix shapeGradientsCartesian =
@@ -326,7 +326,7 @@ namespace MGroup.FEM.Structural.Continuum
 
 			for (int gp = 0; gp < numGPs; ++gp)
 			{
-				IMatrixView constitutive = materialsAtGaussPoints[gp].ConstitutiveMatrix;
+				IReadOnlyMatrix constitutive = materialsAtGaussPoints[gp].ConstitutiveMatrix;
 				var jacobian = new IsoparametricJacobian2D(Nodes, shapeGradientsNatural[gp]);
 				Matrix shapeGrandientsCartesian =
 					jacobian.TransformNaturalDerivativesToCartesian(shapeGradientsNatural[gp]);
