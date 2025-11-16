@@ -670,7 +670,7 @@ namespace MGroup.FEM.Structural.Continuum
 				integrCoeffsTimesStresses[npoint][2, 2] = integrCoeffsTimesSpkvec[npoint][2];
 
 				//
-				IMatrixView consDisp = materialsAtGaussPoints[npoint].ConstitutiveMatrix;
+				IReadOnlyMatrix consDisp = materialsAtGaussPoints[npoint].ConstitutiveMatrix;
 				s = s == MatrixSymmetry.Symmetric ? consDisp.MatrixSymmetry : s;
 
 				var DG = new double[3, 3] { { DefGradVec[npoint][0], DefGradVec[npoint][3], DefGradVec[npoint][6] }, { DefGradVec[npoint][7], DefGradVec[npoint][1], DefGradVec[npoint][4] }, { DefGradVec[npoint][5], DefGradVec[npoint][8], DefGradVec[npoint][2] } };
