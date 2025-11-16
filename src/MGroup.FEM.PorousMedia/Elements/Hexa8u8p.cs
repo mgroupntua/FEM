@@ -222,7 +222,7 @@ namespace MGroup.FEM.PorousMedia.Elements
 
 			for (int i = 0; i < iInt3; i++)
 			{
-				IMatrixView constitutive = materialsAtGaussPoints[i].ConstitutiveMatrix;
+				IReadOnlyMatrix constitutive = materialsAtGaussPoints[i].ConstitutiveMatrix;
 				for (int j = 0; j < 6; j++)
 				{
 					for (int k = 0; k < 6; k++) afE[i, j, k] = constitutive[j, k];

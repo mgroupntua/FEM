@@ -21,11 +21,11 @@ namespace MGroup.FEM.PorousMedia.Helpers
 
 	public class GaussLegendrePoint3D
 	{
-		private IMatrixView B;
+		private IReadOnlyMatrix B;
 		private double Ksi;
 		private double Heta;
 
-		public GaussLegendrePoint3D(double ksi, double heta, double zeta, IMatrixView deformationMatrix, double weightFactor)
+		public GaussLegendrePoint3D(double ksi, double heta, double zeta, IReadOnlyMatrix deformationMatrix, double weightFactor)
 		{
 			this.Ksi = ksi;
 			this.Heta = heta;
