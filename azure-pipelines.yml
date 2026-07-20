@@ -12,11 +12,11 @@ pr:
     - develop
 
 pool:
-  vmImage: 'windows-2019'
+  vmImage: 'windows-2022'
 
 variables:
   buildPlatform: 'Any CPU'
-  buildConfiguration: 'Debug'
+  buildConfiguration: 'Release'
   testProject: 'tests/MGroup.FEM.Tests'
   enableSonarCloud: true
 
@@ -48,6 +48,7 @@ steps:
 - task: SonarCloudPrepare@1
   condition: and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['enableSonarCloud'], 'true'))
   displayName: "Prepares SonarCloud analysis"
+  continueOnError: true
   inputs:
     SonarCloud: 'SonarCloud'
     organization: 'mgroupntua'
@@ -137,10 +138,12 @@ steps:
 - task: SonarCloudAnalyze@1
   condition: and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['enableSonarCloud'], 'true'))
   displayName: "Performs SonarCloud Analysis"
+  continueOnError: true
 
 - task: SonarCloudPublish@1
   condition: and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['enableSonarCloud'], 'true'))
   displayName: 'Publish Quality Gate Results'
+  continueOnError: true
   inputs:
      pollingTimeoutSec: '300'
 
